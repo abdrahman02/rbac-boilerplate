@@ -55,8 +55,8 @@ export interface AuditLog {
 
 export interface AuthenticatedUser {
   id: number
+  name: string
   email: string
-  full_name: string
   roles: string[]
   permissions: string[]
 }
@@ -74,5 +74,15 @@ export interface PaginatedResponse<T> {
     total: number
     page: number
     limit: number
+  }
+}
+
+export {}
+
+declare global {
+  namespace Express {
+    interface Request {
+      user?: AuthenticatedUser
+    }
   }
 }

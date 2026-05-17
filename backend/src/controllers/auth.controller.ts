@@ -1,0 +1,115 @@
+import type { Request, Response } from 'express'
+import * as authService from '../services/auth.service.js'
+import {
+  setAuthCookies,
+  clearAuthCookies,
+  hashRefreshToken,
+} from '../services/token.service.js'
+import type { ApiResponse, AuthenticatedUser } from '../types/index.js'
+
+const ERROR_STATUS: Record<string, number> = {
+  EMAIL_TAKEN: 409,
+  INVALID_CREDENTIALS: 401,
+  ACCOUNT_DISABLED: 403,
+  INVALID_REFRESH_TOKEN: 401,
+  REFRESH_TOKEN_EXPIRED: 401,
+  USER_NOT_FOUND: 404,
+}
+
+function handleError(res: Response, err: unknown): void {
+  const message = err instanceof Error ? err.message : 'Internal server error'
+  const status = ERROR_STATUS[message] ?? 500
+  const body: ApiResponse<null> = {
+    success: false,
+    data: null,
+    message,
+  }
+  res.status(status).json(body)
+}
+
+export async function register(req: Request, res: Response): Promise<void> {
+  try {
+    const result = await authService.register(req.body)
+    setAuthCookies(res, result.accessToken, result.refreshToken)
+    const body: ApiResponse<AuthenticatedUser> = {
+      success: true,
+      data: result.user,
+      message: null,
+    }
+    res.status(201).json(body)
+  } catch (err) {
+    handleError(res, err)
+  }
+}
+
+export async function login(req: Request, res: Response): Promise<void> {
+  try {
+    const result = await authService.login(req.body)
+    setAuthCookies(res, result.accessToken, result.refreshToken)
+    const body: ApiResponse<AuthenticatedUser> = {
+      success: true,
+      data: result.user,
+      message: null,
+    }
+    res.json(body)
+  } catch (err) {
+    handleError(res, err)
+  }
+}
+
+export async function logout(req: Request, res: Response): Promise<void> {
+  try {
+    const rawToken = req.cookies['refresh_token'] as string | undefined
+    if (rawToken && req.user) {
+      await authService.logout(req.user.id, hashRefreshToken(rawToken))
+    }
+    clearAuthCookies(res)
+    const body: ApiResponse<null> = {
+      success: true,
+      data: null,
+      message: null,
+    }
+    res.json(body)
+  } catch (err) {
+    handleError(res, err)
+  }
+}
+
+export async function refresh(req: Request, res: Response): Promise<void> {
+  try {
+    const rawToken = req.cookies['refresh_token'] as string | undefined
+    if (!rawToken) {
+      const body: ApiResponse<null> = {
+        success: false,
+        data: null,
+        message: 'No refresh token provided',
+      }
+      res.status(401).json(body)
+      return
+    }
+    const result = await authService.refresh(rawToken)
+    setAuthCookies(res, result.accessToken, result.refreshToken)
+    const body: ApiResponse<AuthenticatedUser> = {
+      success: true,
+      data: result.user,
+      message: null,
+    }
+    res.json(body)
+  } catch (err) {
+    handleError(res, err)
+  }
+}
+
+export async function me(req: Request, res: Response): Promise<void> {
+  try {
+    const user = await authService.getMe(req.user!.id)
+    const body: ApiResponse<AuthenticatedUser> = {
+      success: true,
+      data: user,
+      message: null,
+    }
+    res.json(body)
+  } catch (err) {
+    handleError(res, err)
+  }
+}

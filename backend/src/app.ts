@@ -3,6 +3,7 @@ import cors from 'cors'
 import cookieParser from 'cookie-parser'
 import { env } from './config/env.js'
 import { setupSwagger } from './config/swagger.js'
+import authRouter from './routes/auth.js'
 
 export function createApp(): Application {
   const app = express()
@@ -18,6 +19,8 @@ export function createApp(): Application {
   app.use(cookieParser())
 
   setupSwagger(app)
+
+  app.use('/api/auth', authRouter)
 
   app.get('/health', (_req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() })

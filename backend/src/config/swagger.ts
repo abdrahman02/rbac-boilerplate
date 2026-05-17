@@ -42,6 +42,9 @@ const options: swaggerJsdoc.Options = {
       },
     },
     security: [{ cookieAuth: [] }],
+    tags: [
+      { name: 'Auth', description: 'Authentication — register, login, logout, refresh, me' },
+    ],
   },
   apis: ['./src/routes/*.ts'],
 }
