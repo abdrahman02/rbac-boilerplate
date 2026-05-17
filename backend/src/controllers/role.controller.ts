@@ -1,0 +1,309 @@
+import type { Request, Response } from 'express'
+import * as svc from '../services/role.service.js'
+import type { ApiResponse, RoleWithPermissions } from '../types/index.js'
+import type { CreateRoleInput, UpdateRoleInput, AssignPermissionInput } from '../schemas/role.schema.js'
+
+export async function listRoles(req: Request, res: Response): Promise<void> {
+  try {
+    const roles = await svc.listRoles()
+    const body: ApiResponse<RoleWithPermissions[]> = {
+      success: true,
+      data: roles,
+      message: null,
+    }
+    res.status(200).json(body)
+  } catch (error) {
+    const body: ApiResponse<null> = {
+      success: false,
+      data: null,
+      message: error instanceof Error ? error.message : 'Internal server error',
+    }
+    res.status(500).json(body)
+  }
+}
+
+export async function getRole(req: Request, res: Response): Promise<void> {
+  try {
+    const id = typeof req.params.id === 'string' ? req.params.id : undefined
+    if (!id) {
+      const body: ApiResponse<null> = {
+        success: false,
+        data: null,
+        message: 'Invalid role ID',
+      }
+      res.status(400).json(body)
+      return
+    }
+
+    const roleId = parseInt(id, 10)
+    if (Number.isNaN(roleId)) {
+      const body: ApiResponse<null> = {
+        success: false,
+        data: null,
+        message: 'Invalid role ID',
+      }
+      res.status(400).json(body)
+      return
+    }
+
+    const role = await svc.getRole(roleId)
+    if (!role) {
+      const body: ApiResponse<null> = {
+        success: false,
+        data: null,
+        message: 'Role not found',
+      }
+      res.status(404).json(body)
+      return
+    }
+
+    const body: ApiResponse<RoleWithPermissions> = {
+      success: true,
+      data: role,
+      message: null,
+    }
+    res.status(200).json(body)
+  } catch (error) {
+    const body: ApiResponse<null> = {
+      success: false,
+      data: null,
+      message: error instanceof Error ? error.message : 'Internal server error',
+    }
+    res.status(500).json(body)
+  }
+}
+
+export async function createRole(req: Request, res: Response): Promise<void> {
+  try {
+    const input = req.body as CreateRoleInput
+    const roleId = await svc.createRole(input)
+
+    const role = await svc.getRole(roleId)
+    const body: ApiResponse<RoleWithPermissions> = {
+      success: true,
+      data: role,
+      message: null,
+    }
+    res.status(201).json(body)
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : 'Internal server error'
+    const statusCode = msg === 'ROLE_NAME_TAKEN' ? 409 : 500
+
+    const body: ApiResponse<null> = {
+      success: false,
+      data: null,
+      message: msg,
+    }
+    res.status(statusCode).json(body)
+  }
+}
+
+export async function updateRole(req: Request, res: Response): Promise<void> {
+  try {
+    const id = typeof req.params.id === 'string' ? req.params.id : undefined
+    if (!id) {
+      const body: ApiResponse<null> = {
+        success: false,
+        data: null,
+        message: 'Invalid role ID',
+      }
+      res.status(400).json(body)
+      return
+    }
+
+    const roleId = parseInt(id, 10)
+    if (Number.isNaN(roleId)) {
+      const body: ApiResponse<null> = {
+        success: false,
+        data: null,
+        message: 'Invalid role ID',
+      }
+      res.status(400).json(body)
+      return
+    }
+
+    const input = req.body as UpdateRoleInput
+    const updated = await svc.updateRole(roleId, input)
+    if (!updated) {
+      const body: ApiResponse<null> = {
+        success: false,
+        data: null,
+        message: 'Role not found',
+      }
+      res.status(404).json(body)
+      return
+    }
+
+    const role = await svc.getRole(roleId)
+    const body: ApiResponse<RoleWithPermissions> = {
+      success: true,
+      data: role,
+      message: null,
+    }
+    res.status(200).json(body)
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : 'Internal server error'
+    const statusCode = msg === 'ROLE_NAME_TAKEN' ? 409 : 500
+
+    const body: ApiResponse<null> = {
+      success: false,
+      data: null,
+      message: msg,
+    }
+    res.status(statusCode).json(body)
+  }
+}
+
+export async function deleteRole(req: Request, res: Response): Promise<void> {
+  try {
+    const id = typeof req.params.id === 'string' ? req.params.id : undefined
+    if (!id) {
+      const body: ApiResponse<null> = {
+        success: false,
+        data: null,
+        message: 'Invalid role ID',
+      }
+      res.status(400).json(body)
+      return
+    }
+
+    const roleId = parseInt(id, 10)
+    if (Number.isNaN(roleId)) {
+      const body: ApiResponse<null> = {
+        success: false,
+        data: null,
+        message: 'Invalid role ID',
+      }
+      res.status(400).json(body)
+      return
+    }
+
+    const deleted = await svc.deleteRole(roleId)
+    if (!deleted) {
+      const body: ApiResponse<null> = {
+        success: false,
+        data: null,
+        message: 'Role not found',
+      }
+      res.status(404).json(body)
+      return
+    }
+
+    const body: ApiResponse<null> = {
+      success: true,
+      data: null,
+      message: null,
+    }
+    res.status(200).json(body)
+  } catch (error) {
+    const body: ApiResponse<null> = {
+      success: false,
+      data: null,
+      message: error instanceof Error ? error.message : 'Internal server error',
+    }
+    res.status(500).json(body)
+  }
+}
+
+export async function assignPermission(req: Request, res: Response): Promise<void> {
+  try {
+    const id = typeof req.params.id === 'string' ? req.params.id : undefined
+    if (!id) {
+      const body: ApiResponse<null> = {
+        success: false,
+        data: null,
+        message: 'Invalid role ID',
+      }
+      res.status(400).json(body)
+      return
+    }
+
+    const roleId = parseInt(id, 10)
+    if (Number.isNaN(roleId)) {
+      const body: ApiResponse<null> = {
+        success: false,
+        data: null,
+        message: 'Invalid role ID',
+      }
+      res.status(400).json(body)
+      return
+    }
+
+    const input = req.body as AssignPermissionInput
+    await svc.assignPermission(roleId, input.permission_id)
+
+    const role = await svc.getRole(roleId)
+    const body: ApiResponse<RoleWithPermissions> = {
+      success: true,
+      data: role,
+      message: null,
+    }
+    res.status(200).json(body)
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : 'Internal server error'
+    const statusCode = msg === 'ROLE_NOT_FOUND' ? 404 : 500
+
+    const body: ApiResponse<null> = {
+      success: false,
+      data: null,
+      message: msg,
+    }
+    res.status(statusCode).json(body)
+  }
+}
+
+export async function removePermission(req: Request, res: Response): Promise<void> {
+  try {
+    const id = typeof req.params.id === 'string' ? req.params.id : undefined
+    const permissionIdStr = typeof req.params.permissionId === 'string' ? req.params.permissionId : undefined
+
+    if (!id || !permissionIdStr) {
+      const body: ApiResponse<null> = {
+        success: false,
+        data: null,
+        message: 'Invalid role ID or permission ID',
+      }
+      res.status(400).json(body)
+      return
+    }
+
+    const roleId = parseInt(id, 10)
+    const permissionId = parseInt(permissionIdStr, 10)
+
+    if (Number.isNaN(roleId) || Number.isNaN(permissionId)) {
+      const body: ApiResponse<null> = {
+        success: false,
+        data: null,
+        message: 'Invalid role ID or permission ID',
+      }
+      res.status(400).json(body)
+      return
+    }
+
+    const removed = await svc.removePermission(roleId, permissionId)
+    if (!removed) {
+      const body: ApiResponse<null> = {
+        success: false,
+        data: null,
+        message: 'Role or permission not found',
+      }
+      res.status(404).json(body)
+      return
+    }
+
+    const role = await svc.getRole(roleId)
+    const body: ApiResponse<RoleWithPermissions> = {
+      success: true,
+      data: role,
+      message: null,
+    }
+    res.status(200).json(body)
+  } catch (error) {
+    const body: ApiResponse<null> = {
+      success: false,
+      data: null,
+      message: error instanceof Error ? error.message : 'Internal server error',
+    }
+    res.status(500).json(body)
+  }
+}

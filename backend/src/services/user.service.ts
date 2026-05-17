@@ -1,0 +1,95 @@
+import * as repo from '../repositories/user.repository.js'
+import { hashPassword } from '../utils/hash.js'
+import type { UserWithRoles, PaginatedResponse } from '../types/index.js'
+import type { CreateUserInput, UpdateUserInput } from '../schemas/user.schema.js'
+
+export async function listUsers(
+  page: number,
+  limit: number,
+): Promise<PaginatedResponse<UserWithRoles>> {
+  const { rows, total } = await repo.findAllUsers(page, limit)
+
+  const data = await Promise.all(
+    rows.map(async (u) => {
+      const roles = await repo.getUserRoles(u.id)
+      return {
+        id: u.id,
+        name: u.full_name,
+        email: u.email,
+        is_active: u.is_active,
+        roles,
+        created_at: u.created_at,
+      }
+    }),
+  )
+
+  return {
+    success: true,
+    data,
+    meta: {
+      total,
+      page,
+      limit,
+    },
+  }
+}
+
+export async function getUser(userId: number): Promise<UserWithRoles | null> {
+  const user = await repo.findUserById(userId)
+  if (!user) return null
+
+  const roles = await repo.getUserRoles(userId)
+  return {
+    id: user.id,
+    name: user.full_name,
+    email: user.email,
+    is_active: user.is_active,
+    roles,
+    created_at: user.created_at,
+  }
+}
+
+export async function createUser(input: CreateUserInput): Promise<number> {
+  const emailTaken = await repo.emailExists(input.email)
+  if (emailTaken) throw new Error('EMAIL_TAKEN')
+
+  const passwordHash = await hashPassword(input.password)
+  const userId = await repo.createUser(input.name, input.email, passwordHash)
+
+  if (input.role_ids && input.role_ids.length > 0) {
+    for (const roleId of input.role_ids) {
+      await repo.assignRoleToUser(userId, roleId)
+    }
+  }
+
+  return userId
+}
+
+export async function updateUser(userId: number, input: UpdateUserInput): Promise<boolean> {
+  if (input.email) {
+    const emailTaken = await repo.emailExists(input.email, userId)
+    if (emailTaken) throw new Error('EMAIL_TAKEN')
+  }
+
+  const updateFields: { full_name?: string; email?: string; is_active?: boolean } = {}
+  if (input.name) updateFields.full_name = input.name
+  if (input.email) updateFields.email = input.email
+  if (input.is_active !== undefined) updateFields.is_active = input.is_active
+
+  return repo.updateUser(userId, updateFields)
+}
+
+export async function deleteUser(userId: number): Promise<boolean> {
+  return repo.softDeleteUser(userId)
+}
+
+export async function assignRole(userId: number, roleId: number): Promise<void> {
+  const user = await repo.findUserById(userId)
+  if (!user) throw new Error('USER_NOT_FOUND')
+
+  await repo.assignRoleToUser(userId, roleId)
+}
+
+export async function removeRole(userId: number, roleId: number): Promise<boolean> {
+  return repo.removeRoleFromUser(userId, roleId)
+}

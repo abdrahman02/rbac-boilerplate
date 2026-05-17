@@ -39,11 +39,85 @@ const options: swaggerJsdoc.Options = {
             message: { type: 'string' },
           },
         },
+        Permission: {
+          type: 'object',
+          properties: {
+            id: { type: 'integer' },
+            name: { type: 'string', description: 'Format: resource:action (e.g., users:read)' },
+            description: { type: 'string', nullable: true },
+            created_at: { type: 'string', format: 'date-time' },
+          },
+        },
+        Role: {
+          type: 'object',
+          properties: {
+            id: { type: 'integer' },
+            name: { type: 'string' },
+            description: { type: 'string', nullable: true },
+            created_at: { type: 'string', format: 'date-time' },
+          },
+        },
+        RoleWithPermissions: {
+          type: 'object',
+          properties: {
+            id: { type: 'integer' },
+            name: { type: 'string' },
+            description: { type: 'string', nullable: true },
+            permissions: {
+              type: 'array',
+              items: { $ref: '#/components/schemas/Permission' },
+            },
+            created_at: { type: 'string', format: 'date-time' },
+          },
+        },
+        User: {
+          type: 'object',
+          properties: {
+            id: { type: 'integer' },
+            name: { type: 'string' },
+            email: { type: 'string', format: 'email' },
+            is_active: { type: 'boolean' },
+            created_at: { type: 'string', format: 'date-time' },
+          },
+        },
+        UserWithRoles: {
+          type: 'object',
+          properties: {
+            id: { type: 'integer' },
+            name: { type: 'string' },
+            email: { type: 'string', format: 'email' },
+            is_active: { type: 'boolean' },
+            roles: {
+              type: 'array',
+              items: { $ref: '#/components/schemas/Role' },
+            },
+            created_at: { type: 'string', format: 'date-time' },
+          },
+        },
+        PaginatedResponse: {
+          type: 'object',
+          properties: {
+            success: { type: 'boolean' },
+            data: { type: 'array' },
+            message: { type: 'string', nullable: true },
+            meta: {
+              type: 'object',
+              properties: {
+                total: { type: 'integer' },
+                page: { type: 'integer' },
+                limit: { type: 'integer' },
+              },
+            },
+          },
+        },
       },
     },
     security: [{ cookieAuth: [] }],
     tags: [
       { name: 'Auth', description: 'Authentication — register, login, logout, refresh, me' },
+      { name: 'Users', description: 'User management — CRUD operations and role assignment' },
+      { name: 'Roles', description: 'Role management — CRUD operations and permission assignment' },
+      { name: 'Permissions', description: 'Permission management — CRUD operations' },
     ],
   },
   apis: ['./src/routes/*.ts'],

@@ -61,6 +61,23 @@ export interface AuthenticatedUser {
   permissions: string[]
 }
 
+export interface UserWithRoles {
+  id: number
+  name: string
+  email: string
+  is_active: boolean
+  roles: string[]
+  created_at: Date
+}
+
+export interface RoleWithPermissions {
+  id: number
+  name: string
+  description: string | null
+  permissions: string[]
+  created_at: Date
+}
+
 export interface ApiResponse<T> {
   success: boolean
   data: T | null
