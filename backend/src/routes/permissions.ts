@@ -3,6 +3,7 @@ import { authMiddleware } from '../middleware/auth.middleware.js'
 import { requirePermission } from '../middleware/permission.middleware.js'
 import { validate } from '../middleware/validate.middleware.js'
 import { createPermissionSchema, updatePermissionSchema } from '../schemas/permission.schema.js'
+import { auditLog } from '../middleware/audit-log.middleware.js'
 import * as ctrl from '../controllers/permission.controller.js'
 
 const router = Router()
@@ -65,7 +66,7 @@ router.get('/:id', authMiddleware, requirePermission('permissions:read'), ctrl.g
  *       409:
  *         description: Permission name already exists
  */
-router.post('/', authMiddleware, requirePermission('permissions:create'), validate(createPermissionSchema), ctrl.createPermission)
+router.post('/', authMiddleware, requirePermission('permissions:create'), validate(createPermissionSchema), auditLog('create_permission', 'permission'), ctrl.createPermission)
 
 /**
  * @swagger
@@ -95,7 +96,7 @@ router.post('/', authMiddleware, requirePermission('permissions:create'), valida
  *       404:
  *         description: Permission not found
  */
-router.patch('/:id', authMiddleware, requirePermission('permissions:update'), validate(updatePermissionSchema), ctrl.updatePermission)
+router.patch('/:id', authMiddleware, requirePermission('permissions:update'), validate(updatePermissionSchema), auditLog('update_permission', 'permission'), ctrl.updatePermission)
 
 /**
  * @swagger
@@ -116,6 +117,6 @@ router.patch('/:id', authMiddleware, requirePermission('permissions:update'), va
  *       404:
  *         description: Permission not found
  */
-router.delete('/:id', authMiddleware, requirePermission('permissions:delete'), ctrl.deletePermission)
+router.delete('/:id', authMiddleware, requirePermission('permissions:delete'), auditLog('delete_permission', 'permission'), ctrl.deletePermission)
 
 export default router

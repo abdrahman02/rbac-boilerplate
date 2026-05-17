@@ -7,6 +7,7 @@ import authRouter from './routes/auth.js'
 import usersRouter from './routes/users.js'
 import rolesRouter from './routes/roles.js'
 import permissionsRouter from './routes/permissions.js'
+import auditLogsRouter from './routes/audit-logs.js'
 
 export function createApp(): Application {
   const app = express()
@@ -27,6 +28,7 @@ export function createApp(): Application {
   app.use('/api/users', usersRouter)
   app.use('/api/roles', rolesRouter)
   app.use('/api/permissions', permissionsRouter)
+  app.use('/api/audit-logs', auditLogsRouter)
 
   app.get('/health', (_req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() })

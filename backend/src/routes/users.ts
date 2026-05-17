@@ -3,6 +3,7 @@ import { authMiddleware } from '../middleware/auth.middleware.js'
 import { requirePermission } from '../middleware/permission.middleware.js'
 import { validate } from '../middleware/validate.middleware.js'
 import { createUserSchema, updateUserSchema, assignRoleSchema } from '../schemas/user.schema.js'
+import { auditLog } from '../middleware/audit-log.middleware.js'
 import * as ctrl from '../controllers/user.controller.js'
 
 const router = Router()
@@ -74,7 +75,7 @@ router.get('/:id', authMiddleware, requirePermission('users:read'), ctrl.getUser
  *       409:
  *         description: Email already exists
  */
-router.post('/', authMiddleware, requirePermission('users:create'), validate(createUserSchema), ctrl.createUser)
+router.post('/', authMiddleware, requirePermission('users:create'), validate(createUserSchema), auditLog('create_user', 'user'), ctrl.createUser)
 
 /**
  * @swagger
@@ -105,7 +106,7 @@ router.post('/', authMiddleware, requirePermission('users:create'), validate(cre
  *       404:
  *         description: User not found
  */
-router.patch('/:id', authMiddleware, requirePermission('users:update'), validate(updateUserSchema), ctrl.updateUser)
+router.patch('/:id', authMiddleware, requirePermission('users:update'), validate(updateUserSchema), auditLog('update_user', 'user'), ctrl.updateUser)
 
 /**
  * @swagger
@@ -126,7 +127,7 @@ router.patch('/:id', authMiddleware, requirePermission('users:update'), validate
  *       404:
  *         description: User not found
  */
-router.delete('/:id', authMiddleware, requirePermission('users:delete'), ctrl.deleteUser)
+router.delete('/:id', authMiddleware, requirePermission('users:delete'), auditLog('delete_user', 'user'), ctrl.deleteUser)
 
 /**
  * @swagger
@@ -153,7 +154,7 @@ router.delete('/:id', authMiddleware, requirePermission('users:delete'), ctrl.de
  *       200:
  *         description: Role assigned
  */
-router.post('/:id/roles', authMiddleware, requirePermission('users:update'), validate(assignRoleSchema), ctrl.assignRole)
+router.post('/:id/roles', authMiddleware, requirePermission('users:update'), validate(assignRoleSchema), auditLog('assign_role', 'user'), ctrl.assignRole)
 
 /**
  * @swagger
@@ -176,6 +177,6 @@ router.post('/:id/roles', authMiddleware, requirePermission('users:update'), val
  *       200:
  *         description: Role removed
  */
-router.delete('/:id/roles/:roleId', authMiddleware, requirePermission('users:update'), ctrl.removeRole)
+router.delete('/:id/roles/:roleId', authMiddleware, requirePermission('users:update'), auditLog('remove_role', 'user'), ctrl.removeRole)
 
 export default router

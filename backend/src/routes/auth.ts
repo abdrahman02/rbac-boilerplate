@@ -3,6 +3,7 @@ import { authRateLimit } from '../middleware/rate-limit.middleware.js'
 import { authMiddleware } from '../middleware/auth.middleware.js'
 import { validate } from '../middleware/validate.middleware.js'
 import { registerSchema, loginSchema } from '../schemas/auth.schema.js'
+import { auditLog } from '../middleware/audit-log.middleware.js'
 import * as authController from '../controllers/auth.controller.js'
 
 const router = Router()
@@ -49,7 +50,7 @@ const router = Router()
  *       429:
  *         description: Too many requests
  */
-router.post('/register', authRateLimit, validate(registerSchema), authController.register)
+router.post('/register', authRateLimit, validate(registerSchema), auditLog('register', 'auth'), authController.register)
 
 /**
  * @swagger
@@ -80,7 +81,7 @@ router.post('/register', authRateLimit, validate(registerSchema), authController
  *       429:
  *         description: Too many requests
  */
-router.post('/login', authRateLimit, validate(loginSchema), authController.login)
+router.post('/login', authRateLimit, validate(loginSchema), auditLog('login', 'auth'), authController.login)
 
 /**
  * @swagger
@@ -96,7 +97,7 @@ router.post('/login', authRateLimit, validate(loginSchema), authController.login
  *       401:
  *         description: Unauthorized
  */
-router.post('/logout', authMiddleware, authController.logout)
+router.post('/logout', authMiddleware, auditLog('logout', 'auth'), authController.logout)
 
 /**
  * @swagger
