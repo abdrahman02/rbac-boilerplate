@@ -1,31 +1,52 @@
-import type { ResultSetHeader, RowDataPacket } from 'mysql2/promise'
-import { pool } from '../config/database.js'
+import { prisma } from '../lib/prisma.js'
 import type { User, RefreshToken } from '../types/index.js'
 
-interface UserRow extends User, RowDataPacket {
-  password_hash: string
+function mapUser(u: {
+  id: number
+  email: string
+  passwordHash: string
+  fullName: string
+  isActive: boolean
+  createdAt: Date
+  updatedAt: Date
+}): User {
+  return {
+    id: u.id,
+    email: u.email,
+    password_hash: u.passwordHash,
+    full_name: u.fullName,
+    is_active: u.isActive,
+    created_at: u.createdAt,
+    updated_at: u.updatedAt,
+  }
 }
 
-interface RefreshTokenRow extends RefreshToken, RowDataPacket {}
-
-interface NameRow extends RowDataPacket {
-  name: string
+function mapRefreshToken(t: {
+  id: number
+  userId: number
+  tokenHash: string
+  expiresAt: Date
+  createdAt: Date
+  revokedAt: Date | null
+}): RefreshToken {
+  return {
+    id: t.id,
+    user_id: t.userId,
+    token_hash: t.tokenHash,
+    expires_at: t.expiresAt,
+    created_at: t.createdAt,
+    revoked_at: t.revokedAt,
+  }
 }
 
-export async function findUserByEmail(email: string): Promise<UserRow | null> {
-  const [rows] = await pool.execute<UserRow[]>(
-    'SELECT * FROM users WHERE email = ? AND deleted_at IS NULL',
-    [email],
-  )
-  return rows[0] ?? null
+export async function findUserByEmail(email: string): Promise<User | null> {
+  const user = await prisma.user.findFirst({ where: { email, deletedAt: null } })
+  return user ? mapUser(user) : null
 }
 
-export async function findUserById(id: number): Promise<UserRow | null> {
-  const [rows] = await pool.execute<UserRow[]>(
-    'SELECT * FROM users WHERE id = ? AND deleted_at IS NULL',
-    [id],
-  )
-  return rows[0] ?? null
+export async function findUserById(id: number): Promise<User | null> {
+  const user = await prisma.user.findFirst({ where: { id, deletedAt: null } })
+  return user ? mapUser(user) : null
 }
 
 export async function createUser(
@@ -33,40 +54,54 @@ export async function createUser(
   email: string,
   passwordHash: string,
 ): Promise<number> {
-  const [result] = await pool.execute<ResultSetHeader>(
-    'INSERT INTO users (full_name, email, password_hash) VALUES (?, ?, ?)',
-    [name, email, passwordHash],
-  )
-  return result.insertId
+  const user = await prisma.user.create({
+    data: { fullName: name, email, passwordHash },
+    select: { id: true },
+  })
+  return user.id
 }
 
 export async function assignDefaultRole(userId: number): Promise<void> {
-  await pool.execute(
-    `INSERT IGNORE INTO user_roles (user_id, role_id)
-     SELECT ?, id FROM roles WHERE name = 'user'`,
-    [userId],
-  )
+  const role = await prisma.role.findFirst({
+    where: { name: 'user' },
+    select: { id: true },
+  })
+  if (!role) return
+
+  await prisma.userRole.upsert({
+    where: { userId_roleId: { userId, roleId: role.id } },
+    create: { userId, roleId: role.id },
+    update: {},
+  })
 }
 
 export async function getUserRoles(userId: number): Promise<string[]> {
-  const [rows] = await pool.execute<NameRow[]>(
-    `SELECT r.name FROM roles r
-     INNER JOIN user_roles ur ON ur.role_id = r.id
-     WHERE ur.user_id = ?`,
-    [userId],
-  )
-  return rows.map((r) => r.name)
+  const rows = await prisma.userRole.findMany({
+    where: { userId },
+    select: { role: { select: { name: true } } },
+  })
+  return rows.map((r) => r.role.name)
 }
 
 export async function getUserPermissions(userId: number): Promise<string[]> {
-  const [rows] = await pool.execute<NameRow[]>(
-    `SELECT DISTINCT p.name FROM permissions p
-     INNER JOIN role_permissions rp ON rp.permission_id = p.id
-     INNER JOIN user_roles ur ON ur.role_id = rp.role_id
-     WHERE ur.user_id = ?`,
-    [userId],
-  )
-  return rows.map((r) => r.name)
+  const rows = await prisma.userRole.findMany({
+    where: { userId },
+    select: {
+      role: {
+        select: {
+          permissions: { select: { permission: { select: { name: true } } } },
+        },
+      },
+    },
+  })
+
+  const names = new Set<string>()
+  for (const ur of rows) {
+    for (const rp of ur.role.permissions) {
+      names.add(rp.permission.name)
+    }
+  }
+  return [...names]
 }
 
 export async function saveRefreshToken(
@@ -74,34 +109,26 @@ export async function saveRefreshToken(
   tokenHash: string,
   expiresAt: Date,
 ): Promise<void> {
-  await pool.execute(
-    'INSERT INTO refresh_tokens (user_id, token_hash, expires_at) VALUES (?, ?, ?)',
-    [userId, tokenHash, expiresAt],
-  )
+  await prisma.refreshToken.create({ data: { userId, tokenHash, expiresAt } })
 }
 
-export async function findRefreshToken(
-  tokenHash: string,
-): Promise<RefreshTokenRow | null> {
-  const [rows] = await pool.execute<RefreshTokenRow[]>(
-    `SELECT * FROM refresh_tokens
-     WHERE token_hash = ? AND revoked_at IS NULL`,
-    [tokenHash],
-  )
-  return rows[0] ?? null
+export async function findRefreshToken(tokenHash: string): Promise<RefreshToken | null> {
+  const token = await prisma.refreshToken.findFirst({
+    where: { tokenHash, revokedAt: null },
+  })
+  return token ? mapRefreshToken(token) : null
 }
 
 export async function revokeRefreshToken(tokenHash: string): Promise<void> {
-  await pool.execute(
-    'UPDATE refresh_tokens SET revoked_at = NOW() WHERE token_hash = ?',
-    [tokenHash],
-  )
+  await prisma.refreshToken.updateMany({
+    where: { tokenHash },
+    data: { revokedAt: new Date() },
+  })
 }
 
 export async function revokeAllUserTokens(userId: number): Promise<void> {
-  await pool.execute(
-    `UPDATE refresh_tokens SET revoked_at = NOW()
-     WHERE user_id = ? AND revoked_at IS NULL`,
-    [userId],
-  )
+  await prisma.refreshToken.updateMany({
+    where: { userId, revokedAt: null },
+    data: { revokedAt: new Date() },
+  })
 }

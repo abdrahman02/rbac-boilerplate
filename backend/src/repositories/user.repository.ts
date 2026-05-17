@@ -1,40 +1,62 @@
-import type { ResultSetHeader, RowDataPacket } from 'mysql2/promise'
-import { pool } from '../config/database.js'
+import { prisma } from '../lib/prisma.js'
 import type { User } from '../types/index.js'
 
-interface UserRow extends User, RowDataPacket {}
-interface CountRow extends RowDataPacket { total: number }
-interface NameRow extends RowDataPacket { name: string }
+// Public user fields returned from list/get queries (excludes password_hash)
+export type UserRow = Omit<User, 'password_hash'>
+
+function mapUser(u: {
+  id: number
+  email: string
+  passwordHash: string
+  fullName: string
+  isActive: boolean
+  createdAt: Date
+  updatedAt: Date
+}): User {
+  return {
+    id: u.id,
+    email: u.email,
+    password_hash: u.passwordHash,
+    full_name: u.fullName,
+    is_active: u.isActive,
+    created_at: u.createdAt,
+    updated_at: u.updatedAt,
+  }
+}
 
 export async function findAllUsers(
   page: number,
   limit: number,
 ): Promise<{ rows: UserRow[]; total: number }> {
   const offset = (page - 1) * limit
+  const where = { deletedAt: null } as const
 
-  const [[countRow]] = await pool.execute<CountRow[]>(
-    'SELECT COUNT(*) AS total FROM users WHERE deleted_at IS NULL',
-  )
-  const total = countRow?.total ?? 0
+  const [total, users] = await prisma.$transaction([
+    prisma.user.count({ where }),
+    prisma.user.findMany({
+      where,
+      select: { id: true, email: true, fullName: true, isActive: true, createdAt: true, updatedAt: true },
+      orderBy: { createdAt: 'desc' },
+      skip: offset,
+      take: limit,
+    }),
+  ])
 
-  const [rows] = await pool.execute<UserRow[]>(
-    `SELECT id, full_name, email, is_active, created_at, updated_at
-     FROM users WHERE deleted_at IS NULL
-     ORDER BY created_at DESC
-     LIMIT ? OFFSET ?`,
-    [limit, offset],
-  )
+  const rows: UserRow[] = users.map((u) => ({
+    id: u.id,
+    email: u.email,
+    full_name: u.fullName,
+    is_active: u.isActive,
+    created_at: u.createdAt,
+    updated_at: u.updatedAt,
+  }))
 
   return { rows, total }
 }
 
-export async function findUserById(id: number): Promise<UserRow | null> {
-  const [rows] = await pool.execute<UserRow[]>(
-    `SELECT id, full_name, email, is_active, created_at, updated_at
-     FROM users WHERE id = ? AND deleted_at IS NULL`,
-    [id],
-  )
-  return rows[0] ?? null
+export async function findUserById(id: number): Promise<User | null> {
+  const user = await prisma.user.findFirst({ where: { id, deletedAt: null } })
+  return user ? mapUser(user) : null
 }
 
 export async function createUser(
@@ -42,77 +64,62 @@ export async function createUser(
   email: string,
   passwordHash: string,
 ): Promise<number> {
-  const [result] = await pool.execute<ResultSetHeader>(
-    'INSERT INTO users (full_name, email, password_hash) VALUES (?, ?, ?)',
-    [name, email, passwordHash],
-  )
-  return result.insertId
+  const user = await prisma.user.create({
+    data: { fullName: name, email, passwordHash },
+    select: { id: true },
+  })
+  return user.id
 }
 
 export async function updateUser(
   id: number,
   fields: { full_name?: string; email?: string; is_active?: boolean },
 ): Promise<boolean> {
-  const columnMap: { col: string; val: unknown }[] = []
-  if (fields.full_name !== undefined) columnMap.push({ col: 'full_name', val: fields.full_name })
-  if (fields.email !== undefined) columnMap.push({ col: 'email', val: fields.email })
-  if (fields.is_active !== undefined) columnMap.push({ col: 'is_active', val: fields.is_active })
+  if (Object.keys(fields).length === 0) return false
 
-  if (columnMap.length === 0) return false
+  const data: { fullName?: string; email?: string; isActive?: boolean } = {}
+  if (fields.full_name !== undefined) data.fullName = fields.full_name
+  if (fields.email !== undefined) data.email = fields.email
+  if (fields.is_active !== undefined) data.isActive = fields.is_active
 
-  const setClauses = columnMap.map(({ col }) => `${col} = ?`).join(', ')
-  const values = columnMap.map(({ val }) => val)
-
-  const [result] = await pool.execute<ResultSetHeader>(
-    `UPDATE users SET ${setClauses}, updated_at = NOW() WHERE id = ? AND deleted_at IS NULL` as any,
-    [...values, id] as any,
-  )
-  return result.affectedRows > 0
+  const result = await prisma.user.updateMany({ where: { id, deletedAt: null }, data })
+  return result.count > 0
 }
 
 export async function softDeleteUser(id: number): Promise<boolean> {
-  const [result] = await pool.execute<ResultSetHeader>(
-    'UPDATE users SET deleted_at = NOW() WHERE id = ? AND deleted_at IS NULL',
-    [id],
-  )
-  return result.affectedRows > 0
+  const result = await prisma.user.updateMany({
+    where: { id, deletedAt: null },
+    data: { deletedAt: new Date() },
+  })
+  return result.count > 0
 }
 
 export async function getUserRoles(userId: number): Promise<string[]> {
-  const [rows] = await pool.execute<NameRow[]>(
-    `SELECT r.name FROM roles r
-     INNER JOIN user_roles ur ON ur.role_id = r.id
-     WHERE ur.user_id = ?`,
-    [userId],
-  )
-  return rows.map((r) => r.name)
+  const rows = await prisma.userRole.findMany({
+    where: { userId },
+    select: { role: { select: { name: true } } },
+  })
+  return rows.map((r) => r.role.name)
 }
 
 export async function assignRoleToUser(userId: number, roleId: number): Promise<void> {
-  await pool.execute(
-    'INSERT IGNORE INTO user_roles (user_id, role_id) VALUES (?, ?)',
-    [userId, roleId],
-  )
+  await prisma.userRole.upsert({
+    where: { userId_roleId: { userId, roleId } },
+    create: { userId, roleId },
+    update: {},
+  })
 }
 
 export async function removeRoleFromUser(userId: number, roleId: number): Promise<boolean> {
-  const [result] = await pool.execute<ResultSetHeader>(
-    'DELETE FROM user_roles WHERE user_id = ? AND role_id = ?',
-    [userId, roleId],
-  )
-  return result.affectedRows > 0
+  const result = await prisma.userRole.deleteMany({ where: { userId, roleId } })
+  return result.count > 0
 }
 
 export async function emailExists(email: string, excludeId?: number): Promise<boolean> {
-  interface ExistsRow extends RowDataPacket { c: number }
-  const [rows] = excludeId !== undefined
-    ? await pool.execute<ExistsRow[]>(
-        'SELECT 1 AS c FROM users WHERE email = ? AND id != ? AND deleted_at IS NULL LIMIT 1',
-        [email, excludeId],
-      )
-    : await pool.execute<ExistsRow[]>(
-        'SELECT 1 AS c FROM users WHERE email = ? AND deleted_at IS NULL LIMIT 1',
-        [email],
-      )
-  return rows.length > 0
+  const where = excludeId !== undefined
+    ? { email, deletedAt: null, id: { not: excludeId } }
+    : { email, deletedAt: null }
+
+  const user = await prisma.user.findFirst({ where, select: { id: true } })
+  return user !== null
 }

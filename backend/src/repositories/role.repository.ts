@@ -1,96 +1,94 @@
-import type { ResultSetHeader, RowDataPacket } from 'mysql2/promise'
-import { pool } from '../config/database.js'
+import { prisma } from '../lib/prisma.js'
 import type { Role } from '../types/index.js'
 
-interface RoleRow extends Role, RowDataPacket {}
-interface NameRow extends RowDataPacket { name: string }
-
-export async function findAllRoles(): Promise<RoleRow[]> {
-  const [rows] = await pool.execute<RoleRow[]>(
-    'SELECT id, name, description, created_at FROM roles ORDER BY name',
-  )
-  return rows
+function mapRole(r: {
+  id: number
+  name: string
+  description: string | null
+  createdAt: Date
+}): Role {
+  return {
+    id: r.id,
+    name: r.name,
+    description: r.description,
+    created_at: r.createdAt,
+  }
 }
 
-export async function findRoleById(id: number): Promise<RoleRow | null> {
-  const [rows] = await pool.execute<RoleRow[]>(
-    'SELECT id, name, description, created_at FROM roles WHERE id = ?',
-    [id],
-  )
-  return rows[0] ?? null
+export async function findAllRoles(): Promise<Role[]> {
+  const rows = await prisma.role.findMany({
+    select: { id: true, name: true, description: true, createdAt: true },
+    orderBy: { name: 'asc' },
+  })
+  return rows.map(mapRole)
 }
 
-export async function findRoleByName(name: string): Promise<RoleRow | null> {
-  const [rows] = await pool.execute<RoleRow[]>(
-    'SELECT id, name, description, created_at FROM roles WHERE name = ?',
-    [name],
-  )
-  return rows[0] ?? null
+export async function findRoleById(id: number): Promise<Role | null> {
+  const role = await prisma.role.findUnique({
+    where: { id },
+    select: { id: true, name: true, description: true, createdAt: true },
+  })
+  return role ? mapRole(role) : null
+}
+
+export async function findRoleByName(name: string): Promise<Role | null> {
+  const role = await prisma.role.findUnique({
+    where: { name },
+    select: { id: true, name: true, description: true, createdAt: true },
+  })
+  return role ? mapRole(role) : null
 }
 
 export async function createRole(name: string, description?: string): Promise<number> {
-  const [result] = await pool.execute<ResultSetHeader>(
-    'INSERT INTO roles (name, description) VALUES (?, ?)',
-    [name, description ?? null],
-  )
-  return result.insertId
+  const role = await prisma.role.create({
+    data: { name, description: description ?? null },
+    select: { id: true },
+  })
+  return role.id
 }
 
 export async function updateRole(
   id: number,
   fields: { name?: string; description?: string | null },
 ): Promise<boolean> {
-  const columnMap: { col: string; val: unknown }[] = []
-  if (fields.name !== undefined) columnMap.push({ col: 'name', val: fields.name })
-  if (fields.description !== undefined) columnMap.push({ col: 'description', val: fields.description })
+  if (Object.keys(fields).length === 0) return false
 
-  if (columnMap.length === 0) return false
+  const data: { name?: string; description?: string | null } = {}
+  if (fields.name !== undefined) data.name = fields.name
+  if (fields.description !== undefined) data.description = fields.description
 
-  const setClauses = columnMap.map(({ col }) => `${col} = ?`).join(', ')
-  const values = columnMap.map(({ val }) => val)
-
-  const [result] = await pool.execute<ResultSetHeader>(
-    `UPDATE roles SET ${setClauses}, updated_at = NOW() WHERE id = ?` as any,
-    [...values, id] as any,
-  )
-  return result.affectedRows > 0
+  const result = await prisma.role.updateMany({ where: { id }, data })
+  return result.count > 0
 }
 
 export async function deleteRole(id: number): Promise<boolean> {
-  const [result] = await pool.execute<ResultSetHeader>(
-    'DELETE FROM roles WHERE id = ?',
-    [id],
-  )
-  return result.affectedRows > 0
+  const result = await prisma.role.deleteMany({ where: { id } })
+  return result.count > 0
 }
 
 export async function getRolePermissions(roleId: number): Promise<string[]> {
-  const [rows] = await pool.execute<NameRow[]>(
-    `SELECT p.name FROM permissions p
-     INNER JOIN role_permissions rp ON rp.permission_id = p.id
-     WHERE rp.role_id = ?`,
-    [roleId],
-  )
-  return rows.map((r) => r.name)
+  const rows = await prisma.rolePermission.findMany({
+    where: { roleId },
+    select: { permission: { select: { name: true } } },
+  })
+  return rows.map((r) => r.permission.name)
 }
 
 export async function assignPermissionToRole(
   roleId: number,
   permissionId: number,
 ): Promise<void> {
-  await pool.execute(
-    'INSERT IGNORE INTO role_permissions (role_id, permission_id) VALUES (?, ?)',
-    [roleId, permissionId],
-  )
+  await prisma.rolePermission.upsert({
+    where: { roleId_permissionId: { roleId, permissionId } },
+    create: { roleId, permissionId },
+    update: {},
+  })
 }
 
 export async function removePermissionFromRole(
   roleId: number,
   permissionId: number,
 ): Promise<boolean> {
-  const [result] = await pool.execute<ResultSetHeader>(
-    'DELETE FROM role_permissions WHERE role_id = ? AND permission_id = ?',
-    [roleId, permissionId],
-  )
-  return result.affectedRows > 0
+  const result = await prisma.rolePermission.deleteMany({ where: { roleId, permissionId } })
+  return result.count > 0
 }
