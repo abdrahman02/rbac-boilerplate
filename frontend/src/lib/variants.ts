@@ -14,6 +14,9 @@ export const button = tv({
       md: 'h-10 px-4 text-sm',
       lg: 'h-11 px-6 text-base',
     },
+    fullWidth: {
+      true: 'w-full',
+    },
   },
   defaultVariants: {
     variant: 'primary',
@@ -44,3 +47,6 @@ export const badge = tv({
   },
   defaultVariants: { variant: 'default' },
 })
+
+export const buttonVariants = button
+export const inputVariants = input

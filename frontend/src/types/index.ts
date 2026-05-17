@@ -35,8 +35,9 @@ export interface AuditLog {
 export interface AuthenticatedUser {
   id: number
   email: string
-  full_name: string
-  roles: string[]
+  name: string
+  full_name?: string
+  roles: Array<{ id: number; name: string }>
   permissions: string[]
 }
 

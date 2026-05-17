@@ -1,5 +1,26 @@
-import { redirect } from 'next/navigation'
+'use client'
 
-export default function RootPage() {
-  redirect('/login')
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { useAuth } from '@/hooks/useAuth'
+
+export default function HomePage() {
+  const router = useRouter()
+  const { isLoading, isAuthenticated } = useAuth()
+
+  useEffect(() => {
+    if (isLoading) return
+
+    if (isAuthenticated) {
+      router.push('/dashboard')
+    } else {
+      router.push('/login')
+    }
+  }, [isLoading, isAuthenticated, router])
+
+  return (
+    <div className="flex h-screen items-center justify-center">
+      <div>Loading...</div>
+    </div>
+  )
 }
