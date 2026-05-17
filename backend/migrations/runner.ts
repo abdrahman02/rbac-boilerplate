@@ -1,6 +1,8 @@
-import 'dotenv/config'
+import dotenv from 'dotenv'
 import fs from 'node:fs'
 import path from 'node:path'
+
+dotenv.config({ path: path.resolve(import.meta.dirname, '../../.env') })
 import mysql from 'mysql2/promise'
 
 const pool = mysql.createPool({

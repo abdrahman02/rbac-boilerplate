@@ -1,5 +1,8 @@
-import 'dotenv/config'
+import dotenv from 'dotenv'
+import path from 'node:path'
 import mysql from 'mysql2/promise'
+
+dotenv.config({ path: path.resolve(import.meta.dirname, '../../.env') })
 
 interface IdRow extends mysql.RowDataPacket {
   id: number
