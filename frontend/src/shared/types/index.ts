@@ -21,6 +21,23 @@ export interface Permission {
   created_at: string
 }
 
+export interface UserWithRoles {
+  id: number
+  name: string
+  email: string
+  is_active: boolean
+  roles: string[]
+  created_at: string
+}
+
+export interface RoleWithPermissions {
+  id: number
+  name: string
+  description: string | null
+  permissions: string[]
+  created_at: string
+}
+
 export interface AuditLog {
   id: number
   user_id: number | null
