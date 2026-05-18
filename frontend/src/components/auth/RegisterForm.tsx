@@ -7,8 +7,8 @@ import { useRouter } from 'next/navigation'
 import { useQueryClient } from '@tanstack/react-query'
 import Link from 'next/link'
 import { z } from 'zod'
-import { apiClient } from '@/lib/api-client'
-import { getErrorMessage } from '@/lib/api-error'
+import { apiClient } from '@/shared/lib/api-client'
+import { getErrorMessage } from '@/shared/lib/api-error'
 import { Button, Input, FormField } from '@/components/ui'
 
 const registerSchema = z

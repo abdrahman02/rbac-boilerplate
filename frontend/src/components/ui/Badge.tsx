@@ -1,6 +1,6 @@
 import type { ComponentPropsWithoutRef } from 'react'
 import type { VariantProps } from 'tailwind-variants'
-import { badge } from '@/lib/variants'
+import { badge } from '@/shared/lib/variants'
 
 type BadgeProps = ComponentPropsWithoutRef<'span'> & VariantProps<typeof badge>
 

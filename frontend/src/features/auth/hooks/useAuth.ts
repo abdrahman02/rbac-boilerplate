@@ -1,8 +1,8 @@
 import { useEffect } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { useAuthStore } from '@/stores/authStore'
-import { apiClient } from '@/lib/api-client'
-import type { AuthenticatedUser } from '@/types'
+import { useAuthStore } from '@/features/auth/stores/authStore'
+import { apiClient } from '@/shared/lib/api-client'
+import type { AuthenticatedUser } from '@/features/auth/types'
 
 export function useAuth() {
   const { setUser } = useAuthStore()

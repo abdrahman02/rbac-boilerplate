@@ -1,10 +1,10 @@
 'use client'
 
 import Link from 'next/link'
-import { useAuth } from '@/hooks/useAuth'
-import { useLogout } from '@/hooks/useLogout'
+import { useAuth } from '@/features/auth/hooks/useAuth'
+import { useLogout } from '@/features/auth/hooks/useLogout'
 import { PermissionGate } from '@/components/guard/PermissionGate'
-import { button } from '@/lib/variants'
+import { button } from '@/shared/lib/variants'
 import { Button } from '@/components/ui'
 
 export function NavMenu() {

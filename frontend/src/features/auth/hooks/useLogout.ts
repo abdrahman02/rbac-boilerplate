@@ -1,8 +1,8 @@
 import { useCallback } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
-import { useAuthStore } from '@/stores/authStore'
-import { apiClient } from '@/lib/api-client'
+import { useAuthStore } from '@/features/auth/stores/authStore'
+import { apiClient } from '@/shared/lib/api-client'
 
 export function useLogout() {
   const router = useRouter()

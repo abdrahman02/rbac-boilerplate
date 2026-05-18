@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
-import { QueryProvider } from '@/providers/QueryProvider'
+import { QueryProvider } from '@/shared/providers/QueryProvider'
 
 export const metadata: Metadata = {
   title: 'RBAC Dashboard',

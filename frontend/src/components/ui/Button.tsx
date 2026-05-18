@@ -2,7 +2,7 @@
 
 import { forwardRef, type ComponentPropsWithoutRef } from 'react'
 import type { VariantProps } from 'tailwind-variants'
-import { button } from '@/lib/variants'
+import { button } from '@/shared/lib/variants'
 import { Spinner } from './Spinner'
 
 type ButtonProps = ComponentPropsWithoutRef<'button'> &

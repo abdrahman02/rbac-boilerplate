@@ -1,7 +1,7 @@
 'use client'
 
 import { forwardRef, type ComponentPropsWithoutRef } from 'react'
-import { input } from '@/lib/variants'
+import { input } from '@/shared/lib/variants'
 
 type InputProps = ComponentPropsWithoutRef<'input'> & {
   error?: string | boolean

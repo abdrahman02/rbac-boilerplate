@@ -1,7 +1,7 @@
 'use client'
 
 import { ReactNode } from 'react'
-import { useAuthStore } from '@/stores/authStore'
+import { useAuthStore } from '@/features/auth/stores/authStore'
 
 interface RoleGateProps {
   role: string

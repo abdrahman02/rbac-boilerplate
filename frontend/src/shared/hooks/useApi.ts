@@ -1,7 +1,7 @@
 import { useCallback } from 'react'
 import { useMutation } from '@tanstack/react-query'
-import { apiClient } from '@/lib/api-client'
-import { getErrorMessage } from '@/lib/api-error'
+import { apiClient } from '@/shared/lib/api-client'
+import { getErrorMessage } from '@/shared/lib/api-error'
 
 export function useApi<T>(url: string, method: 'GET' | 'POST' | 'PATCH' | 'DELETE' = 'GET') {
   const { data, error, isPending, mutateAsync } = useMutation<T, Error, unknown>({

@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from 'axios'
-import { useAuthStore } from '@/stores/authStore'
+import { useAuthStore } from '@/features/auth/stores/authStore'
 
 interface PendingRequest {
   config: InternalAxiosRequestConfig
@@ -20,7 +20,6 @@ export const apiClient: AxiosInstance = axios.create({
   },
 })
 
-// Request interceptor
 apiClient.interceptors.request.use(
   (config) => config,
   (error) => Promise.reject(error)
@@ -40,11 +39,7 @@ apiClient.interceptors.response.use(
     if (error.response?.status === 401 && !originalRequest._retry && !isAuthEndpoint) {
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
-          failedQueue.push({
-            config: originalRequest,
-            resolve,
-            reject,
-          })
+          failedQueue.push({ config: originalRequest, resolve, reject })
         })
           .then(() => apiClient(originalRequest))
           .catch((err) => Promise.reject(err))
@@ -55,11 +50,9 @@ apiClient.interceptors.response.use(
 
       try {
         await axios.post(`${baseURL}/auth/refresh`, {}, { withCredentials: true })
-
         failedQueue.forEach(({ config, resolve }) => resolve(''))
         failedQueue = []
         isRefreshing = false
-
         return apiClient(originalRequest)
       } catch (refreshError) {
         useAuthStore.getState().clearAuth()

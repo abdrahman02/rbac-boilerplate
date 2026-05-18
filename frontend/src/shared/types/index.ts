@@ -32,15 +32,6 @@ export interface AuditLog {
   created_at: string
 }
 
-export interface AuthenticatedUser {
-  id: number
-  email: string
-  name: string
-  full_name?: string
-  roles: Array<{ id: number; name: string }>
-  permissions: string[]
-}
-
 export interface ApiResponse<T> {
   success: boolean
   data: T | null
