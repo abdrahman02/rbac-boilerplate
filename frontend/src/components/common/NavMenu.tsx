@@ -34,6 +34,16 @@ export function NavMenu() {
                 Roles
               </Link>
             </PermissionGate>
+            <PermissionGate permission="permissions:read">
+              <Link href="/permissions" className={buttonVariants({ variant: 'ghost', size: 'sm' })}>
+                Permissions
+              </Link>
+            </PermissionGate>
+            <PermissionGate permission="audit_logs:read">
+              <Link href="/audit-logs" className={buttonVariants({ variant: 'ghost', size: 'sm' })}>
+                Audit Logs
+              </Link>
+            </PermissionGate>
           </div>
         </div>
         <div className="flex items-center gap-3">

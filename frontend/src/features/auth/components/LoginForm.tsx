@@ -64,6 +64,12 @@ export function LoginForm() {
         />
       </FormField>
 
+      <div className="text-right">
+        <Link href="/forgot-password" className="text-sm font-medium text-blue-600 hover:underline">
+          Forgot password?
+        </Link>
+      </div>
+
       {error && <p className="text-sm text-red-600">{error}</p>}
 
       <Button type="submit" isLoading={isLoading} fullWidth>
