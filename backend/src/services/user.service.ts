@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client'
 import * as repo from '../repositories/user.repository.js'
 import { hashPassword } from '../utils/hash.js'
 import type { UserWithRoles, PaginatedResponse } from '../types/index.js'
@@ -54,7 +55,16 @@ export async function createUser(input: CreateUserInput): Promise<number> {
   if (emailTaken) throw new Error('EMAIL_TAKEN')
 
   const passwordHash = await hashPassword(input.password)
-  const userId = await repo.createUser(input.name, input.email, passwordHash)
+
+  let userId: number
+  try {
+    userId = await repo.createUser(input.name, input.email, passwordHash)
+  } catch (err) {
+    if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
+      throw new Error('EMAIL_TAKEN')
+    }
+    throw err
+  }
 
   if (input.role_ids && input.role_ids.length > 0) {
     for (const roleId of input.role_ids) {

@@ -57,6 +57,12 @@ export function RoleModal({ isOpen, onClose, role }: RoleModalProps) {
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={isEditing ? 'Edit Role' : 'Create Role'}>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        {errors.root && (
+          <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3">
+            <p className="text-sm font-medium text-red-800">{errors.root.message}</p>
+          </div>
+        )}
+
         <FormField label="Name" error={errors.name?.message}>
           <Input {...register('name')} placeholder="admin" error={errors.name?.message} />
         </FormField>
@@ -68,8 +74,6 @@ export function RoleModal({ isOpen, onClose, role }: RoleModalProps) {
             error={errors.description?.message}
           />
         </FormField>
-
-        {errors.root && <p className="text-sm text-red-600">{errors.root.message}</p>}
 
         <div className="flex justify-end gap-2 pt-2">
           <Button type="button" variant="secondary" onClick={onClose}>

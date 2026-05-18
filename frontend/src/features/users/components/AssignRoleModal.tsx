@@ -37,6 +37,12 @@ export function AssignRoleModal({ isOpen, onClose, user }: AssignRoleModalProps)
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={`Assign Roles — ${user.name}`}>
       <div className="space-y-2">
+        {error && (
+          <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3">
+            <p className="text-sm font-medium text-red-800">{error}</p>
+          </div>
+        )}
+
         {roles.map((role) => {
           const hasRole = user.roles.includes(role.name)
           return (
@@ -58,8 +64,6 @@ export function AssignRoleModal({ isOpen, onClose, user }: AssignRoleModalProps)
             </div>
           )
         })}
-
-        {error && <p className="text-sm text-red-600">{error}</p>}
 
         <div className="flex justify-end pt-2">
           <Button variant="secondary" onClick={onClose}>

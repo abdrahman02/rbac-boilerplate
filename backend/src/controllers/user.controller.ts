@@ -84,15 +84,15 @@ export async function createUser(req: Request, res: Response): Promise<void> {
     }
     res.status(201).json(body)
   } catch (error) {
-    const msg = error instanceof Error ? error.message : 'Internal server error'
-    const statusCode = msg === 'EMAIL_TAKEN' ? 409 : 500
+    const code = error instanceof Error ? error.message : 'INTERNAL_ERROR'
+    const isEmailTaken = code === 'EMAIL_TAKEN'
 
     const body: ApiResponse<null> = {
       success: false,
       data: null,
-      message: msg,
+      message: isEmailTaken ? 'Email address is already in use' : 'Failed to create user',
     }
-    res.status(statusCode).json(body)
+    res.status(isEmailTaken ? 409 : 500).json(body)
   }
 }
 
@@ -140,15 +140,15 @@ export async function updateUser(req: Request, res: Response): Promise<void> {
     }
     res.status(200).json(body)
   } catch (error) {
-    const msg = error instanceof Error ? error.message : 'Internal server error'
-    const statusCode = msg === 'EMAIL_TAKEN' ? 409 : 500
+    const code = error instanceof Error ? error.message : 'INTERNAL_ERROR'
+    const isEmailTaken = code === 'EMAIL_TAKEN'
 
     const body: ApiResponse<null> = {
       success: false,
       data: null,
-      message: msg,
+      message: isEmailTaken ? 'Email address is already in use' : 'Failed to update user',
     }
-    res.status(statusCode).json(body)
+    res.status(isEmailTaken ? 409 : 500).json(body)
   }
 }
 

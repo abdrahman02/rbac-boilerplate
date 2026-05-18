@@ -60,7 +60,11 @@ export function AssignPermissionModal({ isOpen, onClose, role }: AssignPermissio
         })}
       </div>
 
-      {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+      {error && (
+        <div className="mt-2 rounded-md border border-red-200 bg-red-50 px-4 py-3">
+          <p className="text-sm font-medium text-red-800">{error}</p>
+        </div>
+      )}
 
       <div className="flex justify-end pt-4">
         <Button variant="secondary" onClick={onClose}>

@@ -68,6 +68,12 @@ export function UserModal({ isOpen, onClose, user }: UserModalProps) {
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={isEditing ? 'Edit User' : 'Create User'}>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        {errors.root && (
+          <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3">
+            <p className="text-sm font-medium text-red-800">{errors.root.message}</p>
+          </div>
+        )}
+
         <FormField label="Name" error={errors.name?.message}>
           <Input {...register('name')} placeholder="John Doe" error={errors.name?.message} />
         </FormField>
@@ -91,8 +97,6 @@ export function UserModal({ isOpen, onClose, user }: UserModalProps) {
             />
           </FormField>
         )}
-
-        {errors.root && <p className="text-sm text-red-600">{errors.root.message}</p>}
 
         <div className="flex justify-end gap-2 pt-2">
           <Button type="button" variant="secondary" onClick={onClose}>
