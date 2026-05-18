@@ -20,7 +20,7 @@ export function usePermissionList() {
     queryKey: ['permissions'],
     queryFn: async () => {
       const res = await apiClient.get('/permissions')
-      return res.data
+      return res.data.data
     },
   })
 }

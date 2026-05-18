@@ -3,6 +3,6 @@ export interface AuthenticatedUser {
   email: string
   name: string
   full_name?: string
-  roles: Array<{ id: number; name: string }>
+  roles: string[]
   permissions: string[]
 }

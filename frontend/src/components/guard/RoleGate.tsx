@@ -11,6 +11,6 @@ interface RoleGateProps {
 
 export function RoleGate({ role, children, fallback = null }: RoleGateProps) {
   const user = useAuthStore((state) => state.user)
-  const hasRole = user?.roles?.some((r) => r.name === role) ?? false
+  const hasRole = user?.roles?.includes(role) ?? false
   return <>{hasRole ? children : fallback}</>
 }

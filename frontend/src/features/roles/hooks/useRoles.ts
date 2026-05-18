@@ -20,7 +20,7 @@ export function useRoles() {
     queryKey: ['roles'],
     queryFn: async () => {
       const res = await apiClient.get('/roles')
-      return res.data
+      return res.data.data
     },
   })
 }

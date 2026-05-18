@@ -4,6 +4,7 @@ import { useAuth } from '@/features/auth/hooks/useAuth'
 
 export default function ProfilePage() {
   const { user } = useAuth()
+  console.log({user})
 
   return (
     <div className="space-y-6">
@@ -26,10 +27,10 @@ export default function ProfilePage() {
             <dd className="mt-1 flex flex-wrap gap-2">
               {user?.roles?.map((role) => (
                 <span
-                  key={role.id}
+                  key={role}
                   className="inline-flex items-center rounded-full bg-blue-100 px-3 py-0.5 text-sm font-medium text-blue-800"
                 >
-                  {role.name}
+                  {role}
                 </span>
               ))}
             </dd>

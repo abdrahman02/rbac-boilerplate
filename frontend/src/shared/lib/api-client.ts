@@ -10,7 +10,7 @@ interface PendingRequest {
 let isRefreshing = false
 let failedQueue: PendingRequest[] = []
 
-const baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'
+const baseURL = process.env.NEXT_PUBLIC_API_URL
 
 export const apiClient: AxiosInstance = axios.create({
   baseURL,

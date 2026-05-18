@@ -87,11 +87,20 @@ export async function updateUser(
 }
 
 export async function softDeleteUser(id: number): Promise<boolean> {
-  const result = await prisma.user.updateMany({
+  const user = await prisma.user.findFirst({
     where: { id, deletedAt: null },
-    data: { deletedAt: new Date() },
+    select: { email: true },
   })
-  return result.count > 0
+  if (!user) return false
+
+  await prisma.user.update({
+    where: { id },
+    data: {
+      deletedAt: new Date(),
+      email: `deleted_${id}_${user.email}`,
+    },
+  })
+  return true
 }
 
 export async function getUserRoles(userId: number): Promise<string[]> {
