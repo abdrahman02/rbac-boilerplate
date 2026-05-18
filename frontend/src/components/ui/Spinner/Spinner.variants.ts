@@ -1,7 +1,6 @@
 import { tv } from 'tailwind-variants'
-import type { VariantProps } from 'tailwind-variants'
 
-const spinner = tv({
+export const spinnerVariants = tv({
   base: 'animate-spin rounded-full border-2 border-current border-t-transparent',
   variants: {
     size: {
@@ -12,9 +11,3 @@ const spinner = tv({
   },
   defaultVariants: { size: 'md' },
 })
-
-type SpinnerProps = VariantProps<typeof spinner>
-
-export function Spinner({ size }: SpinnerProps) {
-  return <span className={spinner({ size })} role="status" aria-label="Loading" />
-}

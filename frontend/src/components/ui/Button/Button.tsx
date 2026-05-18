@@ -2,11 +2,11 @@
 
 import { forwardRef, type ComponentPropsWithoutRef } from 'react'
 import type { VariantProps } from 'tailwind-variants'
-import { button } from '@/shared/lib/variants'
-import { Spinner } from './Spinner'
+import { buttonVariants } from './Button.variants'
+import { Spinner } from '../Spinner'
 
 type ButtonProps = ComponentPropsWithoutRef<'button'> &
-  VariantProps<typeof button> & {
+  VariantProps<typeof buttonVariants> & {
     isLoading?: boolean
   }
 
@@ -15,7 +15,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     <button
       ref={ref}
       disabled={disabled || isLoading}
-      className={button({ variant, size, fullWidth, className })}
+      className={buttonVariants({ variant, size, fullWidth, className })}
       {...props}
     >
       {isLoading ? (

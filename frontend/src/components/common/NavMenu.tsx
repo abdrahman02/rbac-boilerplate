@@ -4,8 +4,7 @@ import Link from 'next/link'
 import { useAuth } from '@/features/auth/hooks/useAuth'
 import { useLogout } from '@/features/auth/hooks/useLogout'
 import { PermissionGate } from '@/components/guard/PermissionGate'
-import { button } from '@/shared/lib/variants'
-import { Button } from '@/components/ui'
+import { Button, buttonVariants } from '@/components/ui'
 
 export function NavMenu() {
   const { user, isAuthenticated } = useAuth()
@@ -19,19 +18,19 @@ export function NavMenu() {
         <div className="flex items-center gap-4">
           <h1 className="text-lg font-semibold">RBAC Dashboard</h1>
           <div className="flex gap-2">
-            <Link href="/" className={button({ variant: 'ghost', size: 'sm' })}>
+            <Link href="/" className={buttonVariants({ variant: 'ghost', size: 'sm' })}>
               Dashboard
             </Link>
-            <Link href="/profile" className={button({ variant: 'ghost', size: 'sm' })}>
+            <Link href="/profile" className={buttonVariants({ variant: 'ghost', size: 'sm' })}>
               Profile
             </Link>
             <PermissionGate permission="users:read">
-              <Link href="/users" className={button({ variant: 'ghost', size: 'sm' })}>
+              <Link href="/users" className={buttonVariants({ variant: 'ghost', size: 'sm' })}>
                 Users
               </Link>
             </PermissionGate>
             <PermissionGate permission="roles:read">
-              <Link href="/roles" className={button({ variant: 'ghost', size: 'sm' })}>
+              <Link href="/roles" className={buttonVariants({ variant: 'ghost', size: 'sm' })}>
                 Roles
               </Link>
             </PermissionGate>

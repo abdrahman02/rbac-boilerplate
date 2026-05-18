@@ -1,12 +1,12 @@
 import type { ComponentPropsWithoutRef } from 'react'
 import type { VariantProps } from 'tailwind-variants'
-import { badge } from '@/shared/lib/variants'
+import { badgeVariants } from './Badge.variants'
 
-type BadgeProps = ComponentPropsWithoutRef<'span'> & VariantProps<typeof badge>
+type BadgeProps = ComponentPropsWithoutRef<'span'> & VariantProps<typeof badgeVariants>
 
 export function Badge({ variant, className, children, ...props }: BadgeProps) {
   return (
-    <span className={badge({ variant, className })} {...props}>
+    <span className={badgeVariants({ variant, className })} {...props}>
       {children}
     </span>
   )
