@@ -124,6 +124,18 @@ export async function removeRoleFromUser(userId: number, roleId: number): Promis
   return result.count > 0
 }
 
+export async function anonymizeDeletedEmail(email: string): Promise<void> {
+  const user = await prisma.user.findFirst({
+    where: { email, deletedAt: { not: null } },
+    select: { id: true },
+  })
+  if (!user) return
+  await prisma.user.update({
+    where: { id: user.id },
+    data: { email: `deleted_${user.id}_${email}` },
+  })
+}
+
 export async function emailExists(email: string, excludeId?: number): Promise<boolean> {
   const where = excludeId !== undefined
     ? { email, deletedAt: null, id: { not: excludeId } }

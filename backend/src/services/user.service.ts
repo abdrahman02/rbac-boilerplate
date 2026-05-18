@@ -54,6 +54,9 @@ export async function createUser(input: CreateUserInput): Promise<number> {
   const emailTaken = await repo.emailExists(input.email)
   if (emailTaken) throw new Error('EMAIL_TAKEN')
 
+  // Free the email constraint from any soft-deleted rows (legacy data before anonymization fix)
+  await repo.anonymizeDeletedEmail(input.email)
+
   const passwordHash = await hashPassword(input.password)
 
   let userId: number
