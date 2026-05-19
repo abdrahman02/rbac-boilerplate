@@ -22,17 +22,6 @@ export interface Permission {
   created_at: Date
 }
 
-export interface UserRole {
-  user_id: number
-  role_id: number
-  assigned_at: Date
-}
-
-export interface RolePermission {
-  role_id: number
-  permission_id: number
-}
-
 export interface RefreshToken {
   id: number
   user_id: number
@@ -93,8 +82,6 @@ export interface PaginatedResponse<T> {
     limit: number
   }
 }
-
-export {}
 
 declare global {
   namespace Express {

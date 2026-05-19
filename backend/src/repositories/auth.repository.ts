@@ -126,9 +126,3 @@ export async function revokeRefreshToken(tokenHash: string): Promise<void> {
   })
 }
 
-export async function revokeAllUserTokens(userId: number): Promise<void> {
-  await prisma.refreshToken.updateMany({
-    where: { userId, revokedAt: null },
-    data: { revokedAt: new Date() },
-  })
-}

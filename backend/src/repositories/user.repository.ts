@@ -1,8 +1,7 @@
 import { prisma } from '../lib/prisma.js'
 import type { User } from '../types/index.js'
 
-// Public user fields returned from list/get queries (excludes password_hash)
-export type UserRow = Omit<User, 'password_hash'>
+type UserRow = Omit<User, 'password_hash'>
 
 function mapUser(u: {
   id: number
