@@ -2,7 +2,6 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { apiClient } from '@/shared/lib/api-client'
-import { getErrorMessage } from '@/shared/lib/api-error'
 import type { UserWithRoles, PaginatedResponse } from '@/shared/types'
 
 interface CreateUserPayload {
@@ -35,7 +34,6 @@ export function useCreateUser() {
       return res.data
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['users'] }),
-    onError: (err) => getErrorMessage(err),
   })
 }
 
@@ -47,7 +45,6 @@ export function useUpdateUser() {
       return res.data
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['users'] }),
-    onError: (err) => getErrorMessage(err),
   })
 }
 
@@ -58,7 +55,6 @@ export function useDeleteUser() {
       await apiClient.delete(`/users/${id}`)
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['users'] }),
-    onError: (err) => getErrorMessage(err),
   })
 }
 
@@ -69,7 +65,6 @@ export function useAssignRole() {
       await apiClient.post(`/users/${userId}/roles`, { role_id: roleId })
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['users'] }),
-    onError: (err) => getErrorMessage(err),
   })
 }
 
@@ -80,6 +75,5 @@ export function useRemoveRole() {
       await apiClient.delete(`/users/${userId}/roles/${roleId}`)
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['users'] }),
-    onError: (err) => getErrorMessage(err),
   })
 }

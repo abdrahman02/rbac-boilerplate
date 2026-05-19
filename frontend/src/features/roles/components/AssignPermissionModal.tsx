@@ -19,7 +19,7 @@ export function AssignPermissionModal({ isOpen, onClose, role }: AssignPermissio
   const removePerm = useRemovePermissionFromRole()
   const [error, setError] = useState<string | null>(null)
 
-  const handleToggle = async (permissionId: number, permName: string, hasPerm: boolean) => {
+  const handleToggle = async (permissionId: number, hasPerm: boolean) => {
     setError(null)
     try {
       if (hasPerm) {
@@ -50,7 +50,7 @@ export function AssignPermissionModal({ isOpen, onClose, role }: AssignPermissio
               <Button
                 size="sm"
                 variant={hasPerm ? 'danger' : 'primary'}
-                onClick={() => handleToggle(perm.id, perm.name, hasPerm)}
+                onClick={() => handleToggle(perm.id, hasPerm)}
                 isLoading={isPending}
               >
                 {hasPerm ? 'Remove' : 'Assign'}

@@ -1,4 +1,4 @@
-export type { User, UserWithRoles } from './user'
+export type { UserWithRoles } from './user'
 export type { Role, RoleWithPermissions } from './role'
 export type { Permission } from './permission'
 export type { AuditLog } from './audit-log'

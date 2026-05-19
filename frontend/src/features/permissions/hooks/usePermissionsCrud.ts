@@ -2,7 +2,6 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { apiClient } from '@/shared/lib/api-client'
-import { getErrorMessage } from '@/shared/lib/api-error'
 import type { Permission } from '@/shared/types'
 
 interface CreatePermissionPayload {
@@ -33,7 +32,6 @@ export function useCreatePermission() {
       return res.data
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['permissions'] }),
-    onError: (err) => getErrorMessage(err),
   })
 }
 
@@ -45,7 +43,6 @@ export function useUpdatePermission() {
       return res.data
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['permissions'] }),
-    onError: (err) => getErrorMessage(err),
   })
 }
 
@@ -56,6 +53,5 @@ export function useDeletePermission() {
       await apiClient.delete(`/permissions/${id}`)
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['permissions'] }),
-    onError: (err) => getErrorMessage(err),
   })
 }

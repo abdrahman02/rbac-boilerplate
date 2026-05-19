@@ -2,7 +2,6 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { apiClient } from '@/shared/lib/api-client'
-import { getErrorMessage } from '@/shared/lib/api-error'
 import type { RoleWithPermissions } from '@/shared/types'
 
 interface CreateRolePayload {
@@ -33,7 +32,6 @@ export function useCreateRole() {
       return res.data
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['roles'] }),
-    onError: (err) => getErrorMessage(err),
   })
 }
 
@@ -45,7 +43,6 @@ export function useUpdateRole() {
       return res.data
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['roles'] }),
-    onError: (err) => getErrorMessage(err),
   })
 }
 
@@ -56,7 +53,6 @@ export function useDeleteRole() {
       await apiClient.delete(`/roles/${id}`)
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['roles'] }),
-    onError: (err) => getErrorMessage(err),
   })
 }
 
@@ -67,7 +63,6 @@ export function useAssignPermissionToRole() {
       await apiClient.post(`/roles/${roleId}/permissions`, { permission_id: permissionId })
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['roles'] }),
-    onError: (err) => getErrorMessage(err),
   })
 }
 
@@ -78,6 +73,5 @@ export function useRemovePermissionFromRole() {
       await apiClient.delete(`/roles/${roleId}/permissions/${permissionId}`)
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['roles'] }),
-    onError: (err) => getErrorMessage(err),
   })
 }

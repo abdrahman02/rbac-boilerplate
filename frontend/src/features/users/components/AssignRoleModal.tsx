@@ -19,7 +19,7 @@ export function AssignRoleModal({ isOpen, onClose, user }: AssignRoleModalProps)
   const removeRole = useRemoveRole()
   const [error, setError] = useState<string | null>(null)
 
-  const handleToggle = async (roleId: number, roleName: string, hasRole: boolean) => {
+  const handleToggle = async (roleId: number, hasRole: boolean) => {
     setError(null)
     try {
       if (hasRole) {
@@ -56,7 +56,7 @@ export function AssignRoleModal({ isOpen, onClose, user }: AssignRoleModalProps)
               <Button
                 size="sm"
                 variant={hasRole ? 'danger' : 'primary'}
-                onClick={() => handleToggle(role.id, role.name, hasRole)}
+                onClick={() => handleToggle(role.id, hasRole)}
                 isLoading={isPending}
               >
                 {hasRole ? 'Remove' : 'Assign'}
