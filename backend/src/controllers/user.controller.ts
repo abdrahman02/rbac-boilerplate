@@ -1,5 +1,6 @@
 import type { Request, Response } from 'express'
 import * as svc from '../services/user.service.js'
+import { handleError } from '../lib/handle-error.js'
 import type { ApiResponse, UserWithRoles, PaginatedResponse } from '../types/index.js'
 import type { CreateUserInput, UpdateUserInput, AssignRoleInput } from '../schemas/user.schema.js'
 
@@ -11,12 +12,7 @@ export async function listUsers(req: Request, res: Response): Promise<void> {
     const result = await svc.listUsers(page, limit)
     res.status(200).json(result)
   } catch (error) {
-    const body: ApiResponse<null> = {
-      success: false,
-      data: null,
-      message: error instanceof Error ? error.message : 'Internal server error',
-    }
-    res.status(500).json(body)
+    handleError(res, error)
   }
 }
 
@@ -62,12 +58,7 @@ export async function getUser(req: Request, res: Response): Promise<void> {
     }
     res.status(200).json(body)
   } catch (error) {
-    const body: ApiResponse<null> = {
-      success: false,
-      data: null,
-      message: error instanceof Error ? error.message : 'Internal server error',
-    }
-    res.status(500).json(body)
+    handleError(res, error)
   }
 }
 
@@ -84,15 +75,7 @@ export async function createUser(req: Request, res: Response): Promise<void> {
     }
     res.status(201).json(body)
   } catch (error) {
-    const code = error instanceof Error ? error.message : 'INTERNAL_ERROR'
-    const isEmailTaken = code === 'EMAIL_TAKEN'
-
-    const body: ApiResponse<null> = {
-      success: false,
-      data: null,
-      message: isEmailTaken ? 'Email address is already in use' : 'Failed to create user',
-    }
-    res.status(isEmailTaken ? 409 : 500).json(body)
+    handleError(res, error)
   }
 }
 
@@ -140,15 +123,7 @@ export async function updateUser(req: Request, res: Response): Promise<void> {
     }
     res.status(200).json(body)
   } catch (error) {
-    const code = error instanceof Error ? error.message : 'INTERNAL_ERROR'
-    const isEmailTaken = code === 'EMAIL_TAKEN'
-
-    const body: ApiResponse<null> = {
-      success: false,
-      data: null,
-      message: isEmailTaken ? 'Email address is already in use' : 'Failed to update user',
-    }
-    res.status(isEmailTaken ? 409 : 500).json(body)
+    handleError(res, error)
   }
 }
 
@@ -194,12 +169,7 @@ export async function deleteUser(req: Request, res: Response): Promise<void> {
     }
     res.status(200).json(body)
   } catch (error) {
-    const body: ApiResponse<null> = {
-      success: false,
-      data: null,
-      message: error instanceof Error ? error.message : 'Internal server error',
-    }
-    res.status(500).json(body)
+    handleError(res, error)
   }
 }
 
@@ -238,15 +208,7 @@ export async function assignRole(req: Request, res: Response): Promise<void> {
     }
     res.status(200).json(body)
   } catch (error) {
-    const msg = error instanceof Error ? error.message : 'Internal server error'
-    const statusCode = msg === 'USER_NOT_FOUND' ? 404 : 500
-
-    const body: ApiResponse<null> = {
-      success: false,
-      data: null,
-      message: msg,
-    }
-    res.status(statusCode).json(body)
+    handleError(res, error)
   }
 }
 
@@ -297,11 +259,6 @@ export async function removeRole(req: Request, res: Response): Promise<void> {
     }
     res.status(200).json(body)
   } catch (error) {
-    const body: ApiResponse<null> = {
-      success: false,
-      data: null,
-      message: error instanceof Error ? error.message : 'Internal server error',
-    }
-    res.status(500).json(body)
+    handleError(res, error)
   }
 }

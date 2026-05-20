@@ -1,6 +1,8 @@
+import type { Permission } from '@prisma/client'
 import type { Request, Response } from 'express'
 import * as svc from '../services/permission.service.js'
-import type { ApiResponse, Permission } from '../types/index.js'
+import { handleError } from '../lib/handle-error.js'
+import type { ApiResponse } from '../types/index.js'
 import type { CreatePermissionInput, UpdatePermissionInput } from '../schemas/permission.schema.js'
 
 export async function listPermissions(req: Request, res: Response): Promise<void> {
@@ -13,12 +15,7 @@ export async function listPermissions(req: Request, res: Response): Promise<void
     }
     res.status(200).json(body)
   } catch (error) {
-    const body: ApiResponse<null> = {
-      success: false,
-      data: null,
-      message: error instanceof Error ? error.message : 'Internal server error',
-    }
-    res.status(500).json(body)
+    handleError(res, error)
   }
 }
 
@@ -64,12 +61,7 @@ export async function getPermission(req: Request, res: Response): Promise<void> 
     }
     res.status(200).json(body)
   } catch (error) {
-    const body: ApiResponse<null> = {
-      success: false,
-      data: null,
-      message: error instanceof Error ? error.message : 'Internal server error',
-    }
-    res.status(500).json(body)
+    handleError(res, error)
   }
 }
 
@@ -86,15 +78,7 @@ export async function createPermission(req: Request, res: Response): Promise<voi
     }
     res.status(201).json(body)
   } catch (error) {
-    const msg = error instanceof Error ? error.message : 'Internal server error'
-    const statusCode = msg === 'PERMISSION_NAME_TAKEN' ? 409 : 500
-
-    const body: ApiResponse<null> = {
-      success: false,
-      data: null,
-      message: msg,
-    }
-    res.status(statusCode).json(body)
+    handleError(res, error)
   }
 }
 
@@ -142,15 +126,7 @@ export async function updatePermission(req: Request, res: Response): Promise<voi
     }
     res.status(200).json(body)
   } catch (error) {
-    const msg = error instanceof Error ? error.message : 'Internal server error'
-    const statusCode = msg === 'PERMISSION_NAME_TAKEN' ? 409 : 500
-
-    const body: ApiResponse<null> = {
-      success: false,
-      data: null,
-      message: msg,
-    }
-    res.status(statusCode).json(body)
+    handleError(res, error)
   }
 }
 
@@ -196,11 +172,6 @@ export async function deletePermission(req: Request, res: Response): Promise<voi
     }
     res.status(200).json(body)
   } catch (error) {
-    const body: ApiResponse<null> = {
-      success: false,
-      data: null,
-      message: error instanceof Error ? error.message : 'Internal server error',
-    }
-    res.status(500).json(body)
+    handleError(res, error)
   }
 }

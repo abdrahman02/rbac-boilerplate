@@ -1,5 +1,6 @@
 import type { Request, Response } from 'express'
 import * as svc from '../services/role.service.js'
+import { handleError } from '../lib/handle-error.js'
 import type { ApiResponse, RoleWithPermissions } from '../types/index.js'
 import type { CreateRoleInput, UpdateRoleInput, AssignPermissionInput } from '../schemas/role.schema.js'
 
@@ -13,12 +14,7 @@ export async function listRoles(req: Request, res: Response): Promise<void> {
     }
     res.status(200).json(body)
   } catch (error) {
-    const body: ApiResponse<null> = {
-      success: false,
-      data: null,
-      message: error instanceof Error ? error.message : 'Internal server error',
-    }
-    res.status(500).json(body)
+    handleError(res, error)
   }
 }
 
@@ -64,12 +60,7 @@ export async function getRole(req: Request, res: Response): Promise<void> {
     }
     res.status(200).json(body)
   } catch (error) {
-    const body: ApiResponse<null> = {
-      success: false,
-      data: null,
-      message: error instanceof Error ? error.message : 'Internal server error',
-    }
-    res.status(500).json(body)
+    handleError(res, error)
   }
 }
 
@@ -86,15 +77,7 @@ export async function createRole(req: Request, res: Response): Promise<void> {
     }
     res.status(201).json(body)
   } catch (error) {
-    const msg = error instanceof Error ? error.message : 'Internal server error'
-    const statusCode = msg === 'ROLE_NAME_TAKEN' ? 409 : 500
-
-    const body: ApiResponse<null> = {
-      success: false,
-      data: null,
-      message: msg,
-    }
-    res.status(statusCode).json(body)
+    handleError(res, error)
   }
 }
 
@@ -142,15 +125,7 @@ export async function updateRole(req: Request, res: Response): Promise<void> {
     }
     res.status(200).json(body)
   } catch (error) {
-    const msg = error instanceof Error ? error.message : 'Internal server error'
-    const statusCode = msg === 'ROLE_NAME_TAKEN' ? 409 : 500
-
-    const body: ApiResponse<null> = {
-      success: false,
-      data: null,
-      message: msg,
-    }
-    res.status(statusCode).json(body)
+    handleError(res, error)
   }
 }
 
@@ -196,12 +171,7 @@ export async function deleteRole(req: Request, res: Response): Promise<void> {
     }
     res.status(200).json(body)
   } catch (error) {
-    const body: ApiResponse<null> = {
-      success: false,
-      data: null,
-      message: error instanceof Error ? error.message : 'Internal server error',
-    }
-    res.status(500).json(body)
+    handleError(res, error)
   }
 }
 
@@ -240,15 +210,7 @@ export async function assignPermission(req: Request, res: Response): Promise<voi
     }
     res.status(200).json(body)
   } catch (error) {
-    const msg = error instanceof Error ? error.message : 'Internal server error'
-    const statusCode = msg === 'ROLE_NOT_FOUND' ? 404 : 500
-
-    const body: ApiResponse<null> = {
-      success: false,
-      data: null,
-      message: msg,
-    }
-    res.status(statusCode).json(body)
+    handleError(res, error)
   }
 }
 
@@ -299,11 +261,6 @@ export async function removePermission(req: Request, res: Response): Promise<voi
     }
     res.status(200).json(body)
   } catch (error) {
-    const body: ApiResponse<null> = {
-      success: false,
-      data: null,
-      message: error instanceof Error ? error.message : 'Internal server error',
-    }
-    res.status(500).json(body)
+    handleError(res, error)
   }
 }

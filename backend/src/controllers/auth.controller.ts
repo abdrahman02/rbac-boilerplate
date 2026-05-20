@@ -5,27 +5,8 @@ import {
   clearAuthCookies,
   hashRefreshToken,
 } from '../services/token.service.js'
+import { handleError } from '../lib/handle-error.js'
 import type { ApiResponse, AuthenticatedUser } from '../types/index.js'
-
-const ERROR_STATUS: Record<string, number> = {
-  EMAIL_TAKEN: 409,
-  INVALID_CREDENTIALS: 401,
-  ACCOUNT_DISABLED: 403,
-  INVALID_REFRESH_TOKEN: 401,
-  REFRESH_TOKEN_EXPIRED: 401,
-  USER_NOT_FOUND: 404,
-}
-
-function handleError(res: Response, err: unknown): void {
-  const message = err instanceof Error ? err.message : 'Internal server error'
-  const status = ERROR_STATUS[message] ?? 500
-  const body: ApiResponse<null> = {
-    success: false,
-    data: null,
-    message,
-  }
-  res.status(status).json(body)
-}
 
 export async function register(req: Request, res: Response): Promise<void> {
   try {
