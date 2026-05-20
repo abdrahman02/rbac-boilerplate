@@ -15,7 +15,7 @@
     "migrate:dev": "npm run migrate:dev --workspace=backend",
     "migrate:reset": "npm run migrate:reset --workspace=backend",
     "migrate:rollback": "npm run migrate:rollback --workspace=backend",
-    "migrate:generate": "npm run migrate:generate --workspace=backend",
+    "prisma:generate": "npm run prisma:generate --workspace=backend",
     "seed": "npm run seed --workspace=backend",
     "create-admin": "tsx backend/scripts/create-admin.ts",
     "test": "npm run test --workspace=backend && npm run test --workspace=frontend",

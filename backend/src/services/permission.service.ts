@@ -1,4 +1,4 @@
-import type { Permission } from '@prisma/client'
+import type { Permission } from '../generated/prisma/index.js'
 import * as repo from '../repositories/permission.repository.js'
 import type { CreatePermissionInput, UpdatePermissionInput } from '../schemas/permission.schema.js'
 

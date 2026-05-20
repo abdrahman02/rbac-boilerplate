@@ -1,4 +1,4 @@
-import type { User } from '@prisma/client'
+import type { User } from '../generated/prisma/index.js'
 import { prisma } from '../lib/prisma.js'
 
 type UserRow = Omit<User, 'passwordHash' | 'deletedAt'>

@@ -21,6 +21,9 @@ build/
 .next/
 out/
 
+# Prisma generated client
+backend/src/generated/
+
 # TypeScript
 *.tsbuildinfo
 

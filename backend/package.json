@@ -11,7 +11,7 @@
     "migrate:dev": "prisma migrate dev",
     "migrate:reset": "prisma migrate reset",
     "migrate:rollback": "prisma migrate rollback",
-    "migrate:generate": "prisma generate",
+    "prisma:generate": "prisma generate",
     "seed": "tsx seeders/seed.ts",
     "test": "vitest run",
     "test:watch": "vitest",

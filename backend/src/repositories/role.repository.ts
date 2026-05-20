@@ -1,4 +1,4 @@
-import type { Role } from '@prisma/client'
+import type { Role } from '../generated/prisma/index.js'
 import { prisma } from '../lib/prisma.js'
 
 export async function findAllRoles(): Promise<Role[]> {

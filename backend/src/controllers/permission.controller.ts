@@ -1,4 +1,4 @@
-import type { Permission } from '@prisma/client'
+import type { Permission } from '../generated/prisma/index.js'
 import type { Request, Response } from 'express'
 import * as svc from '../services/permission.service.js'
 import { handleError } from '../lib/handle-error.js'

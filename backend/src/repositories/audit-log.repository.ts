@@ -1,5 +1,5 @@
-import type { AuditLog } from '@prisma/client'
-import { Prisma } from '@prisma/client'
+import type { AuditLog } from '../generated/prisma/index.js'
+import { Prisma } from '../generated/prisma/index.js'
 import { prisma } from '../lib/prisma.js'
 
 export interface CreateAuditLogInput {

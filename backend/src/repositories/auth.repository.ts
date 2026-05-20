@@ -1,4 +1,4 @@
-import type { RefreshToken, User } from '@prisma/client'
+import type { RefreshToken, User } from '../generated/prisma/index.js'
 import { prisma } from '../lib/prisma.js'
 
 export async function findUserByEmail(email: string): Promise<User | null> {

@@ -1,4 +1,4 @@
-import type { Permission } from '@prisma/client'
+import type { Permission } from '../generated/prisma/index.js'
 import { prisma } from '../lib/prisma.js'
 
 export async function findAllPermissions(): Promise<Permission[]> {

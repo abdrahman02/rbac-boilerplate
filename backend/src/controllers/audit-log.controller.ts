@@ -1,4 +1,4 @@
-import type { AuditLog } from '@prisma/client'
+import type { AuditLog } from '../generated/prisma/index.js'
 import type { Request, Response } from 'express'
 import * as auditLogService from '../services/audit-log.service.js'
 import { handleError } from '../lib/handle-error.js'

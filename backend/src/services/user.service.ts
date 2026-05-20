@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client'
+import { Prisma } from '../generated/prisma/index.js'
 import * as repo from '../repositories/user.repository.js'
 import { hashPassword } from '../utils/hash.js'
 import type { UserWithRoles, PaginatedResponse } from '../types/index.js'
