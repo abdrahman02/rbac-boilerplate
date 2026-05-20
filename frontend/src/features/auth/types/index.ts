@@ -1,7 +1,11 @@
-export interface AuthenticatedUser {
-  id: number
-  email: string
-  name: string
-  roles: string[]
-  permissions: string[]
-}
+import { z } from 'zod'
+
+export const authenticatedUserSchema = z.object({
+  id: z.number(),
+  email: z.string().email(),
+  name: z.string(),
+  roles: z.array(z.string()),
+  permissions: z.array(z.string()),
+})
+
+export type AuthenticatedUser = z.infer<typeof authenticatedUserSchema>

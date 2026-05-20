@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useAuthStore } from '@/features/auth/stores/authStore'
 import { apiClient } from '@/shared/lib/api-client'
-import type { AuthenticatedUser } from '@/features/auth/types'
+import { authenticatedUserSchema, type AuthenticatedUser } from '@/features/auth/types'
 
 export function useAuth() {
   const { setUser } = useAuthStore()
@@ -11,7 +11,7 @@ export function useAuth() {
     queryKey: ['auth', 'me'],
     queryFn: async () => {
       const response = await apiClient.get('/auth/me')
-      return response.data.data as AuthenticatedUser
+      return authenticatedUserSchema.parse(response.data.data)
     },
   })
 

@@ -1,5 +1,5 @@
 import { apiClient } from '@/shared/lib/api-client'
-import type { AuthenticatedUser } from '@/features/auth/types'
+import { authenticatedUserSchema, type AuthenticatedUser } from '@/features/auth/types'
 import type { LoginInput } from './login.schema'
 
 /**
@@ -7,5 +7,5 @@ import type { LoginInput } from './login.schema'
  */
 export async function loginApi(data: LoginInput): Promise<AuthenticatedUser> {
   const response = await apiClient.post('/auth/login', data)
-  return response.data.data as AuthenticatedUser
+  return authenticatedUserSchema.parse(response.data.data)
 }
