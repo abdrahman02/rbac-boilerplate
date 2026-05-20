@@ -4,8 +4,10 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { z } from 'zod'
-import { Button, Input, FormField } from '@/components/ui'
+import { AuthShell } from './AuthShell'
+import { Alert, Button, FormField, Input, CheckIcon, LockIcon, PasswordStrengthMeter } from '@/shared/components/ui'
 
 const resetPasswordSchema = z
   .object({
@@ -22,6 +24,9 @@ type ResetPasswordInput = z.infer<typeof resetPasswordSchema>
 export function ResetPasswordForm() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [done, setDone] = useState(false)
+  const [passwordValue, setPasswordValue] = useState('')
 
   const {
     register,
@@ -31,37 +36,97 @@ export function ResetPasswordForm() {
 
   const onSubmit = async () => {
     setIsLoading(true)
+    setError(null)
     try {
       // TODO: Implement password reset endpoint
-      router.push('/login')
+      setDone(true)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Something went wrong')
     } finally {
       setIsLoading(false)
     }
   }
 
+  const footer = (
+    <Link href="/login" className="text-primary font-medium no-underline">
+      Back to sign in
+    </Link>
+  )
+
+  if (done) {
+    return (
+      <AuthShell footer={footer}>
+        <SuccessState onContinue={() => router.push('/login')} />
+      </AuthShell>
+    )
+  }
+
+  const passwordRegister = register('password')
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      <FormField label="New Password" error={errors.password?.message}>
-        <Input
-          type="password"
-          {...register('password')}
-          error={errors.password?.message}
-          placeholder="••••••••"
-        />
-      </FormField>
+    <AuthShell footer={footer}>
+      <h1 className="text-[26px] font-semibold tracking-tight m-0">Set a new password</h1>
+      <p className="mt-1.5 mb-7 text-sm text-muted-foreground">
+        Choose a password you haven&apos;t used before.
+      </p>
 
-      <FormField label="Confirm Password" error={errors.confirmPassword?.message}>
-        <Input
-          type="password"
-          {...register('confirmPassword')}
-          error={errors.confirmPassword?.message}
-          placeholder="••••••••"
-        />
-      </FormField>
+      {error && <Alert message={error} className="mb-4" />}
 
-      <Button type="submit" isLoading={isLoading} fullWidth>
-        Reset Password
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-3.5">
+        <FormField label="New password" required error={errors.password?.message}>
+          <Input
+            type="password"
+            placeholder="Enter new password"
+            autoComplete="new-password"
+            iconLeft={<LockIcon />}
+            error={errors.password?.message}
+            {...passwordRegister}
+            onChange={(e) => {
+              setPasswordValue(e.target.value)
+              passwordRegister.onChange(e)
+            }}
+          />
+          <PasswordStrengthMeter password={passwordValue} />
+        </FormField>
+
+        <FormField label="Confirm new password" required error={errors.confirmPassword?.message}>
+          <Input
+            type="password"
+            placeholder="Re-enter new password"
+            autoComplete="new-password"
+            iconLeft={<LockIcon />}
+            error={errors.confirmPassword?.message}
+            {...register('confirmPassword')}
+          />
+        </FormField>
+
+        <Button type="submit" isLoading={isLoading} fullWidth size="lg">
+          Update password
+        </Button>
+      </form>
+    </AuthShell>
+  )
+}
+
+interface SuccessStateProps {
+  onContinue: () => void
+}
+
+function SuccessState({ onContinue }: SuccessStateProps) {
+  return (
+    <div className="animate-scale-in">
+      <div className="w-14 h-14 rounded-2xl bg-success/12 text-success border border-success/22 inline-flex items-center justify-center mb-[18px]">
+        <CheckIcon size={26} />
+      </div>
+
+      <h1 className="text-2xl font-semibold tracking-tight m-0">Password updated</h1>
+      <p className="mt-2 mb-6 text-sm text-muted-foreground leading-relaxed">
+        You can now sign in with your new password.
+      </p>
+
+      <Button type="button" size="lg" onClick={onContinue}>
+        Continue to sign in
       </Button>
-    </form>
+    </div>
   )
 }
