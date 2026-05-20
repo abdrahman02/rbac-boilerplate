@@ -13,7 +13,7 @@ export default function AuditLogsPage() {
     page,
     limit: 20,
     action: action || undefined,
-    resource_type: resourceType || undefined,
+    resourceType: resourceType || undefined,
   })
 
   const logs = data?.data ?? []
@@ -95,11 +95,11 @@ export default function AuditLogsPage() {
               logs.map((log) => (
                 <tr key={log.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 font-mono text-sm text-gray-900">{log.action}</td>
-                  <td className="px-6 py-4 text-sm text-gray-600">{log.resource_type}</td>
-                  <td className="px-6 py-4 text-sm text-gray-500">{log.resource_id ?? '—'}</td>
-                  <td className="px-6 py-4 text-sm text-gray-500">{log.ip_address ?? '—'}</td>
+                  <td className="px-6 py-4 text-sm text-gray-600">{log.resourceType}</td>
+                  <td className="px-6 py-4 text-sm text-gray-500">{log.resourceId ?? '—'}</td>
+                  <td className="px-6 py-4 text-sm text-gray-500">{log.ipAddress ?? '—'}</td>
                   <td className="px-6 py-4 text-sm text-gray-500">
-                    {new Date(log.created_at).toLocaleString()}
+                    {new Date(log.createdAt).toLocaleString()}
                   </td>
                 </tr>
               ))

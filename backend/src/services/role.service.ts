@@ -13,7 +13,7 @@ export async function listRoles(): Promise<RoleWithPermissions[]> {
         name: r.name,
         description: r.description,
         permissions,
-        created_at: r.created_at,
+        created_at: r.createdAt,
       }
     }),
   )
@@ -29,7 +29,7 @@ export async function getRole(roleId: number): Promise<RoleWithPermissions | nul
     name: role.name,
     description: role.description,
     permissions,
-    created_at: role.created_at,
+    created_at: role.createdAt,
   }
 }
 

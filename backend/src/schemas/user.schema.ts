@@ -1,8 +1,9 @@
 import { z } from 'zod'
+import { emailField } from './shared.js'
 
 export const createUserSchema = z.object({
   name: z.string().min(2).max(100).trim(),
-  email: z.string().email().toLowerCase(),
+  email: emailField,
   password: z
     .string()
     .min(8)
@@ -17,7 +18,7 @@ export const createUserSchema = z.object({
 export const updateUserSchema = z
   .object({
     name: z.string().min(2).max(100).trim().optional(),
-    email: z.string().email().toLowerCase().optional(),
+    email: emailField.optional(),
     is_active: z.boolean().optional(),
   })
   .refine((data) => Object.keys(data).length > 0, {

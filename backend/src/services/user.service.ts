@@ -15,11 +15,11 @@ export async function listUsers(
       const roles = await repo.getUserRoles(u.id)
       return {
         id: u.id,
-        name: u.full_name,
+        name: u.fullName,
         email: u.email,
-        is_active: u.is_active,
+        is_active: u.isActive,
         roles,
-        created_at: u.created_at,
+        created_at: u.createdAt,
       }
     }),
   )
@@ -42,11 +42,11 @@ export async function getUser(userId: number): Promise<UserWithRoles | null> {
   const roles = await repo.getUserRoles(userId)
   return {
     id: user.id,
-    name: user.full_name,
+    name: user.fullName,
     email: user.email,
-    is_active: user.is_active,
+    is_active: user.isActive,
     roles,
-    created_at: user.created_at,
+    created_at: user.createdAt,
   }
 }
 
@@ -84,10 +84,10 @@ export async function updateUser(userId: number, input: UpdateUserInput): Promis
     if (emailTaken) throw new Error('EMAIL_TAKEN')
   }
 
-  const updateFields: { full_name?: string; email?: string; is_active?: boolean } = {}
-  if (input.name) updateFields.full_name = input.name
+  const updateFields: { fullName?: string; email?: string; isActive?: boolean } = {}
+  if (input.name) updateFields.fullName = input.name
   if (input.email) updateFields.email = input.email
-  if (input.is_active !== undefined) updateFields.is_active = input.is_active
+  if (input.is_active !== undefined) updateFields.isActive = input.is_active
 
   return repo.updateUser(userId, updateFields)
 }

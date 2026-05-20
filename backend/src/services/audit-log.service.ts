@@ -1,6 +1,7 @@
+import type { AuditLog } from '@prisma/client'
 import * as repo from '../repositories/audit-log.repository.js'
-import type { AuditLog, PaginatedResponse } from '../types/index.js'
 import type { AuditLogFilters } from '../repositories/audit-log.repository.js'
+import type { PaginatedResponse } from '../types/index.js'
 
 export async function listAuditLogs(
 	filters: AuditLogFilters,

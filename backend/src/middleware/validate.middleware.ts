@@ -7,7 +7,7 @@ export function validate(schema: ZodSchema) {
     const result = schema.safeParse(req.body)
 
     if (!result.success) {
-      const firstError = result.error.errors[0]
+      const firstError = result.error.issues[0]
       const body: ApiResponse<null> = {
         success: false,
         data: null,

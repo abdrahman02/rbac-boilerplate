@@ -87,7 +87,7 @@ export default function PermissionsPage() {
                     <td className="px-6 py-4 font-mono text-sm text-gray-900">{perm.name}</td>
                     <td className="px-6 py-4 text-sm text-gray-600">{perm.description ?? '—'}</td>
                     <td className="px-6 py-4 text-sm text-gray-500">
-                      {new Date(perm.created_at).toLocaleDateString()}
+                      {new Date(perm.createdAt).toLocaleDateString()}
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex gap-2">

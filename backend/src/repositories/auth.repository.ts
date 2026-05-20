@@ -1,52 +1,12 @@
+import type { RefreshToken, User } from '@prisma/client'
 import { prisma } from '../lib/prisma.js'
-import type { User, RefreshToken } from '../types/index.js'
-
-function mapUser(u: {
-  id: number
-  email: string
-  passwordHash: string
-  fullName: string
-  isActive: boolean
-  createdAt: Date
-  updatedAt: Date
-}): User {
-  return {
-    id: u.id,
-    email: u.email,
-    password_hash: u.passwordHash,
-    full_name: u.fullName,
-    is_active: u.isActive,
-    created_at: u.createdAt,
-    updated_at: u.updatedAt,
-  }
-}
-
-function mapRefreshToken(t: {
-  id: number
-  userId: number
-  tokenHash: string
-  expiresAt: Date
-  createdAt: Date
-  revokedAt: Date | null
-}): RefreshToken {
-  return {
-    id: t.id,
-    user_id: t.userId,
-    token_hash: t.tokenHash,
-    expires_at: t.expiresAt,
-    created_at: t.createdAt,
-    revoked_at: t.revokedAt,
-  }
-}
 
 export async function findUserByEmail(email: string): Promise<User | null> {
-  const user = await prisma.user.findFirst({ where: { email, deletedAt: null } })
-  return user ? mapUser(user) : null
+  return prisma.user.findFirst({ where: { email, deletedAt: null } })
 }
 
 export async function findUserById(id: number): Promise<User | null> {
-  const user = await prisma.user.findFirst({ where: { id, deletedAt: null } })
-  return user ? mapUser(user) : null
+  return prisma.user.findFirst({ where: { id, deletedAt: null } })
 }
 
 export async function createUser(
@@ -113,10 +73,7 @@ export async function saveRefreshToken(
 }
 
 export async function findRefreshToken(tokenHash: string): Promise<RefreshToken | null> {
-  const token = await prisma.refreshToken.findFirst({
-    where: { tokenHash, revokedAt: null },
-  })
-  return token ? mapRefreshToken(token) : null
+  return prisma.refreshToken.findFirst({ where: { tokenHash, revokedAt: null } })
 }
 
 export async function revokeRefreshToken(tokenHash: string): Promise<void> {
@@ -125,4 +82,3 @@ export async function revokeRefreshToken(tokenHash: string): Promise<void> {
     data: { revokedAt: new Date() },
   })
 }
-

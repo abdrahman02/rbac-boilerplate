@@ -1,42 +1,16 @@
+import type { Role } from '@prisma/client'
 import { prisma } from '../lib/prisma.js'
-import type { Role } from '../types/index.js'
-
-function mapRole(r: {
-  id: number
-  name: string
-  description: string | null
-  createdAt: Date
-}): Role {
-  return {
-    id: r.id,
-    name: r.name,
-    description: r.description,
-    created_at: r.createdAt,
-  }
-}
 
 export async function findAllRoles(): Promise<Role[]> {
-  const rows = await prisma.role.findMany({
-    select: { id: true, name: true, description: true, createdAt: true },
-    orderBy: { name: 'asc' },
-  })
-  return rows.map(mapRole)
+  return prisma.role.findMany({ orderBy: { name: 'asc' } })
 }
 
 export async function findRoleById(id: number): Promise<Role | null> {
-  const role = await prisma.role.findUnique({
-    where: { id },
-    select: { id: true, name: true, description: true, createdAt: true },
-  })
-  return role ? mapRole(role) : null
+  return prisma.role.findUnique({ where: { id } })
 }
 
 export async function findRoleByName(name: string): Promise<Role | null> {
-  const role = await prisma.role.findUnique({
-    where: { name },
-    select: { id: true, name: true, description: true, createdAt: true },
-  })
-  return role ? mapRole(role) : null
+  return prisma.role.findUnique({ where: { name } })
 }
 
 export async function createRole(name: string, description?: string): Promise<number> {

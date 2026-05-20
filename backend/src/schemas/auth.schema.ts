@@ -1,8 +1,9 @@
 import { z } from 'zod'
+import { emailField } from './shared.js'
 
 export const registerSchema = z.object({
   name: z.string().min(2).max(100).trim(),
-  email: z.string().email().toLowerCase(),
+  email: emailField,
   password: z
     .string()
     .min(8)
@@ -14,7 +15,7 @@ export const registerSchema = z.object({
 })
 
 export const loginSchema = z.object({
-  email: z.string().email().toLowerCase(),
+  email: emailField,
   password: z.string().min(1),
 })
 

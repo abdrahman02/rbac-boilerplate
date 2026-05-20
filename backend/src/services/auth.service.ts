@@ -25,10 +25,10 @@ export async function login(input: LoginInput): Promise<AuthResult> {
   const user = await repo.findUserByEmail(input.email)
   if (!user) throw new Error('INVALID_CREDENTIALS')
 
-  const valid = await comparePassword(input.password, user.password_hash)
+  const valid = await comparePassword(input.password, user.passwordHash)
   if (!valid) throw new Error('INVALID_CREDENTIALS')
 
-  if (!user.is_active) throw new Error('ACCOUNT_DISABLED')
+  if (!user.isActive) throw new Error('ACCOUNT_DISABLED')
 
   return buildAuthResult(user.id)
 }
@@ -47,13 +47,13 @@ export async function refresh(rawRefreshToken: string): Promise<AuthResult> {
   if (!stored) throw new Error('INVALID_REFRESH_TOKEN')
 
   const now = new Date()
-  if (now > new Date(stored.expires_at)) {
+  if (now > new Date(stored.expiresAt)) {
     await repo.revokeRefreshToken(tokenHash)
     throw new Error('REFRESH_TOKEN_EXPIRED')
   }
 
   await repo.revokeRefreshToken(tokenHash)
-  return buildAuthResult(stored.user_id)
+  return buildAuthResult(stored.userId)
 }
 
 export async function getMe(userId: number): Promise<AuthenticatedUser> {
@@ -67,7 +67,7 @@ export async function getMe(userId: number): Promise<AuthenticatedUser> {
 
   return {
     id: user.id,
-    name: user.full_name,
+    name: user.fullName,
     email: user.email,
     roles,
     permissions,
@@ -85,7 +85,7 @@ async function buildAuthResult(userId: number): Promise<AuthResult> {
 
   const authenticatedUser: AuthenticatedUser = {
     id: user.id,
-    name: user.full_name,
+    name: user.fullName,
     email: user.email,
     roles,
     permissions,

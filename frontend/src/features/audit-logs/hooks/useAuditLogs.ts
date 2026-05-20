@@ -5,9 +5,9 @@ import { apiClient } from '@/shared/lib/api-client'
 import type { AuditLog, PaginatedResponse } from '@/shared/types'
 
 interface AuditLogFilters {
-  user_id?: number
+  userId?: number
   action?: string
-  resource_type?: string
+  resourceType?: string
   page?: number
   limit?: number
 }
@@ -16,9 +16,9 @@ export function useAuditLogs(filters: AuditLogFilters = {}) {
   const { page = 1, limit = 20, ...rest } = filters
 
   const params = new URLSearchParams({ page: String(page), limit: String(limit) })
-  if (rest.user_id) params.set('user_id', String(rest.user_id))
+  if (rest.userId) params.set('userId', String(rest.userId))
   if (rest.action) params.set('action', rest.action)
-  if (rest.resource_type) params.set('resource_type', rest.resource_type)
+  if (rest.resourceType) params.set('resourceType', rest.resourceType)
 
   return useQuery<PaginatedResponse<AuditLog>>({
     queryKey: ['audit-logs', filters],

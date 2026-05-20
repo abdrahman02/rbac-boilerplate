@@ -7,10 +7,10 @@ dotenv.config({ path: path.resolve(import.meta.dirname, '../../.env') })
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   PORT: z.string().default('3001'),
-  FRONTEND_URL: z.string().url(),
+  FRONTEND_URL: z.url(),
 
   DB_HOST: z.string().min(1),
-  DB_PORT: z.string().default('3306'),
+  DB_PORT: z.coerce.number().default(3306),
   DB_NAME: z.string().min(1),
   DB_USER: z.string().min(1),
   DB_PASSWORD: z.string().min(1),

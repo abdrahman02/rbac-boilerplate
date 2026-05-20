@@ -1,5 +1,5 @@
+import type { Permission } from '@prisma/client'
 import * as repo from '../repositories/permission.repository.js'
-import type { Permission } from '../types/index.js'
 import type { CreatePermissionInput, UpdatePermissionInput } from '../schemas/permission.schema.js'
 
 export async function listPermissions(): Promise<Permission[]> {

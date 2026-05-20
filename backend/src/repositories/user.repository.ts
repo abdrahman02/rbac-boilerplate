@@ -1,27 +1,7 @@
+import type { User } from '@prisma/client'
 import { prisma } from '../lib/prisma.js'
-import type { User } from '../types/index.js'
 
-type UserRow = Omit<User, 'password_hash'>
-
-function mapUser(u: {
-  id: number
-  email: string
-  passwordHash: string
-  fullName: string
-  isActive: boolean
-  createdAt: Date
-  updatedAt: Date
-}): User {
-  return {
-    id: u.id,
-    email: u.email,
-    password_hash: u.passwordHash,
-    full_name: u.fullName,
-    is_active: u.isActive,
-    created_at: u.createdAt,
-    updated_at: u.updatedAt,
-  }
-}
+type UserRow = Omit<User, 'passwordHash' | 'deletedAt'>
 
 export async function findAllUsers(
   page: number,
@@ -30,32 +10,29 @@ export async function findAllUsers(
   const offset = (page - 1) * limit
   const where = { deletedAt: null } as const
 
-  const [total, users] = await prisma.$transaction([
+  const [total, rows] = await prisma.$transaction([
     prisma.user.count({ where }),
     prisma.user.findMany({
       where,
-      select: { id: true, email: true, fullName: true, isActive: true, createdAt: true, updatedAt: true },
+      select: {
+        id: true,
+        email: true,
+        fullName: true,
+        isActive: true,
+        createdAt: true,
+        updatedAt: true,
+      },
       orderBy: { createdAt: 'desc' },
       skip: offset,
       take: limit,
     }),
   ])
 
-  const rows: UserRow[] = users.map((u) => ({
-    id: u.id,
-    email: u.email,
-    full_name: u.fullName,
-    is_active: u.isActive,
-    created_at: u.createdAt,
-    updated_at: u.updatedAt,
-  }))
-
   return { rows, total }
 }
 
 export async function findUserById(id: number): Promise<User | null> {
-  const user = await prisma.user.findFirst({ where: { id, deletedAt: null } })
-  return user ? mapUser(user) : null
+  return prisma.user.findFirst({ where: { id, deletedAt: null } })
 }
 
 export async function createUser(
@@ -72,16 +49,10 @@ export async function createUser(
 
 export async function updateUser(
   id: number,
-  fields: { full_name?: string; email?: string; is_active?: boolean },
+  fields: { fullName?: string; email?: string; isActive?: boolean },
 ): Promise<boolean> {
   if (Object.keys(fields).length === 0) return false
-
-  const data: { fullName?: string; email?: string; isActive?: boolean } = {}
-  if (fields.full_name !== undefined) data.fullName = fields.full_name
-  if (fields.email !== undefined) data.email = fields.email
-  if (fields.is_active !== undefined) data.isActive = fields.is_active
-
-  const result = await prisma.user.updateMany({ where: { id, deletedAt: null }, data })
+  const result = await prisma.user.updateMany({ where: { id, deletedAt: null }, data: fields })
   return result.count > 0
 }
 
@@ -136,9 +107,10 @@ export async function anonymizeDeletedEmail(email: string): Promise<void> {
 }
 
 export async function emailExists(email: string, excludeId?: number): Promise<boolean> {
-  const where = excludeId !== undefined
-    ? { email, deletedAt: null, id: { not: excludeId } }
-    : { email, deletedAt: null }
+  const where =
+    excludeId !== undefined
+      ? { email, deletedAt: null, id: { not: excludeId } }
+      : { email, deletedAt: null }
 
   const user = await prisma.user.findFirst({ where, select: { id: true } })
   return user !== null

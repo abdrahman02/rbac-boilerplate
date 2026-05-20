@@ -1,6 +1,6 @@
+import type { AuditLog } from '@prisma/client'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../lib/prisma.js'
-import type { AuditLog } from '../types/index.js'
 
 export interface CreateAuditLogInput {
   userId: number | null
@@ -12,33 +12,11 @@ export interface CreateAuditLogInput {
 }
 
 export interface AuditLogFilters {
-  user_id?: number | undefined
+  userId?: number | undefined
   action?: string | undefined
-  resource_type?: string | undefined
-  date_from?: Date | undefined
-  date_to?: Date | undefined
-}
-
-function mapAuditLog(log: {
-  id: number
-  userId: number | null
-  action: string
-  resourceType: string
-  resourceId: number | null
-  details: Prisma.JsonValue | null
-  ipAddress: string | null
-  createdAt: Date
-}): AuditLog {
-  return {
-    id: log.id,
-    user_id: log.userId,
-    action: log.action,
-    resource_type: log.resourceType,
-    resource_id: log.resourceId,
-    details: log.details !== null ? (log.details as Record<string, unknown>) : null,
-    ip_address: log.ipAddress,
-    created_at: log.createdAt,
-  }
+  resourceType?: string | undefined
+  dateFrom?: Date | undefined
+  dateTo?: Date | undefined
 }
 
 export async function insertAuditLog(input: CreateAuditLogInput): Promise<void> {
@@ -61,37 +39,27 @@ export async function findAuditLogs(
 ): Promise<{ rows: AuditLog[]; total: number }> {
   const where: Prisma.AuditLogWhereInput = {}
 
-  if (filters.user_id !== undefined) where.userId = filters.user_id
+  if (filters.userId !== undefined) where.userId = filters.userId
   if (filters.action !== undefined) where.action = { contains: filters.action }
-  if (filters.resource_type !== undefined) where.resourceType = filters.resource_type
-  if (filters.date_from !== undefined || filters.date_to !== undefined) {
+  if (filters.resourceType !== undefined) where.resourceType = filters.resourceType
+  if (filters.dateFrom !== undefined || filters.dateTo !== undefined) {
     where.createdAt = {
-      ...(filters.date_from !== undefined ? { gte: filters.date_from } : {}),
-      ...(filters.date_to !== undefined ? { lte: filters.date_to } : {}),
+      ...(filters.dateFrom !== undefined ? { gte: filters.dateFrom } : {}),
+      ...(filters.dateTo !== undefined ? { lte: filters.dateTo } : {}),
     }
   }
 
   const offset = (page - 1) * limit
 
-  const [total, logs] = await prisma.$transaction([
+  const [total, rows] = await prisma.$transaction([
     prisma.auditLog.count({ where }),
     prisma.auditLog.findMany({
       where,
-      select: {
-        id: true,
-        userId: true,
-        action: true,
-        resourceType: true,
-        resourceId: true,
-        details: true,
-        ipAddress: true,
-        createdAt: true,
-      },
       orderBy: { createdAt: 'desc' },
       skip: offset,
       take: limit,
     }),
   ])
 
-  return { rows: logs.map(mapAuditLog), total }
+  return { rows, total }
 }

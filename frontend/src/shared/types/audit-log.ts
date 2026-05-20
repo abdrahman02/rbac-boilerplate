@@ -1,10 +1,10 @@
 export interface AuditLog {
   id: number
-  user_id: number | null
+  userId: number | null
   action: string
-  resource_type: string
-  resource_id: number | null
+  resourceType: string
+  resourceId: number | null
   details: Record<string, unknown> | null
-  ip_address: string | null
-  created_at: string
+  ipAddress: string | null
+  createdAt: string
 }
