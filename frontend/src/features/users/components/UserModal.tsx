@@ -11,7 +11,7 @@ import type { UserWithRoles } from '@/shared/types'
 
 const schema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
-  email: z.string().email('Invalid email'),
+  email: z.email({ message: 'Invalid email' }),
   password: z.string().optional(),
 })
 

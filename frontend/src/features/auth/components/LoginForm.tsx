@@ -12,7 +12,7 @@ import { getErrorMessage } from '@/shared/lib/api-error'
 import { Button, Input, FormField } from '@/components/ui'
 
 const loginSchema = z.object({
-  email: z.string().email('Invalid email'),
+  email: z.email({ message: 'Invalid email' }),
   password: z.string().min(8, 'Password must be at least 8 characters'),
 })
 

@@ -14,7 +14,7 @@ import { Button, Input, FormField } from '@/components/ui'
 const registerSchema = z
   .object({
     name: z.string().min(2, 'Name must be at least 2 characters'),
-    email: z.string().email('Invalid email'),
+    email: z.email({ message: 'Invalid email' }),
     password: z.string().min(8, 'Password must be at least 8 characters'),
     confirmPassword: z.string(),
   })

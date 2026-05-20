@@ -8,7 +8,7 @@ import { z } from 'zod'
 import { Button, Input, FormField } from '@/components/ui'
 
 const forgotPasswordSchema = z.object({
-  email: z.string().email('Invalid email'),
+  email: z.email({ message: 'Invalid email' }),
 })
 
 type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>
