@@ -77,16 +77,14 @@ export function LoginForm() {
         </FormField>
 
         <FormField
-          label={
-            <span className="flex justify-between w-full">
-              <span>Password</span>
-              <Link
-                href="/forgot-password"
-                className="text-[12.5px] text-primary font-medium no-underline"
-              >
-                Forgot?
-              </Link>
-            </span>
+          label="Password"
+          labelRight={
+            <Link
+              href="/forgot-password"
+              className="text-[12.5px] text-primary font-medium no-underline"
+            >
+              Forgot?
+            </Link>
           }
           required
           error={errors.password?.message}
