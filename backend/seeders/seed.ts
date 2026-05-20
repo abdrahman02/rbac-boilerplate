@@ -1,77 +1,94 @@
-import dotenv from 'dotenv'
-import path from 'node:path'
-import mysql from 'mysql2/promise'
+import { config } from 'dotenv'
+import { resolve } from 'node:path'
+import { PrismaClient } from '@prisma/client'
+import { PrismaMariaDb } from '@prisma/adapter-mariadb'
+import { env } from '../src/config/env.js'
 
-dotenv.config({ path: path.resolve(import.meta.dirname, '../../.env') })
+const envPath = resolve(process.cwd(), 'backend/.env')
+config({ path: envPath })
 
-interface IdRow extends mysql.RowDataPacket {
-  id: number
-}
-
-const pool = mysql.createPool({
-  host: process.env['DB_HOST'],
-  port: Number(process.env['DB_PORT'] ?? 3306),
-  database: process.env['DB_NAME'],
-  user: process.env['DB_USER'],
-  password: process.env['DB_PASSWORD'],
+const adapter = new PrismaMariaDb({
+  host: env.DB_HOST,
+  port: env.DB_PORT,
+  user: env.DB_USER,
+  password: env.DB_PASSWORD,
+  database: env.DB_NAME,
 })
 
+const prisma = new PrismaClient({ adapter })
+
 const DEFAULT_PERMISSIONS = [
-  { name: 'users:read',         description: 'View list and detail of users' },
-  { name: 'users:create',       description: 'Create new users' },
-  { name: 'users:update',       description: 'Update existing users' },
-  { name: 'users:delete',       description: 'Delete users' },
-  { name: 'roles:read',         description: 'View list and detail of roles' },
-  { name: 'roles:create',       description: 'Create new roles' },
-  { name: 'roles:update',       description: 'Update existing roles' },
-  { name: 'roles:delete',       description: 'Delete roles' },
-  { name: 'permissions:read',   description: 'View list and detail of permissions' },
+  { name: 'users:read', description: 'View list and detail of users' },
+  { name: 'users:create', description: 'Create new users' },
+  { name: 'users:update', description: 'Update existing users' },
+  { name: 'users:delete', description: 'Delete users' },
+  { name: 'roles:read', description: 'View list and detail of roles' },
+  { name: 'roles:create', description: 'Create new roles' },
+  { name: 'roles:update', description: 'Update existing roles' },
+  { name: 'roles:delete', description: 'Delete roles' },
+  { name: 'permissions:read', description: 'View list and detail of permissions' },
   { name: 'permissions:create', description: 'Create new permissions' },
   { name: 'permissions:update', description: 'Update existing permissions' },
   { name: 'permissions:delete', description: 'Delete permissions' },
-  { name: 'audit_logs:read',    description: 'View audit logs' },
+  { name: 'audit_logs:read', description: 'View audit logs' },
 ]
 
 const DEFAULT_ROLES = [
   { name: 'admin', description: 'Full system access — all permissions assigned' },
-  { name: 'user',  description: 'Basic user — no admin permissions by default' },
+  { name: 'user', description: 'Basic user — no admin permissions by default' },
 ]
 
 async function seed(): Promise<void> {
+  // Seed permissions
   for (const perm of DEFAULT_PERMISSIONS) {
-    await pool.execute(
-      'INSERT IGNORE INTO permissions (name, description) VALUES (?, ?)',
-      [perm.name, perm.description],
-    )
+    await prisma.permission.upsert({
+      where: { name: perm.name },
+      update: { description: perm.description },
+      create: { name: perm.name, description: perm.description },
+    })
   }
   console.log(`✓ Seeded ${DEFAULT_PERMISSIONS.length} permissions`)
 
+  // Seed roles
   for (const role of DEFAULT_ROLES) {
-    await pool.execute(
-      'INSERT IGNORE INTO roles (name, description) VALUES (?, ?)',
-      [role.name, role.description],
-    )
+    await prisma.role.upsert({
+      where: { name: role.name },
+      update: { description: role.description },
+      create: { name: role.name, description: role.description },
+    })
   }
   console.log(`✓ Seeded ${DEFAULT_ROLES.length} roles`)
 
-  const [adminRows] = await pool.execute<IdRow[]>(
-    'SELECT id FROM roles WHERE name = ?',
-    ['admin'],
-  )
-  const adminRole = adminRows[0]
+  // Get admin role
+  const adminRole = await prisma.role.findFirst({
+    where: { name: 'admin' },
+  })
+
   if (!adminRole) throw new Error('admin role not found after insert')
 
-  const [permRows] = await pool.execute<IdRow[]>('SELECT id FROM permissions')
-  for (const perm of permRows) {
-    await pool.execute(
-      'INSERT IGNORE INTO role_permissions (role_id, permission_id) VALUES (?, ?)',
-      [adminRole.id, perm.id],
-    )
+  // Get all permissions
+  const permissions = await prisma.permission.findMany()
+
+  // Assign all permissions to admin role
+  for (const perm of permissions) {
+    await prisma.rolePermission.upsert({
+      where: {
+        roleId_permissionId: {
+          roleId: adminRole.id,
+          permissionId: perm.id,
+        },
+      },
+      update: {},
+      create: {
+        roleId: adminRole.id,
+        permissionId: perm.id,
+      },
+    })
   }
-  console.log(`✓ Assigned all ${permRows.length} permissions to admin role`)
+  console.log(`✓ Assigned all ${permissions.length} permissions to admin role`)
 
   console.log('\nSeed complete.')
-  await pool.end()
+  await prisma.$disconnect()
 }
 
 seed().catch((err) => {
