@@ -1,4 +1,4 @@
-import { LoginForm } from '@/features/auth/components/LoginForm'
+import { LoginForm } from '@/features/auth/login'
 
 export const metadata = {
   title: 'Login - RBAC Boilerplate',
