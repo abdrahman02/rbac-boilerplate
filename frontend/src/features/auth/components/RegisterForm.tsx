@@ -9,12 +9,13 @@ import Link from 'next/link'
 import { z } from 'zod'
 import { apiClient } from '@/shared/lib/api-client'
 import { getErrorMessage } from '@/shared/lib/api-error'
-import { Button, Input, FormField } from '@/components/ui'
+import { AuthShell } from './AuthShell'
+import { Alert, Button, FormField, Input, MailIcon, LockIcon, PasswordStrengthMeter } from '@/shared/components/ui'
 
 const registerSchema = z
   .object({
     name: z.string().min(2, 'Name must be at least 2 characters'),
-    email: z.email({ message: 'Invalid email' }),
+    email: z.email({ message: 'Invalid email address' }),
     password: z.string().min(8, 'Password must be at least 8 characters'),
     confirmPassword: z.string(),
   })
@@ -30,6 +31,7 @@ export function RegisterForm() {
   const queryClient = useQueryClient()
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [passwordValue, setPasswordValue] = useState('')
 
   const {
     register,
@@ -55,56 +57,88 @@ export function RegisterForm() {
     }
   }
 
+  const footer = (
+    <>
+      Already have an account?{' '}
+      <Link href="/login" className="text-primary font-medium no-underline">
+        Sign in
+      </Link>
+    </>
+  )
+
+  const passwordRegister = register('password')
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      <FormField label="Name" error={errors.name?.message}>
-        <Input
-          type="text"
-          {...register('name')}
-          error={errors.name?.message}
-          placeholder="John Doe"
-        />
-      </FormField>
-
-      <FormField label="Email" error={errors.email?.message}>
-        <Input
-          type="email"
-          {...register('email')}
-          error={errors.email?.message}
-          placeholder="john@example.com"
-        />
-      </FormField>
-
-      <FormField label="Password" error={errors.password?.message}>
-        <Input
-          type="password"
-          {...register('password')}
-          error={errors.password?.message}
-          placeholder="••••••••"
-        />
-      </FormField>
-
-      <FormField label="Confirm Password" error={errors.confirmPassword?.message}>
-        <Input
-          type="password"
-          {...register('confirmPassword')}
-          error={errors.confirmPassword?.message}
-          placeholder="••••••••"
-        />
-      </FormField>
-
-      {error && <p className="text-sm text-red-600">{error}</p>}
-
-      <Button type="submit" isLoading={isLoading} fullWidth>
-        Create Account
-      </Button>
-
-      <p className="text-center text-sm">
-        Already have an account?{' '}
-        <Link href="/login" className="font-medium text-blue-600 hover:underline">
-          Login
-        </Link>
+    <AuthShell footer={footer}>
+      <h1 className="text-[26px] font-semibold tracking-tight m-0">Create your account</h1>
+      <p className="mt-1.5 mb-7 text-sm text-muted-foreground">
+        You&apos;ll be the workspace owner with full admin permissions.
       </p>
-    </form>
+
+      {error && <Alert message={error} className="mb-4" />}
+
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-3.5">
+        <FormField label="Full name" required error={errors.name?.message}>
+          <Input
+            type="text"
+            placeholder="Ada Lovelace"
+            autoComplete="name"
+            error={errors.name?.message}
+            {...register('name')}
+          />
+        </FormField>
+
+        <FormField label="Work email" required error={errors.email?.message}>
+          <Input
+            type="email"
+            placeholder="you@company.com"
+            autoComplete="email"
+            iconLeft={<MailIcon />}
+            error={errors.email?.message}
+            {...register('email')}
+          />
+        </FormField>
+
+        <FormField
+          label="Password"
+          required
+          error={errors.password?.message}
+          hint={!errors.password?.message ? '8+ characters, mix of letters and numbers' : undefined}
+        >
+          <Input
+            type="password"
+            placeholder="Create a strong password"
+            autoComplete="new-password"
+            iconLeft={<LockIcon />}
+            error={errors.password?.message}
+            {...passwordRegister}
+            onChange={(e) => {
+              setPasswordValue(e.target.value)
+              passwordRegister.onChange(e)
+            }}
+          />
+          <PasswordStrengthMeter password={passwordValue} />
+        </FormField>
+
+        <FormField label="Confirm password" required error={errors.confirmPassword?.message}>
+          <Input
+            type="password"
+            placeholder="Re-enter password"
+            autoComplete="new-password"
+            iconLeft={<LockIcon />}
+            error={errors.confirmPassword?.message}
+            {...register('confirmPassword')}
+          />
+        </FormField>
+
+        <Button type="submit" isLoading={isLoading} fullWidth size="lg" className="mt-1.5">
+          Create account
+        </Button>
+
+        <p className="text-xs text-muted-foreground text-center mt-1">
+          By continuing you accept our Terms and Privacy Policy.
+        </p>
+      </form>
+    </AuthShell>
   )
 }
