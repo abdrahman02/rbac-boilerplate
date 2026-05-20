@@ -1,15 +1,18 @@
+import { PrismaMariaDb } from '@prisma/adapter-mariadb'
 import { PrismaClient } from '@prisma/client'
 import { env } from '../config/env.js'
 
-const url = `mysql://${env.DB_USER}:${encodeURIComponent(env.DB_PASSWORD)}@${env.DB_HOST}:${env.DB_PORT}/${env.DB_NAME}`
+const adapter = new PrismaMariaDb({
+  host: env.DB_HOST,
+  port: env.DB_PORT,
+  user: env.DB_USER,
+  password: env.DB_PASSWORD,
+  database: env.DB_NAME,
+  // Required for MySQL 8+ / 9.x caching_sha2_password auth plugin
+  allowPublicKeyRetrieval: true,
+})
 
-const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient }
-
-export const prisma =
-  globalForPrisma.prisma ??
-  new PrismaClient({
-    datasources: { db: { url } },
-    log: env.NODE_ENV === 'development' ? ['warn', 'error'] : ['error'],
-  })
-
-if (env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
+export const prisma = new PrismaClient({
+  adapter,
+  log: env.NODE_ENV === 'development' ? ['warn', 'error'] : ['error'],
+})
