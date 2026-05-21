@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
+import type { BaseSyntheticEvent } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
 import { resetPasswordSchema, type ResetPasswordInput } from './resetPassword.schema'
 
@@ -13,7 +14,7 @@ interface UseResetPasswordFormReturn {
   done: boolean
   password: string
   onContinue: () => void
-  onSubmit: (e?: React.BaseSyntheticEvent) => Promise<void>
+  onSubmit: (e?: BaseSyntheticEvent) => Promise<void>
 }
 
 export function useResetPasswordForm(): UseResetPasswordFormReturn {

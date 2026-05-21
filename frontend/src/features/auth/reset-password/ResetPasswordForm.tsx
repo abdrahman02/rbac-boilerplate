@@ -7,7 +7,6 @@ import {
   Button,
   FormField,
   Input,
-  Alert,
   CheckIcon,
   LockIcon,
   PasswordStrengthMeter,
