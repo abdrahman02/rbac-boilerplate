@@ -1,0 +1,115 @@
+'use client'
+
+import { memo } from 'react'
+import Link from 'next/link'
+import { getErrorMessage } from '@/shared/lib/api-error'
+import { AuthShell } from '@/features/auth/components/AuthShell'
+import {
+  Alert,
+  Button,
+  FormField,
+  Input,
+  MailIcon,
+  LockIcon,
+  PasswordStrengthMeter,
+} from '@/shared/components/ui'
+import { useRegisterForm } from './useRegisterForm'
+
+/**
+ * Memoised wrapper to avoid re-rendering the meter on every keystroke
+ * unless the password value itself changes.
+ */
+const PasswordStrengthMeterMemo = memo(PasswordStrengthMeter)
+
+/**
+ * Pure JSX registration form.
+ * Contains zero useState, zero useRouter, and zero async logic.
+ * All behaviour is delegated to useRegisterForm.
+ */
+export function RegisterForm() {
+  const { form, isPending, error, password, onSubmit } = useRegisterForm()
+
+  const {
+    register,
+    formState: { errors },
+  } = form
+
+  const footer = (
+    <>
+      Already have an account?{' '}
+      <Link href="/login" className="text-primary font-medium no-underline">
+        Sign in
+      </Link>
+    </>
+  )
+
+  return (
+    <AuthShell footer={footer}>
+      <h1 className="text-[26px] font-semibold tracking-tight m-0">Create your account</h1>
+      <p className="mt-1.5 mb-7 text-sm text-muted-foreground">
+        You&apos;ll be the workspace owner with full admin permissions.
+      </p>
+
+      {error && <Alert message={getErrorMessage(error)} className="mb-4" />}
+
+      <form onSubmit={onSubmit} className="flex flex-col gap-3.5">
+        <FormField label="Full name" required error={errors.name?.message}>
+          <Input
+            type="text"
+            placeholder="Ada Lovelace"
+            autoComplete="name"
+            error={errors.name?.message}
+            {...register('name')}
+          />
+        </FormField>
+
+        <FormField label="Work email" required error={errors.email?.message}>
+          <Input
+            type="email"
+            placeholder="you@company.com"
+            autoComplete="email"
+            iconLeft={<MailIcon />}
+            error={errors.email?.message}
+            {...register('email')}
+          />
+        </FormField>
+
+        <FormField
+          label="Password"
+          required
+          error={errors.password?.message}
+          hint={!errors.password?.message ? '8+ characters, mix of letters and numbers' : undefined}
+        >
+          <Input
+            type="password"
+            placeholder="Create a strong password"
+            autoComplete="new-password"
+            iconLeft={<LockIcon />}
+            error={errors.password?.message}
+            {...register('password')}
+          />
+          <PasswordStrengthMeterMemo password={password} />
+        </FormField>
+
+        <FormField label="Confirm password" required error={errors.confirmPassword?.message}>
+          <Input
+            type="password"
+            placeholder="Re-enter password"
+            autoComplete="new-password"
+            iconLeft={<LockIcon />}
+            error={errors.confirmPassword?.message}
+            {...register('confirmPassword')}
+          />
+        </FormField>
+
+        <Button type="submit" isLoading={isPending} fullWidth size="lg" className="mt-1.5">
+          Create account
+        </Button>
+
+        <p className="text-xs text-muted-foreground text-center mt-1">
+          By continuing you accept our Terms and Privacy Policy.
+        </p>
+      </form>
+    </AuthShell>
+  )
+}
