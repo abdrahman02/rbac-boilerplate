@@ -1,8 +1,6 @@
-import { ResetPasswordForm } from '@/features/auth/components/ResetPasswordForm'
+import { ResetPasswordForm } from '@/features/auth/reset-password'
 
-export const metadata = {
-  title: 'Reset Password - RBAC Boilerplate',
-}
+export const metadata = { title: 'Reset Password - RBAC Boilerplate' }
 
 export default function ResetPasswordPage() {
   return <ResetPasswordForm />
