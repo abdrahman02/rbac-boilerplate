@@ -1,8 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { Button } from '@/components/ui'
-import { PermissionGate } from '@/components/guard/PermissionGate'
+import { Button } from '@/shared/components/ui'
+import { PermissionGate } from '@/shared/components/guard/PermissionGate'
 import { usePermissionList, useDeletePermission } from '@/features/permissions/hooks/usePermissionsCrud'
 import { PermissionModal } from '@/features/permissions/components/PermissionModal'
 import { getErrorMessage } from '@/shared/lib/api-error'

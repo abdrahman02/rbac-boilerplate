@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useAuditLogs } from '@/features/audit-logs/hooks/useAuditLogs'
-import { Button, Input } from '@/components/ui'
+import { Button, Input } from '@/shared/components/ui'
 
 export default function AuditLogsPage() {
   const [page, setPage] = useState(1)

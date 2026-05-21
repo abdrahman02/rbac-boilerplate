@@ -3,8 +3,8 @@
 import Link from 'next/link'
 import { useAuth } from '@/features/auth/hooks/useAuth'
 import { useLogout } from '@/features/auth/hooks/useLogout'
-import { PermissionGate } from '@/components/guard/PermissionGate'
-import { Button, buttonVariants } from '@/components/ui'
+import { PermissionGate } from '@/shared/components/guard/PermissionGate'
+import { Button, buttonVariants } from '@/shared/components/ui'
 
 export function NavMenu() {
   const { user, isAuthenticated } = useAuth()

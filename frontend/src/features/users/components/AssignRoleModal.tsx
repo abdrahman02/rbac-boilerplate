@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Modal, Button } from '@/components/ui'
+import { Modal, Button } from '@/shared/components/ui'
 import { useRoles } from '@/features/roles/hooks/useRoles'
 import { useAssignRole, useRemoveRole } from '@/features/users/hooks/useUsers'
 import { getErrorMessage } from '@/shared/lib/api-error'

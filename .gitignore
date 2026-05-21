@@ -4,6 +4,7 @@ PRD.md
 TRACKING.md
 TODO.md
 .claude/
+frontend/docs/superpowers/**/*
 
 # Dependencies
 node_modules/

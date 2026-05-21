@@ -1,8 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { Button, Badge } from '@/components/ui'
-import { PermissionGate } from '@/components/guard/PermissionGate'
+import { Button, Badge } from '@/shared/components/ui'
+import { PermissionGate } from '@/shared/components/guard/PermissionGate'
 import { useUsers, useDeleteUser } from '@/features/users/hooks/useUsers'
 import { UserModal } from '@/features/users/components/UserModal'
 import { AssignRoleModal } from '@/features/users/components/AssignRoleModal'

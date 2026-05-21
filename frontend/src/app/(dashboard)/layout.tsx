@@ -1,8 +1,8 @@
 'use client'
 
 import { ReactNode } from 'react'
-import { ProtectedRoute } from '@/components/guard/ProtectedRoute'
-import { NavMenu } from '@/components/common/NavMenu'
+import { ProtectedRoute } from '@/shared/components/guard/ProtectedRoute'
+import { NavMenu } from '@/shared/components/common/NavMenu'
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   return (

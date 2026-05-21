@@ -1,6 +1,0 @@
-export { Button, buttonVariants } from './Button'
-export { Input, inputVariants } from './Input'
-export { FormField } from './FormField'
-export { Badge, badgeVariants } from './Badge'
-export { Spinner, spinnerVariants } from './Spinner'
-export { Modal } from './Modal'
