@@ -23,8 +23,8 @@ export function NavGroup({ label, icon, items, collapsed = false, onChildClick }
   const [isOpen, setIsOpen] = useState(false)
 
   useEffect(() => {
-    if (isActiveParent) setIsOpen(true)
-  }, [pathname, isActiveParent])
+    if (items.some((item) => pathname.startsWith(item.href))) setIsOpen(true)
+  }, [pathname, items])
 
   const childList = items.map((item) => {
     const active = pathname.startsWith(item.href)
@@ -75,6 +75,7 @@ export function NavGroup({ label, icon, items, collapsed = false, onChildClick }
     <div>
       <button
         type="button"
+        aria-expanded={isOpen}
         onClick={() => setIsOpen((prev) => !prev)}
         className={navGroupTriggerVariants({ activeParent: isActiveParent, collapsed: false })}
       >
