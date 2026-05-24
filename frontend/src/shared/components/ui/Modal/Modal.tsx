@@ -32,7 +32,7 @@ export function Modal({ isOpen, onClose, title, children, maxWidth = 'md' }: Mod
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
-      <div className={`w-full ${maxWidthClass[maxWidth]} rounded-lg bg-card shadow-xl`}>
+      <div className={`w-full ${maxWidthClass[maxWidth]} rounded-lg bg-card shadow-2xl`}>
         <div className="flex items-center justify-between border-b border-border px-6 py-4">
           <h2 className="text-lg font-semibold text-card-foreground">{title}</h2>
           <button

@@ -4,6 +4,18 @@
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, "SF Mono", Menlo, monospace;
   --radius-default: 0.375rem;
+
+  /* Radius scale — generates rounded-sm/md/lg/xl utilities */
+  --radius-sm:  calc(0.375rem - 4px);
+  --radius-md:  calc(0.375rem - 2px);
+  --radius-lg:  0.375rem;
+  --radius-xl:  calc(0.375rem + 4px);
+
+  /* Shadow scale — generates shadow-sm/md/lg/2xl utilities */
+  --shadow-sm:  0 1px 2px 0 rgb(0 0 0 / 0.04);
+  --shadow-md:  0 4px 12px -2px rgb(0 0 0 / 0.06), 0 2px 4px -1px rgb(0 0 0 / 0.04);
+  --shadow-lg:  0 12px 24px -8px rgb(0 0 0 / 0.10), 0 4px 8px -2px rgb(0 0 0 / 0.04);
+  --shadow-2xl: 0 32px 64px -16px rgb(0 0 0 / 0.18);
 }
 
 @theme inline {
@@ -64,16 +76,6 @@
   --sidebar: 248 248 248;
   --sidebar-foreground: 9 9 9;
   --sidebar-border: 228 228 228;
-
-  --radius-sm: calc(0.375rem - 4px);
-  --radius-md: calc(0.375rem - 2px);
-  --radius-lg: 0.375rem;
-  --radius-xl: calc(0.375rem + 4px);
-
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.04);
-  --shadow-md: 0 4px 12px -2px rgb(0 0 0 / 0.06), 0 2px 4px -1px rgb(0 0 0 / 0.04);
-  --shadow-lg: 0 12px 24px -8px rgb(0 0 0 / 0.10), 0 4px 8px -2px rgb(0 0 0 / 0.04);
-  --shadow-2xl: 0 32px 64px -16px rgb(0 0 0 / 0.18);
 }
 
 .dark {
