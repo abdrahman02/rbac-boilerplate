@@ -115,3 +115,38 @@ export async function emailExists(email: string, excludeId?: number): Promise<bo
   const user = await prisma.user.findFirst({ where, select: { id: true } })
   return user !== null
 }
+
+export interface UserExportRow {
+  id: number
+  fullName: string
+  email: string
+  isActive: boolean
+  roles: string[]
+  createdAt: Date
+}
+
+export async function findAllUsersForExport(): Promise<UserExportRow[]> {
+  const users = await prisma.user.findMany({
+    where: { deletedAt: null },
+    select: {
+      id: true,
+      fullName: true,
+      email: true,
+      isActive: true,
+      createdAt: true,
+      roles: {
+        select: { role: { select: { name: true } } },
+      },
+    },
+    orderBy: { createdAt: 'desc' },
+  })
+
+  return users.map((u) => ({
+    id: u.id,
+    fullName: u.fullName,
+    email: u.email,
+    isActive: u.isActive,
+    roles: u.roles.map((r) => r.role.name),
+    createdAt: u.createdAt,
+  }))
+}
