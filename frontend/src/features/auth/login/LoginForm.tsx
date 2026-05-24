@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { Mail, Lock, Eye, EyeOff } from 'lucide-react'
 import { getErrorMessage } from '@/shared/lib/api-error'
 import { AuthShell } from '@/features/auth/components/AuthShell'
 import {
@@ -9,10 +10,6 @@ import {
   Divider,
   FormField,
   Input,
-  MailIcon,
-  LockIcon,
-  EyeIcon,
-  EyeOffIcon,
 } from '@/shared/components/ui'
 import { useLoginForm } from './useLoginForm'
 
@@ -52,7 +49,7 @@ export function LoginForm() {
             type="email"
             placeholder="you@company.com"
             autoComplete="email"
-            iconLeft={<MailIcon />}
+            iconLeft={<Mail size={16} />}
             error={errors.email?.message}
             {...register('email')}
           />
@@ -75,7 +72,7 @@ export function LoginForm() {
             type={showPassword ? 'text' : 'password'}
             placeholder="Enter your password"
             autoComplete="current-password"
-            iconLeft={<LockIcon />}
+            iconLeft={<Lock size={16} />}
             iconRight={
               <button
                 type="button"
@@ -83,7 +80,7 @@ export function LoginForm() {
                 className="border-0 bg-transparent text-muted-foreground p-1 cursor-pointer flex items-center"
                 aria-label={showPassword ? 'Hide password' : 'Show password'}
               >
-                {showPassword ? <EyeOffIcon /> : <EyeIcon />}
+                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
             }
             error={errors.password?.message}

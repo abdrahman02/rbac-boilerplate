@@ -2,14 +2,12 @@
 
 import { memo } from 'react'
 import Link from 'next/link'
+import { Check, ChevronLeft, Mail } from 'lucide-react'
 import { AuthShell } from '@/features/auth/components/AuthShell'
 import {
   Button,
   FormField,
   Input,
-  CheckIcon,
-  ChevronLeftIcon,
-  MailIcon,
 } from '@/shared/components/ui'
 import { useForgotPasswordForm } from './useForgotPasswordForm'
 
@@ -24,7 +22,7 @@ const SuccessState = memo(function SuccessState({ email, onRetry }: SuccessState
   return (
     <div className="animate-scale-in">
       <div className="w-14 h-14 rounded-2xl bg-success/12 text-success border border-success/22 inline-flex items-center justify-center mb-[18px]">
-        <CheckIcon size={26} />
+        <Check size={26} />
       </div>
 
       <h1 className="text-2xl font-semibold tracking-tight m-0">Check your inbox</h1>
@@ -47,7 +45,7 @@ const backLink = (
     href="/login"
     className="text-primary font-medium no-underline inline-flex items-center gap-1"
   >
-    <ChevronLeftIcon size={14} />
+    <ChevronLeft size={14} />
     Back to sign in
   </Link>
 )
@@ -81,7 +79,7 @@ export function ForgotPasswordForm() {
             type="email"
             placeholder="you@company.com"
             autoComplete="email"
-            iconLeft={<MailIcon />}
+            iconLeft={<Mail size={16} />}
             error={errors.email?.message}
             {...register('email')}
           />

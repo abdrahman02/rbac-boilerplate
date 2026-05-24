@@ -2,6 +2,7 @@
 
 import { memo } from 'react'
 import Link from 'next/link'
+import { Mail, Lock } from 'lucide-react'
 import { getErrorMessage } from '@/shared/lib/api-error'
 import { AuthShell } from '@/features/auth/components/AuthShell'
 import {
@@ -9,8 +10,6 @@ import {
   Button,
   FormField,
   Input,
-  MailIcon,
-  LockIcon,
   PasswordStrengthMeter,
 } from '@/shared/components/ui'
 import { useRegisterForm } from './useRegisterForm'
@@ -68,7 +67,7 @@ export function RegisterForm() {
             type="email"
             placeholder="you@company.com"
             autoComplete="email"
-            iconLeft={<MailIcon />}
+            iconLeft={<Mail size={16} />}
             error={errors.email?.message}
             {...register('email')}
           />
@@ -84,7 +83,7 @@ export function RegisterForm() {
             type="password"
             placeholder="Create a strong password"
             autoComplete="new-password"
-            iconLeft={<LockIcon />}
+            iconLeft={<Lock size={16} />}
             error={errors.password?.message}
             {...register('password')}
           />
@@ -96,7 +95,7 @@ export function RegisterForm() {
             type="password"
             placeholder="Re-enter password"
             autoComplete="new-password"
-            iconLeft={<LockIcon />}
+            iconLeft={<Lock size={16} />}
             error={errors.confirmPassword?.message}
             {...register('confirmPassword')}
           />

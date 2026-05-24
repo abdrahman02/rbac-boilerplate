@@ -2,13 +2,12 @@
 
 import { memo } from 'react'
 import Link from 'next/link'
+import { Check, Lock } from 'lucide-react'
 import { AuthShell } from '@/features/auth/components/AuthShell'
 import {
   Button,
   FormField,
   Input,
-  CheckIcon,
-  LockIcon,
   PasswordStrengthMeter,
 } from '@/shared/components/ui'
 import { useResetPasswordForm } from './useResetPasswordForm'
@@ -26,7 +25,7 @@ const SuccessState = memo(function SuccessState({ onContinue }: SuccessStateProp
   return (
     <div className="animate-scale-in">
       <div className="w-14 h-14 rounded-2xl bg-success/12 text-success border border-success/22 inline-flex items-center justify-center mb-[18px]">
-        <CheckIcon size={26} />
+        <Check size={26} />
       </div>
 
       <h1 className="text-2xl font-semibold tracking-tight m-0">Password updated</h1>
@@ -80,7 +79,7 @@ export function ResetPasswordForm() {
             type="password"
             placeholder="Enter new password"
             autoComplete="new-password"
-            iconLeft={<LockIcon />}
+            iconLeft={<Lock size={16} />}
             error={errors.password?.message}
             {...register('password')}
           />
@@ -92,7 +91,7 @@ export function ResetPasswordForm() {
             type="password"
             placeholder="Re-enter new password"
             autoComplete="new-password"
-            iconLeft={<LockIcon />}
+            iconLeft={<Lock size={16} />}
             error={errors.confirmPassword?.message}
             {...register('confirmPassword')}
           />
