@@ -2,15 +2,20 @@ import { describe, it, expect } from 'vitest'
 import { navGroupTriggerVariants, navGroupChildVariants } from './NavGroup.variants'
 
 describe('navGroupTriggerVariants', () => {
-  it('applies sidebar-primary/18 bg when activeParent=true', () => {
+  it('applies primary/18 bg when activeParent=true', () => {
     const result = navGroupTriggerVariants({ activeParent: true, collapsed: false })
-    expect(result).toContain('bg-sidebar-primary')
-    expect(result).toContain('text-sidebar-primary')
+    expect(result).toContain('bg-primary')
+    expect(result).toContain('text-primary')
   })
 
   it('applies sidebar-foreground text when activeParent=false', () => {
     const result = navGroupTriggerVariants({ activeParent: false, collapsed: false })
     expect(result).toContain('text-sidebar-foreground')
+  })
+
+  it('applies hover:bg-primary tint when inactive', () => {
+    const result = navGroupTriggerVariants({ activeParent: false, collapsed: false })
+    expect(result).toContain('hover:bg-primary')
   })
 
   it('applies justify-center when collapsed=true', () => {
@@ -25,14 +30,19 @@ describe('navGroupTriggerVariants', () => {
 })
 
 describe('navGroupChildVariants', () => {
-  it('applies bg-sidebar-primary when active=true', () => {
+  it('applies bg-primary when active=true', () => {
     const result = navGroupChildVariants({ active: true })
-    expect(result).toContain('bg-sidebar-primary')
-    expect(result).toContain('text-sidebar-primary-foreground')
+    expect(result).toContain('bg-primary')
+    expect(result).toContain('text-primary-foreground')
   })
 
   it('applies sidebar-foreground/70 text when active=false', () => {
     const result = navGroupChildVariants({ active: false })
     expect(result).toContain('text-sidebar-foreground')
+  })
+
+  it('applies hover:bg-primary tint when inactive', () => {
+    const result = navGroupChildVariants({ active: false })
+    expect(result).toContain('hover:bg-primary')
   })
 })
