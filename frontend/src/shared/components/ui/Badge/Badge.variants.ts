@@ -9,6 +9,7 @@ export const badgeVariants = tv({
       danger:  'bg-destructive/15 text-destructive',
       warning: 'bg-warning/15 text-warning',
       info:    'bg-accent text-accent-foreground',
+      primary: 'bg-primary/15 text-primary',
     },
   },
   defaultVariants: { variant: 'default' },
