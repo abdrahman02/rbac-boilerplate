@@ -32,7 +32,7 @@ export function AvatarMenu() {
       aria-label="Account menu"
       className="rounded-full p-0.5"
     >
-      <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-[13px] font-semibold select-none">
+      <div className="w-8 h-8 p-5 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-[13px] font-semibold select-none">
         {initials}
       </div>
     </Button>
