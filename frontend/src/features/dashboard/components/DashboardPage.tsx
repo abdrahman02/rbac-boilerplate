@@ -1,5 +1,6 @@
 'use client'
 
+import { useMemo, type ReactNode } from 'react'
 import Link from 'next/link'
 import { Users, Shield, Key, Activity, ChevronRight, Download, UserPlus } from 'lucide-react'
 import { useAuth } from '@/features/auth/hooks/useAuth'
@@ -10,12 +11,57 @@ import { ActivityFeed } from './ActivityFeed'
 import { QuickActions } from './QuickActions'
 import { RoleDistribution } from './RoleDistribution'
 
+interface StatCardConfig {
+  label: string
+  value: number
+  delta?: string
+  sub?: string
+  icon: ReactNode
+}
+
+const STAT_ICONS = {
+  users: <Users size={16} />,
+  roles: <Shield size={16} />,
+  permissions: <Key size={16} />,
+  events: <Activity size={16} />,
+} as const
+
 export function DashboardPage() {
   const { user } = useAuth()
   const { users, totalUsers, roles, totalRoles, permissions, totalPermissions, recentLogs, isLoading } =
     useDashboardStats()
 
   const firstName = user?.name?.split(' ')[0] ?? 'there'
+
+  const statCards = useMemo<StatCardConfig[]>(() => [
+    {
+      label: 'Total users',
+      value: totalUsers,
+      delta: '+2 this week',
+      sub: `${users.filter((u) => !u.is_active).length} inactive`,
+      icon: STAT_ICONS.users,
+    },
+    {
+      label: 'Active roles',
+      value: totalRoles,
+      sub: `${roles.reduce((acc, r) => acc + r.permissions.length, 0)} permissions assigned`,
+      icon: STAT_ICONS.roles,
+    },
+    {
+      label: 'Permissions',
+      value: totalPermissions,
+      delta: '—',
+      sub: 'Across all roles',
+      icon: STAT_ICONS.permissions,
+    },
+    {
+      label: 'Recent events',
+      value: recentLogs.length,
+      delta: '·',
+      sub: 'Last 5 events shown',
+      icon: STAT_ICONS.events,
+    },
+  ], [totalUsers, totalRoles, totalPermissions, recentLogs.length, users, roles])
 
   return (
     <div className="flex flex-col gap-6">
@@ -43,38 +89,9 @@ export function DashboardPage() {
 
       {/* Stat cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          label="Total users"
-          value={totalUsers}
-          delta="+2 this week"
-          sub={`${users.filter((u) => !u.is_active).length} inactive`}
-          icon={<Users size={16} />}
-          tone="primary"
-          isLoading={isLoading}
-        />
-        <StatCard
-          label="Active roles"
-          value={totalRoles}
-          sub={`${roles.reduce((a, r) => a + r.permissions.length, 0)} permissions assigned`}
-          icon={<Shield size={16} />}
-          isLoading={isLoading}
-        />
-        <StatCard
-          label="Permissions"
-          value={totalPermissions}
-          delta="—"
-          sub="Across all roles"
-          icon={<Key size={16} />}
-          isLoading={isLoading}
-        />
-        <StatCard
-          label="Recent events"
-          value={recentLogs.length}
-          delta="·"
-          sub="Last 5 events shown"
-          icon={<Activity size={16} />}
-          isLoading={isLoading}
-        />
+        {statCards.map((card) => (
+          <StatCard key={card.label} {...card} isLoading={isLoading} />
+        ))}
       </div>
 
       {/* Two-column: recent activity + sidebar */}

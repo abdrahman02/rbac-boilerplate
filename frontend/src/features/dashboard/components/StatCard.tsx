@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { memo, type ReactNode } from 'react'
 import { Spinner } from '@/shared/components/ui'
 
 interface StatCardProps {
@@ -7,20 +7,15 @@ interface StatCardProps {
   delta?: string
   sub?: string
   icon: ReactNode
-  tone?: 'primary' | 'muted'
   isLoading?: boolean
 }
 
-export function StatCard({ label, value, delta, sub, icon, tone = 'muted', isLoading }: StatCardProps) {
-  const iconBg = tone === 'primary'
-    ? 'bg-primary/10 text-primary'
-    : 'bg-muted text-muted-foreground'
-
+export const StatCard = memo(function StatCard({ label, value, delta, sub, icon, isLoading }: StatCardProps) {
   return (
     <div className="rounded-xl border border-border bg-card text-card-foreground shadow-sm p-[18px] flex flex-col gap-3">
       <div className="flex items-center justify-between">
         <span className="text-[12.5px] font-medium text-muted-foreground">{label}</span>
-        <span className={`w-7 h-7 rounded-lg inline-flex items-center justify-center ${iconBg}`}>
+        <span className="w-7 h-7 rounded-lg inline-flex items-center justify-center bg-primary/10 text-primary">
           {icon}
         </span>
       </div>
@@ -41,4 +36,4 @@ export function StatCard({ label, value, delta, sub, icon, tone = 'muted', isLoa
       </div>
     </div>
   )
-}
+})

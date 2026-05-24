@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import type { AuditLog, UserWithRoles } from '@/shared/types'
 import type { VariantProps } from 'tailwind-variants'
 import { Avatar, Badge } from '@/shared/components/ui'
@@ -21,7 +22,7 @@ function getActionBadgeVariant(action: string): BadgeVariant {
   return 'default'
 }
 
-function ActivityRow({ log, users }: { log: AuditLog; users: UserWithRoles[] }) {
+const ActivityRow = memo(function ActivityRow({ log, users }: { log: AuditLog; users: UserWithRoles[] }) {
   const user = users.find((u) => u.id === log.userId)
   const displayName = user?.name ?? 'Unknown'
   const variant = getActionBadgeVariant(log.action)
@@ -50,9 +51,9 @@ function ActivityRow({ log, users }: { log: AuditLog; users: UserWithRoles[] }) 
       </span>
     </div>
   )
-}
+})
 
-export function ActivityFeed({ logs, users, isLoading }: ActivityFeedProps) {
+export const ActivityFeed = memo(function ActivityFeed({ logs, users, isLoading }: ActivityFeedProps) {
   if (isLoading) {
     return (
       <div className="flex flex-col">
@@ -86,4 +87,4 @@ export function ActivityFeed({ logs, users, isLoading }: ActivityFeedProps) {
       ))}
     </div>
   )
-}
+})

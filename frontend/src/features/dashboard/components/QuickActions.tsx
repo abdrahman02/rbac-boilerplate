@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import Link from 'next/link'
 import { Users, Shield, Key, ScrollText, ChevronRight } from 'lucide-react'
 
@@ -14,7 +15,7 @@ const QUICK_ACTIONS: QuickAction[] = [
   { icon: ScrollText, label: 'Review audit log',  href: '/audit-logs' },
 ]
 
-export function QuickActions() {
+export const QuickActions = memo(function QuickActions() {
   return (
     <div className="flex flex-col gap-1.5">
       {QUICK_ACTIONS.map(({ icon: Icon, label, href }) => (
@@ -32,4 +33,4 @@ export function QuickActions() {
       ))}
     </div>
   )
-}
+})
