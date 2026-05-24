@@ -25,9 +25,7 @@ export interface DashboardStatsDto {
  * Converts Date objects to ISO 8601 strings for serialization.
  */
 export async function getDashboardStats(): Promise<ApiResponse<DashboardStatsDto>> {
-  // Compute sinceDate here so the repository stays pure and testable
-  const sinceDate = new Date()
-  sinceDate.setDate(sinceDate.getDate() - 7)
+  const sinceDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
 
   const raw = await repo.getDashboardStats(sinceDate)
 

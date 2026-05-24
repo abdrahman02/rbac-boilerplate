@@ -11,6 +11,8 @@ interface RoleBar {
   pct: number
 }
 
+// RoleDistribution fetches its own data because the /api/dashboard/stats endpoint
+// returns aggregate counts, not the full roles/users arrays needed for bar percentages.
 export const RoleDistribution = memo(function RoleDistribution() {
   const rolesQuery = useRoles()
   const usersQuery = useUsers(1, MAX_USERS_FOR_DISTRIBUTION)
