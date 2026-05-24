@@ -29,7 +29,7 @@ export function DashboardShell({ children }: DashboardShellProps) {
             onClick={closeMobile}
             aria-hidden="true"
           />
-          <div className="absolute left-0 top-0 bottom-0 w-[280px]">
+          <div className="absolute left-0 top-0 bottom-0 w-[280px] animate-slide-left">
             <Sidebar onMobileClose={closeMobile} />
           </div>
         </div>
