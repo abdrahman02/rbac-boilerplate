@@ -19,14 +19,9 @@ export interface DashboardStatsRaw {
   recentActivity: RecentActivityItem[]
 }
 
-/**
- * Fetches aggregated dashboard statistics in a single transaction.
- * Includes user counts, role/permission counts, and recent audit activity.
- */
-export async function getDashboardStats(): Promise<DashboardStatsRaw> {
-  const sevenDaysAgo = new Date()
-  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
+const RECENT_ACTIVITY_LIMIT = 5
 
+export async function getDashboardStats(sinceDate: Date): Promise<DashboardStatsRaw> {
   const [
     totalUsers,
     inactiveUsers,
@@ -38,12 +33,12 @@ export async function getDashboardStats(): Promise<DashboardStatsRaw> {
   ] = await prisma.$transaction([
     prisma.user.count({ where: { deletedAt: null } }),
     prisma.user.count({ where: { deletedAt: null, isActive: false } }),
-    prisma.user.count({ where: { deletedAt: null, createdAt: { gte: sevenDaysAgo } } }),
+    prisma.user.count({ where: { deletedAt: null, createdAt: { gte: sinceDate } } }),
     prisma.role.count(),
     prisma.rolePermission.count(),
     prisma.permission.count(),
     prisma.auditLog.findMany({
-      take: 5,
+      take: RECENT_ACTIVITY_LIMIT,
       orderBy: { createdAt: 'desc' },
       include: { user: { select: { fullName: true } } },
     }),
