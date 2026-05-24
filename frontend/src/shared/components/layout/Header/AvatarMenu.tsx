@@ -41,26 +41,26 @@ export function AvatarMenu() {
         <div className="h-px bg-border" />
 
         <div className="p-1">
-          <Link
-            href="/profile"
-            className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[13.5px] hover:bg-muted transition-colors"
-          >
-            <User size={16} className="shrink-0" />
-            Profile
-          </Link>
+          <Button asChild variant="ghost" className="w-full justify-start gap-2.5 text-[13.5px] h-auto py-2 px-2.5 rounded-lg">
+            <Link href="/profile">
+              <User size={16} className="shrink-0" />
+              Profile
+            </Link>
+          </Button>
         </div>
 
         <div className="h-px bg-border" />
 
         <div className="p-1">
-          <button
+          <Button
             type="button"
+            variant="ghost"
             onClick={logout}
-            className="flex items-center gap-2.5 px-2.5 py-2 w-full rounded-lg text-[13.5px] text-destructive hover:bg-destructive/10 transition-colors border-0 bg-transparent font-sans cursor-pointer text-left"
+            className="w-full justify-start gap-2.5 text-[13.5px] h-auto py-2 px-2.5 text-destructive hover:bg-destructive/10 hover:text-destructive"
           >
             <LogOut size={16} className="shrink-0" />
             Log out
-          </button>
+          </Button>
         </div>
       </div>
     </Dropdown>

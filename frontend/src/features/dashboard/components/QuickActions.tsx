@@ -1,6 +1,7 @@
 import { memo } from 'react'
 import Link from 'next/link'
 import { Users, Shield, Key, ScrollText, ChevronRight } from 'lucide-react'
+import { Button } from '@/shared/components/ui/Button'
 
 interface QuickAction {
   icon: typeof Users
@@ -19,17 +20,20 @@ export const QuickActions = memo(function QuickActions() {
   return (
     <div className="flex flex-col gap-1.5">
       {QUICK_ACTIONS.map(({ icon: Icon, label, href }) => (
-        <Link
+        <Button
           key={href}
-          href={href}
-          className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg bg-muted text-foreground text-[13px] font-medium transition-colors hover:bg-accent hover:text-accent-foreground group"
+          asChild
+          variant="ghost"
+          className="w-full justify-start gap-2.5 px-3 py-2.5 h-auto bg-muted text-foreground hover:bg-accent hover:text-accent-foreground text-[13px] font-medium group"
         >
-          <span className="text-primary flex">
-            <Icon size={16} />
-          </span>
-          <span className="flex-1">{label}</span>
-          <ChevronRight size={15} className="text-muted-foreground group-hover:text-accent-foreground transition-colors" />
-        </Link>
+          <Link href={href}>
+            <span className="text-primary flex">
+              <Icon size={16} />
+            </span>
+            <span className="flex-1">{label}</span>
+            <ChevronRight size={15} className="text-muted-foreground group-hover:text-accent-foreground transition-colors" />
+          </Link>
+        </Button>
       ))}
     </div>
   )

@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation'
 import { ChevronDown } from 'lucide-react'
 import { PermissionGate } from '@/shared/components/guard/PermissionGate'
 import { Dropdown } from '@/shared/components/ui/Dropdown'
+import { Button } from '@/shared/components/ui/Button'
 import { navGroupTriggerVariants, navGroupChildVariants } from './NavGroup.variants'
 import type { NavItemDef } from './Sidebar.types'
 
@@ -28,36 +29,32 @@ export function NavGroup({ label, icon, items, collapsed = false, onChildClick }
 
   const childList = items.map((item) => {
     const active = pathname.startsWith(item.href)
-    const className = navGroupChildVariants({ active })
-
-    if (item.permission !== null) {
-      return (
-        <PermissionGate key={item.href} permission={item.permission}>
-          <Link href={item.href} className={className} onClick={onChildClick}>
-            <span className="flex shrink-0">{item.icon}</span>
-            <span>{item.label}</span>
-          </Link>
-        </PermissionGate>
-      )
-    }
-
-    return (
-      <Link key={item.href} href={item.href} className={className} onClick={onChildClick}>
-        <span className="flex shrink-0">{item.icon}</span>
-        <span>{item.label}</span>
-      </Link>
+    const linkEl = (
+      <Button key={item.href} asChild variant="ghost" className={navGroupChildVariants({ active })}>
+        <Link href={item.href} onClick={onChildClick}>
+          <span className="flex shrink-0">{item.icon}</span>
+          <span>{item.label}</span>
+        </Link>
+      </Button>
     )
+
+    return item.permission !== null ? (
+      <PermissionGate key={item.href} permission={item.permission}>
+        {linkEl}
+      </PermissionGate>
+    ) : linkEl
   })
 
   if (collapsed) {
     const trigger = (
-      <button
+      <Button
         type="button"
         title={label}
+        variant="ghost"
         className={navGroupTriggerVariants({ activeParent: isActiveParent, collapsed: true })}
       >
         <span className="flex shrink-0">{icon}</span>
-      </button>
+      </Button>
     )
     return (
       <Dropdown trigger={trigger} placement="right-start" offsetPx={8}>
@@ -73,9 +70,10 @@ export function NavGroup({ label, icon, items, collapsed = false, onChildClick }
 
   return (
     <div>
-      <button
+      <Button
         type="button"
         aria-expanded={isOpen}
+        variant="ghost"
         onClick={() => setIsOpen((prev) => !prev)}
         className={navGroupTriggerVariants({ activeParent: isActiveParent, collapsed: false })}
       >
@@ -85,7 +83,7 @@ export function NavGroup({ label, icon, items, collapsed = false, onChildClick }
           size={14}
           className={`shrink-0 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
         />
-      </button>
+      </Button>
       {isOpen && (
         <div className="pl-4 pt-0.5 flex flex-col gap-0.5">
           {childList}

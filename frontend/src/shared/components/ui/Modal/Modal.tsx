@@ -2,6 +2,7 @@
 
 import { useEffect, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
+import { Button } from '@/shared/components/ui/Button'
 
 interface ModalProps {
   isOpen: boolean
@@ -35,12 +36,15 @@ export function Modal({ isOpen, onClose, title, children, maxWidth = 'md' }: Mod
       <div className={`w-full ${maxWidthClass[maxWidth]} rounded-lg bg-card shadow-2xl`}>
         <div className="flex items-center justify-between border-b border-border px-6 py-4">
           <h2 className="text-lg font-semibold text-card-foreground">{title}</h2>
-          <button
+          <Button
+            variant="ghost"
+            size="iconOnly"
             onClick={onClose}
-            className="rounded p-1 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+            aria-label="Close"
+            className="rounded text-muted-foreground hover:text-foreground"
           >
             ✕
-          </button>
+          </Button>
         </div>
         <div className="px-6 py-4">{children}</div>
       </div>

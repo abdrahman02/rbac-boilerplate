@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import type { ReactNode } from 'react'
+import { Button } from '@/shared/components/ui/Button'
 import { navItemVariants, navBadgeVariants } from './NavItem.variants'
 
 interface NavItemProps {
@@ -19,21 +20,18 @@ export function NavItem({ href, label, icon, badge, collapsed = false, onClick }
   const active = href === '/dashboard' ? pathname === href : pathname.startsWith(href)
 
   return (
-    <Link
-      href={href}
-      title={collapsed ? label : undefined}
-      className={navItemVariants({ active, collapsed })}
-      onClick={onClick}
-    >
-      <span className="flex shrink-0">{icon}</span>
-      {!collapsed && (
-        <>
-          <span className="flex-1">{label}</span>
-          {badge != null && (
-            <span className={navBadgeVariants({ active })}>{badge}</span>
-          )}
-        </>
-      )}
-    </Link>
+    <Button asChild variant="ghost" className={navItemVariants({ active, collapsed })}>
+      <Link href={href} title={collapsed ? label : undefined} onClick={onClick}>
+        <span className="flex shrink-0">{icon}</span>
+        {!collapsed && (
+          <>
+            <span className="flex-1">{label}</span>
+            {badge != null && (
+              <span className={navBadgeVariants({ active })}>{badge}</span>
+            )}
+          </>
+        )}
+      </Link>
+    </Button>
   )
 }

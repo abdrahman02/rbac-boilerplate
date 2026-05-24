@@ -74,14 +74,16 @@ export function LoginForm() {
             autoComplete="current-password"
             iconLeft={<Lock size={16} />}
             iconRight={
-              <button
+              <Button
                 type="button"
+                variant="ghost"
+                size="iconOnly"
                 onClick={toggleShowPassword}
-                className="border-0 bg-transparent text-muted-foreground p-1 cursor-pointer flex items-center"
                 aria-label={showPassword ? 'Hide password' : 'Show password'}
+                className="text-muted-foreground"
               >
                 {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-              </button>
+              </Button>
             }
             error={errors.password?.message}
             {...register('password')}
