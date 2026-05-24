@@ -1,4 +1,10 @@
+import ExcelJS from 'exceljs'
 import * as repo from '../repositories/dashboard.repository.js'
+import * as userRepo from '../repositories/user.repository.js'
+import * as roleRepo from '../repositories/role.repository.js'
+import type { DashboardStatsRaw } from '../repositories/dashboard.repository.js'
+import type { UserExportRow } from '../repositories/user.repository.js'
+import type { RoleExportRow } from '../repositories/role.repository.js'
 import type { ApiResponse } from '../types/index.js'
 
 interface RecentActivityDto {
@@ -18,6 +24,51 @@ export interface DashboardStatsDto {
   totalPermissionsAssigned: number
   totalPermissions: number
   recentActivity: RecentActivityDto[]
+}
+
+function addSummarySheet(wb: ExcelJS.Workbook, stats: DashboardStatsRaw): void {
+  const sheet = wb.addWorksheet('Summary')
+  sheet.addRow(['Metric', 'Value'])
+  sheet.addRow(['Total Users', stats.totalUsers])
+  sheet.addRow(['New Users This Week', stats.newUsersThisWeek])
+  sheet.addRow(['Inactive Users', stats.inactiveUsers])
+  sheet.addRow(['Total Roles', stats.totalRoles])
+  sheet.addRow(['Total Permissions Assigned', stats.totalPermissionsAssigned])
+  sheet.addRow(['Total Permissions', stats.totalPermissions])
+}
+
+function addUsersSheet(wb: ExcelJS.Workbook, users: UserExportRow[]): void {
+  const sheet = wb.addWorksheet('Users')
+  sheet.addRow(['ID', 'Full Name', 'Email', 'Active', 'Roles', 'Created At'])
+  for (const u of users) {
+    sheet.addRow([u.id, u.fullName, u.email, u.isActive, u.roles.join(', '), u.createdAt])
+  }
+}
+
+function addRolesSheet(wb: ExcelJS.Workbook, roles: RoleExportRow[]): void {
+  const sheet = wb.addWorksheet('Roles')
+  sheet.addRow(['ID', 'Name', 'Permissions Count'])
+  for (const r of roles) {
+    sheet.addRow([r.id, r.name, r.permissionCount])
+  }
+}
+
+export async function buildExportWorkbook(permissions: string[]): Promise<Buffer> {
+  const wb = new ExcelJS.Workbook()
+  const sinceDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+  const stats = await repo.getDashboardStats(sinceDate)
+
+  addSummarySheet(wb, stats)
+
+  if (permissions.includes('users:read')) {
+    addUsersSheet(wb, await userRepo.findAllUsersForExport())
+  }
+
+  if (permissions.includes('roles:read')) {
+    addRolesSheet(wb, await roleRepo.findAllRolesForExport())
+  }
+
+  return Buffer.from(await wb.xlsx.writeBuffer())
 }
 
 /**
