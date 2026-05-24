@@ -28,40 +28,37 @@ const STAT_ICONS = {
 
 export function DashboardPage() {
   const { user } = useAuth()
-  const { users, totalUsers, roles, totalRoles, permissions, totalPermissions, recentLogs, isLoading } =
-    useDashboardStats()
+  const { data: stats, isLoading } = useDashboardStats()
 
   const firstName = user?.name?.split(' ')[0] ?? 'there'
 
   const statCards = useMemo<StatCardConfig[]>(() => [
     {
       label: 'Total users',
-      value: totalUsers,
-      delta: '+2 this week',
-      sub: `${users.filter((u) => !u.is_active).length} inactive`,
+      value: stats?.totalUsers ?? 0,
+      delta: stats ? `+${stats.newUsersThisWeek} this week` : undefined,
+      sub: stats ? `${stats.inactiveUsers} inactive` : undefined,
       icon: STAT_ICONS.users,
     },
     {
       label: 'Active roles',
-      value: totalRoles,
-      sub: `${roles.reduce((acc, r) => acc + r.permissions.length, 0)} permissions assigned`,
+      value: stats?.totalRoles ?? 0,
+      sub: stats ? `${stats.totalPermissionsAssigned} permissions assigned` : undefined,
       icon: STAT_ICONS.roles,
     },
     {
       label: 'Permissions',
-      value: totalPermissions,
-      delta: '—',
+      value: stats?.totalPermissions ?? 0,
       sub: 'Across all roles',
       icon: STAT_ICONS.permissions,
     },
     {
       label: 'Recent events',
-      value: recentLogs.length,
-      delta: '·',
+      value: stats?.recentActivity.length ?? 0,
       sub: 'Last 5 events shown',
       icon: STAT_ICONS.events,
     },
-  ], [totalUsers, totalRoles, totalPermissions, recentLogs.length, users, roles])
+  ], [stats])
 
   return (
     <div className="flex flex-col gap-6">
@@ -108,7 +105,7 @@ export function DashboardPage() {
               <ChevronRight size={14} />
             </Link>
           </div>
-          <ActivityFeed logs={recentLogs} users={users} isLoading={isLoading} />
+          <ActivityFeed logs={stats?.recentActivity ?? []} isLoading={isLoading} />
         </div>
 
         {/* Right column */}
@@ -122,7 +119,7 @@ export function DashboardPage() {
           {/* Role distribution */}
           <div className="rounded-xl border border-border bg-card shadow-sm p-5">
             <h2 className="text-[15px] font-semibold mb-3">Role distribution</h2>
-            <RoleDistribution roles={roles} users={users} isLoading={isLoading} />
+            <RoleDistribution />
           </div>
         </div>
       </div>

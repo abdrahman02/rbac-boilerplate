@@ -1,11 +1,8 @@
 import { memo, useMemo } from 'react'
-import type { RoleWithPermissions, UserWithRoles } from '@/shared/types'
+import { useRoles } from '@/features/roles/hooks/useRoles'
+import { useUsers } from '@/features/users/hooks/useUsers'
 
-interface RoleDistributionProps {
-  roles: RoleWithPermissions[]
-  users: UserWithRoles[]
-  isLoading?: boolean
-}
+const MAX_USERS_FOR_DISTRIBUTION = 200
 
 interface RoleBar {
   id: number
@@ -14,15 +11,29 @@ interface RoleBar {
   pct: number
 }
 
-export const RoleDistribution = memo(function RoleDistribution({ roles, users, isLoading }: RoleDistributionProps) {
-  const roleBars = useMemo<RoleBar[]>(() =>
-    roles.slice(0, 6).map((role) => {
-      const count = users.filter((u) => u.roles.includes(role.name)).length
+export const RoleDistribution = memo(function RoleDistribution() {
+  const rolesQuery = useRoles()
+  const usersQuery = useUsers(1, MAX_USERS_FOR_DISTRIBUTION)
+
+  const roles = rolesQuery.data ?? []
+  const users = usersQuery.data?.data ?? []
+  const isLoading = rolesQuery.isLoading || usersQuery.isLoading
+  const isError = rolesQuery.isError || usersQuery.isError
+
+  const roleBars = useMemo<RoleBar[]>(() => {
+    const roleCountMap = users.reduce<Record<string, number>>((acc, u) => {
+      for (const roleName of u.roles) {
+        acc[roleName] = (acc[roleName] ?? 0) + 1
+      }
+      return acc
+    }, {})
+
+    return roles.slice(0, 6).map((role) => {
+      const count = roleCountMap[role.name] ?? 0
       const pct = users.length > 0 ? Math.round((count / users.length) * 100) : 0
       return { id: role.id, name: role.name, count, pct }
-    }),
-    [roles, users],
-  )
+    })
+  }, [roles, users])
 
   if (isLoading) {
     return (
@@ -34,6 +45,12 @@ export const RoleDistribution = memo(function RoleDistribution({ roles, users, i
           </div>
         ))}
       </div>
+    )
+  }
+
+  if (isError) {
+    return (
+      <p className="text-sm text-destructive">Failed to load role distribution.</p>
     )
   }
 

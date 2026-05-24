@@ -1,13 +1,12 @@
 import { memo } from 'react'
-import type { AuditLog, UserWithRoles } from '@/shared/types'
+import type { RecentActivityItem } from '@/shared/types'
 import type { VariantProps } from 'tailwind-variants'
 import { Avatar, Badge } from '@/shared/components/ui'
 import type { badgeVariants } from '@/shared/components/ui/Badge/Badge.variants'
 import { formatRelative, formatDateTime } from '@/shared/lib/format-date'
 
 interface ActivityFeedProps {
-  logs: AuditLog[]
-  users: UserWithRoles[]
+  logs: RecentActivityItem[]
   isLoading?: boolean
 }
 
@@ -22,9 +21,8 @@ function getActionBadgeVariant(action: string): BadgeVariant {
   return 'default'
 }
 
-const ActivityRow = memo(function ActivityRow({ log, users }: { log: AuditLog; users: UserWithRoles[] }) {
-  const user = users.find((u) => u.id === log.userId)
-  const displayName = user?.name ?? 'Unknown'
+const ActivityRow = memo(function ActivityRow({ log }: { log: RecentActivityItem }) {
+  const displayName = log.userName ?? 'Unknown'
   const variant = getActionBadgeVariant(log.action)
 
   return (
@@ -38,9 +36,6 @@ const ActivityRow = memo(function ActivityRow({ log, users }: { log: AuditLog; u
             <span className="font-mono text-xs text-muted-foreground">#{log.resourceId}</span>
           )}
         </div>
-        {log.ipAddress && (
-          <div className="text-[11.5px] text-muted-foreground font-mono mt-0.5">{log.ipAddress}</div>
-        )}
       </div>
       <Badge variant={variant}>{log.action}</Badge>
       <span
@@ -53,7 +48,7 @@ const ActivityRow = memo(function ActivityRow({ log, users }: { log: AuditLog; u
   )
 })
 
-export const ActivityFeed = memo(function ActivityFeed({ logs, users, isLoading }: ActivityFeedProps) {
+export const ActivityFeed = memo(function ActivityFeed({ logs, isLoading }: ActivityFeedProps) {
   if (isLoading) {
     return (
       <div className="flex flex-col">
@@ -83,7 +78,7 @@ export const ActivityFeed = memo(function ActivityFeed({ logs, users, isLoading 
   return (
     <div className="flex flex-col">
       {logs.map((log) => (
-        <ActivityRow key={log.id} log={log} users={users} />
+        <ActivityRow key={log.id} log={log} />
       ))}
     </div>
   )
