@@ -6,7 +6,7 @@ export function BrandMark({ collapsed = false }: BrandMarkProps) {
   return (
     <div className={`flex items-center ${collapsed ? 'justify-center' : 'gap-2.5'}`}>
       <div
-        className="w-8 h-8 rounded-[9px] bg-sidebar-primary text-sidebar-primary-foreground flex items-center justify-center shrink-0"
+        className="w-8 h-8 rounded-[9px] bg-primary text-primary-foreground flex items-center justify-center shrink-0"
         style={{ boxShadow: 'inset 0 -1px 0 rgb(255 255 255 / 0.08), 0 1px 2px rgb(0 0 0 / 0.08)' }}
       >
         <svg
@@ -26,8 +26,8 @@ export function BrandMark({ collapsed = false }: BrandMarkProps) {
       </div>
       {!collapsed && (
         <div className="flex flex-col leading-[1.1]">
-          <span className="text-[14px] font-semibold tracking-[-0.01em]">Bedrock</span>
-          <span className="text-[11px] text-muted-foreground">Access Control</span>
+          <span className="text-[14px] font-semibold tracking-[-0.01em]">RBAC</span>
+          <span className="text-[11px] text-muted-foreground">Access Management</span>
         </div>
       )}
     </div>
