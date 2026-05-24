@@ -11,9 +11,10 @@ export const buttonVariants = tv({
       ghost:     'text-foreground hover:bg-muted',
     },
     size: {
-      sm: 'h-8 px-3 text-sm',
-      md: 'h-10 px-4 text-sm',
-      lg: 'h-[42px] px-6 text-base',
+      sm:       'h-8 px-3 text-sm',
+      md:       'h-10 px-4 text-sm',
+      lg:       'h-[42px] px-6 text-base',
+      iconOnly: 'w-8 h-8 p-0',
     },
     fullWidth: {
       true: 'w-full',

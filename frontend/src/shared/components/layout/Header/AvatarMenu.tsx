@@ -4,12 +4,9 @@ import { User, LogOut } from 'lucide-react'
 import Link from 'next/link'
 import { useAuth } from '@/features/auth/hooks/useAuth'
 import { useLogout } from '@/features/auth/hooks/useLogout'
+import { Button } from '@/shared/components/ui/Button'
 import { Dropdown } from '@/shared/components/ui/Dropdown'
 
-/**
- * Extracts up to 2 initials from a full name.
- * Example: "Abdul Rahman" → "AR"
- */
 function getInitials(name: string): string {
   return name
     .split(' ')
@@ -19,13 +16,8 @@ function getInitials(name: string): string {
     .toUpperCase()
 }
 
-/**
- * AvatarMenu — displays the current user's avatar (initials) as a trigger,
- * and opens a dropdown with profile info, a profile link, and a logout button.
- */
 export function AvatarMenu() {
   const { user } = useAuth()
-  // useLogout returns a plain callback, not a mutation object
   const logout = useLogout()
 
   const name = user?.name ?? 'User'
@@ -33,21 +25,22 @@ export function AvatarMenu() {
   const initials = getInitials(name)
 
   const trigger = (
-    <button
+    <Button
       type="button"
+      variant="ghost"
+      size="iconOnly"
       aria-label="Account menu"
-      className="inline-flex items-center p-0.5 rounded-full border-0 bg-transparent cursor-pointer"
+      className="rounded-full p-0.5"
     >
       <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-[13px] font-semibold select-none">
         {initials}
       </div>
-    </button>
+    </Button>
   )
 
   return (
     <Dropdown trigger={trigger}>
       <div className="w-60 bg-popover text-popover-foreground border border-border rounded-xl shadow-md animate-scale-in overflow-hidden">
-        {/* User info panel */}
         <div className="flex items-center gap-2.5 px-3 py-3">
           <div className="w-9 h-9 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-[13px] font-semibold shrink-0 select-none">
             {initials}
@@ -60,7 +53,6 @@ export function AvatarMenu() {
 
         <div className="h-px bg-border" />
 
-        {/* Profile link */}
         <div className="p-1">
           <Link
             href="/profile"
@@ -73,7 +65,6 @@ export function AvatarMenu() {
 
         <div className="h-px bg-border" />
 
-        {/* Logout button */}
         <div className="p-1">
           <button
             type="button"
