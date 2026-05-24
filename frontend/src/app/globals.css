@@ -27,13 +27,9 @@
   --color-input:                   rgb(var(--input));
   --color-ring:                    rgb(var(--ring));
 
-  /* Sidebar — enables bg-sidebar, text-sidebar-foreground, border-sidebar-border, etc. */
+  /* Sidebar — enables bg-sidebar, text-sidebar-foreground, border-sidebar-border */
   --color-sidebar:                     rgb(var(--sidebar));
   --color-sidebar-foreground:          rgb(var(--sidebar-foreground));
-  --color-sidebar-primary:             rgb(var(--sidebar-primary));
-  --color-sidebar-primary-foreground:  rgb(var(--sidebar-primary-foreground));
-  --color-sidebar-accent:              rgb(var(--sidebar-accent));
-  --color-sidebar-accent-foreground:   rgb(var(--sidebar-accent-foreground));
   --color-sidebar-border:              rgb(var(--sidebar-border));
 
   /* Popover — enables bg-popover, text-popover-foreground */
@@ -67,10 +63,6 @@
 
   --sidebar: 248 248 248;
   --sidebar-foreground: 9 9 9;
-  --sidebar-primary: 22 22 22;
-  --sidebar-primary-foreground: 248 248 248;
-  --sidebar-accent: 245 245 245;
-  --sidebar-accent-foreground: 22 22 22;
   --sidebar-border: 228 228 228;
 
   --radius-sm: calc(0.375rem - 4px);
@@ -106,10 +98,6 @@
 
   --sidebar: 24 24 29;
   --sidebar-foreground: 228 228 228;
-  --sidebar-primary: 22 73 229;
-  --sidebar-primary-foreground: 248 248 248;
-  --sidebar-accent: 38 38 43;
-  --sidebar-accent-foreground: 248 248 248;
   --sidebar-border: 255 255 255 / 0.10;
 }
 
