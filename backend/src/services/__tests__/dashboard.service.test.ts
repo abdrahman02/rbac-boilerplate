@@ -5,6 +5,7 @@ vi.mock('../../repositories/dashboard.repository.js', () => ({
 }))
 
 import * as repo from '../../repositories/dashboard.repository.js'
+import type { RecentActivityItem } from '../../repositories/dashboard.repository.js'
 import { getDashboardStats } from '../dashboard.service.js'
 
 const MOCK_RAW = {
@@ -56,7 +57,7 @@ describe('dashboard service — getDashboardStats', () => {
   it('preserves null userName in recentActivity', async () => {
     const rawWithNullUser = {
       ...MOCK_RAW,
-      recentActivity: [{ ...MOCK_RAW.recentActivity[0], userName: null }],
+      recentActivity: [{ ...MOCK_RAW.recentActivity[0], userName: null }] as RecentActivityItem[],
     }
     vi.mocked(repo.getDashboardStats).mockResolvedValueOnce(rawWithNullUser)
 
