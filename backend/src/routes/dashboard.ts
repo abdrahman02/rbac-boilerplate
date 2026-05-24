@@ -35,5 +35,6 @@ const router = Router()
  *         description: Unauthorized
  */
 router.get('/stats', authMiddleware, ctrl.stats)
+router.get('/export', authMiddleware, ctrl.exportDashboard)
 
 export default router
