@@ -2,15 +2,20 @@ import { describe, it, expect } from 'vitest'
 import { navItemVariants, navBadgeVariants } from './NavItem.variants'
 
 describe('navItemVariants', () => {
-  it('applies sidebar-primary bg when active', () => {
+  it('applies primary bg when active', () => {
     const result = navItemVariants({ active: true, collapsed: false })
-    expect(result).toContain('bg-sidebar-primary')
-    expect(result).toContain('text-sidebar-primary-foreground')
+    expect(result).toContain('bg-primary')
+    expect(result).toContain('text-primary-foreground')
   })
 
   it('applies sidebar-foreground text when inactive', () => {
     const result = navItemVariants({ active: false, collapsed: false })
     expect(result).toContain('text-sidebar-foreground')
+  })
+
+  it('applies hover:bg-primary tint when inactive', () => {
+    const result = navItemVariants({ active: false, collapsed: false })
+    expect(result).toContain('hover:bg-primary')
   })
 
   it('applies justify-center when collapsed', () => {
@@ -25,9 +30,10 @@ describe('navItemVariants', () => {
 })
 
 describe('navBadgeVariants', () => {
-  it('applies white background when active', () => {
+  it('applies white/14 background when active', () => {
     const result = navBadgeVariants({ active: true })
     expect(result).toContain('bg-white')
+    expect(result).toContain('text-primary-foreground')
   })
 
   it('applies muted background when inactive', () => {
