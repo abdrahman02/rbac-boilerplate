@@ -2,10 +2,11 @@
 
 import { useMemo, type ReactNode } from 'react'
 import Link from 'next/link'
-import { Users, Shield, Key, Activity, ChevronRight, Download, UserPlus } from 'lucide-react'
+import { Users, Shield, Key, Activity, ChevronRight, Download, UserPlus, Loader2 } from 'lucide-react'
 import { useAuth } from '@/features/auth/hooks/useAuth'
 import { Button, buttonVariants } from '@/shared/components/ui'
 import { useDashboardStats } from '../hooks/useDashboardStats'
+import { useExportDashboard } from '../hooks/useExportDashboard'
 import { StatCard } from './StatCard'
 import { ActivityFeed } from './ActivityFeed'
 import { QuickActions } from './QuickActions'
@@ -29,6 +30,7 @@ const STAT_ICONS = {
 export function DashboardPage() {
   const { user } = useAuth()
   const { data: stats, isLoading } = useDashboardStats()
+  const { exportDashboard, isExporting } = useExportDashboard()
 
   const firstName = user?.name?.split(' ')[0] ?? 'there'
 
@@ -73,9 +75,15 @@ export function DashboardPage() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" className="gap-1.5">
-            <Download size={14} />
-            Export
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-1.5"
+            onClick={exportDashboard}
+            disabled={isExporting}
+          >
+            {isExporting ? <Loader2 size={14} className="animate-spin" /> : <Download size={14} />}
+            {isExporting ? 'Exporting...' : 'Export'}
           </Button>
           <Link href="/users" className={buttonVariants({ size: 'sm', className: 'gap-1.5' })}>
             <UserPlus size={14} />
