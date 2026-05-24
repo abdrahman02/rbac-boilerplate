@@ -66,3 +66,22 @@ export async function removePermissionFromRole(
   const result = await prisma.rolePermission.deleteMany({ where: { roleId, permissionId } })
   return result.count > 0
 }
+
+export interface RoleExportRow {
+  id: number
+  name: string
+  permissionCount: number
+}
+
+export async function findAllRolesForExport(): Promise<RoleExportRow[]> {
+  const roles = await prisma.role.findMany({
+    include: { _count: { select: { permissions: true } } },
+    orderBy: { name: 'asc' },
+  })
+
+  return roles.map((r) => ({
+    id: r.id,
+    name: r.name,
+    permissionCount: r._count.permissions,
+  }))
+}
