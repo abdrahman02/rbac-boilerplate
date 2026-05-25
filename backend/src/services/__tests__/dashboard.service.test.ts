@@ -18,7 +18,7 @@ vi.mock('exceljs', () => ({
     Workbook: vi.fn(function () {
       return {
         addWorksheet: vi.fn(() => ({
-          addRow: vi.fn(() => ({})),
+          addRow: vi.fn(() => ({ height: 0, eachCell: vi.fn() })),
           eachRow: vi.fn(),
           getColumn: vi.fn(() => ({ width: 0 })),
           views: [],

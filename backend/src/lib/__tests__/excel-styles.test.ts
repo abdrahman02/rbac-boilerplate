@@ -9,8 +9,21 @@ import {
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-function makeMockRow(): Record<string, unknown> {
-  return {}
+type MockCell = Record<string, unknown>
+
+/** Row mock with N cells; styles are applied per-cell via eachCell. */
+function makeMockRow(cellCount = 2) {
+  const cells: MockCell[] = Array.from({ length: cellCount }, () => ({}))
+  return {
+    height: 0 as number,
+    eachCell(
+      _opts: { includeEmpty: boolean },
+      cb: (cell: ExcelJS.Cell, col: number) => void,
+    ) {
+      cells.forEach((cell, i) => cb(cell as unknown as ExcelJS.Cell, i + 1))
+    },
+    cells,
+  }
 }
 
 interface MockColumnStore {
@@ -44,14 +57,38 @@ function makeMockSheet(rows: Array<Array<{ value: unknown }>>) {
 // ── styleHeaderRow ─────────────────────────────────────────────────────────────
 
 describe('styleHeaderRow', () => {
-  it('sets bold white font on navy background', () => {
-    const row = makeMockRow()
+  it('applies navy fill and white bold font to each cell', () => {
+    const row = makeMockRow(3)
     styleHeaderRow(row as unknown as ExcelJS.Row)
 
-    expect((row.font as ExcelJS.Font).bold).toBe(true)
-    expect((row.font as ExcelJS.Font).color).toEqual({ argb: 'FFFFFFFF' })
-    expect((row.fill as ExcelJS.FillPattern).fgColor).toEqual({ argb: 'FF1E3A5F' })
-    expect((row.fill as ExcelJS.FillPattern).pattern).toBe('solid')
+    for (const cell of row.cells) {
+      expect((cell.font as ExcelJS.Font).bold).toBe(true)
+      expect((cell.font as ExcelJS.Font).color).toEqual({ argb: 'FFFFFFFF' })
+      expect((cell.fill as ExcelJS.FillPattern).pattern).toBe('solid')
+      expect((cell.fill as ExcelJS.FillPattern).fgColor).toEqual({ argb: 'FF1E3A5F' })
+    }
+  })
+
+  it('sets font family and size on each header cell', () => {
+    const row = makeMockRow(2)
+    styleHeaderRow(row as unknown as ExcelJS.Row)
+
+    for (const cell of row.cells) {
+      expect((cell.font as ExcelJS.Font).name).toBe('Calibri')
+      expect((cell.font as ExcelJS.Font).size).toBe(11)
+    }
+  })
+
+  it('sets border with medium bottom weight on each cell', () => {
+    const row = makeMockRow(2)
+    styleHeaderRow(row as unknown as ExcelJS.Row)
+
+    for (const cell of row.cells) {
+      expect((cell.border as ExcelJS.Borders).bottom?.style).toBe('medium')
+      expect((cell.border as ExcelJS.Borders).top?.style).toBe('thin')
+      expect((cell.border as ExcelJS.Borders).left?.style).toBe('thin')
+      expect((cell.border as ExcelJS.Borders).right?.style).toBe('thin')
+    }
   })
 
   it('sets row height to 20', () => {
@@ -59,31 +96,38 @@ describe('styleHeaderRow', () => {
     styleHeaderRow(row as unknown as ExcelJS.Row)
     expect(row.height).toBe(20)
   })
-
-  it('sets bottom border to medium weight', () => {
-    const row = makeMockRow()
-    styleHeaderRow(row as unknown as ExcelJS.Row)
-    expect((row.border as ExcelJS.Borders).bottom?.style).toBe('medium')
-  })
 })
 
 // ── styleDataRow ───────────────────────────────────────────────────────────────
 
 describe('styleDataRow', () => {
+  it('applies Calibri font with size 10 to each cell', () => {
+    const row = makeMockRow(3)
+    styleDataRow(row as unknown as ExcelJS.Row)
+
+    for (const cell of row.cells) {
+      expect((cell.font as ExcelJS.Font).name).toBe('Calibri')
+      expect((cell.font as ExcelJS.Font).size).toBe(10)
+    }
+  })
+
+  it('sets thin border on all sides of each cell', () => {
+    const row = makeMockRow(2)
+    styleDataRow(row as unknown as ExcelJS.Row)
+
+    for (const cell of row.cells) {
+      const border = cell.border as ExcelJS.Borders
+      expect(border.top?.style).toBe('thin')
+      expect(border.left?.style).toBe('thin')
+      expect(border.bottom?.style).toBe('thin')
+      expect(border.right?.style).toBe('thin')
+    }
+  })
+
   it('sets row height to 18', () => {
     const row = makeMockRow()
     styleDataRow(row as unknown as ExcelJS.Row)
     expect(row.height).toBe(18)
-  })
-
-  it('sets thin light border on all sides', () => {
-    const row = makeMockRow()
-    styleDataRow(row as unknown as ExcelJS.Row)
-    const border = row.border as ExcelJS.Borders
-    expect(border.top?.style).toBe('thin')
-    expect(border.left?.style).toBe('thin')
-    expect(border.bottom?.style).toBe('thin')
-    expect(border.right?.style).toBe('thin')
   })
 })
 
@@ -119,8 +163,8 @@ describe('autoFitColumns', () => {
 
     autoFitColumns(sheet as unknown as ExcelJS.Worksheet)
 
-    expect(sheet.cols[1]?.width).toBe(8) // 'ID'=2 + 2=4, clamped to 8
-    expect(sheet.cols[2]?.width).toBe(8) // '1'=1 + 2=3, clamped to 8
+    expect(sheet.cols[1]?.width).toBe(8)
+    expect(sheet.cols[2]?.width).toBe(8)
   })
 
   it('caps width at MAX_COL_WIDTH of 50', () => {

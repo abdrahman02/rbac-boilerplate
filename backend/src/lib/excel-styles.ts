@@ -13,29 +13,36 @@ const MIN_COL_WIDTH = 8
 const MAX_COL_WIDTH = 50
 
 // ── Row styling ────────────────────────────────────────────────────────────────
+// Styles are applied per-cell (not per-row) so that fill and borders are scoped
+// exactly to columns that have content — row-level styles span all 16K columns.
 
 export function styleHeaderRow(row: ExcelJS.Row): void {
-  row.font = { bold: true, color: { argb: COLORS.headerText }, size: 11 }
-  row.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: COLORS.headerBg } }
-  row.alignment = { vertical: 'middle', horizontal: 'left' }
-  row.border = {
-    top: { style: 'thin', color: { argb: COLORS.borderAccent } },
-    left: { style: 'thin', color: { argb: COLORS.borderAccent } },
-    bottom: { style: 'medium', color: { argb: COLORS.borderAccent } },
-    right: { style: 'thin', color: { argb: COLORS.borderAccent } },
-  }
   row.height = 20
+  row.eachCell({ includeEmpty: false }, (cell) => {
+    cell.font = { name: 'Calibri', bold: true, color: { argb: COLORS.headerText }, size: 11 }
+    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: COLORS.headerBg } }
+    cell.alignment = { vertical: 'middle', horizontal: 'left' }
+    cell.border = {
+      top: { style: 'thin', color: { argb: COLORS.borderAccent } },
+      left: { style: 'thin', color: { argb: COLORS.borderAccent } },
+      bottom: { style: 'medium', color: { argb: COLORS.borderAccent } },
+      right: { style: 'thin', color: { argb: COLORS.borderAccent } },
+    }
+  })
 }
 
 export function styleDataRow(row: ExcelJS.Row): void {
-  row.alignment = { vertical: 'middle' }
-  row.border = {
-    top: { style: 'thin', color: { argb: COLORS.borderLight } },
-    left: { style: 'thin', color: { argb: COLORS.borderLight } },
-    bottom: { style: 'thin', color: { argb: COLORS.borderLight } },
-    right: { style: 'thin', color: { argb: COLORS.borderLight } },
-  }
   row.height = 18
+  row.eachCell({ includeEmpty: false }, (cell) => {
+    cell.font = { name: 'Calibri', size: 10 }
+    cell.alignment = { vertical: 'middle' }
+    cell.border = {
+      top: { style: 'thin', color: { argb: COLORS.borderLight } },
+      left: { style: 'thin', color: { argb: COLORS.borderLight } },
+      bottom: { style: 'thin', color: { argb: COLORS.borderLight } },
+      right: { style: 'thin', color: { argb: COLORS.borderLight } },
+    }
+  })
 }
 
 // ── Sheet-level helpers ────────────────────────────────────────────────────────
