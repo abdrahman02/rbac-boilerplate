@@ -8,8 +8,9 @@ export async function listUsers(req: Request, res: Response): Promise<void> {
   try {
     const page = Math.max(1, parseInt(req.query.page as string, 10) || 1)
     const limit = Math.min(100, Math.max(1, parseInt(req.query.limit as string, 10) || 10))
+    const search = typeof req.query.search === 'string' ? req.query.search.trim() || undefined : undefined
 
-    const result = await svc.listUsers(page, limit)
+    const result = await svc.listUsers(page, limit, search)
     res.status(200).json(result)
   } catch (error) {
     handleError(res, error)

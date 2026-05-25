@@ -6,9 +6,15 @@ type UserRow = Omit<User, 'passwordHash' | 'deletedAt'>
 export async function findAllUsers(
   page: number,
   limit: number,
+  search?: string,
 ): Promise<{ rows: UserRow[]; total: number }> {
   const offset = (page - 1) * limit
-  const where = { deletedAt: null } as const
+  const where = {
+    deletedAt: null,
+    ...(search
+      ? { OR: [{ fullName: { contains: search } }, { email: { contains: search } }] }
+      : {}),
+  }
 
   const [total, rows] = await prisma.$transaction([
     prisma.user.count({ where }),

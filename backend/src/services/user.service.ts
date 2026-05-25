@@ -7,8 +7,9 @@ import type { CreateUserInput, UpdateUserInput } from '../schemas/user.schema.js
 export async function listUsers(
   page: number,
   limit: number,
+  search?: string,
 ): Promise<PaginatedResponse<UserWithRoles>> {
-  const { rows, total } = await repo.findAllUsers(page, limit)
+  const { rows, total } = await repo.findAllUsers(page, limit, search)
 
   const data = await Promise.all(
     rows.map(async (u) => {

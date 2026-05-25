@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useIsFetching } from "@tanstack/react-query";
 import { useRoles } from "@/features/roles/hooks/useRoles";
 import { Button } from "@/shared/components/ui";
-import { usePermission } from "@/shared/hooks/usePermission";
+import { useDebounce, usePermission } from "@/shared/hooks";
 import type { UserWithRoles } from "@/shared/types";
 import { useDeleteUser, useRemoveRole, useUsers } from "../hooks/useUsers";
 import { AssignRoleModal } from "./AssignRoleModal";
@@ -29,7 +29,8 @@ export function UsersPage() {
   const [assigningUser, setAssigningUser] = useState<UserWithRoles | null>(null);
   const [deletingUser, setDeletingUser] = useState<UserWithRoles | null>(null);
 
-  const { data } = useUsers(page);
+  const debouncedSearch = useDebounce(search, 400);
+  const { data } = useUsers(page, 10, debouncedSearch);
   const isFetching = useIsFetching({ queryKey: ["users"] }) > 0;
   const { data: roles = [] } = useRoles();
   const deleteUser = useDeleteUser();
@@ -43,10 +44,8 @@ export function UsersPage() {
   const meta = data?.meta;
   const totalPages = meta ? Math.ceil(meta.total / meta.limit) : 1;
 
-  // Client-side filter within the current page
+  // Client-side filter for role and status (server handles name/email search)
   const filteredUsers = allUsers.filter((user) => {
-    const q = search.toLowerCase();
-    if (q && !(user.name.toLowerCase().includes(q) || user.email.toLowerCase().includes(q))) return false;
     if (filters.role && !user.roles.includes(filters.role)) return false;
     if (filters.status === "active" && !user.is_active) return false;
     if (filters.status === "inactive" && user.is_active) return false;
