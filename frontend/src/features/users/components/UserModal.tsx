@@ -13,7 +13,15 @@ import type { UserWithRoles } from "@/shared/types";
 const schema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   email: z.email({ message: "Invalid email" }),
-  password: z.string().optional(),
+  // Optional at schema level (edit mode sends ""); refines only run when value is non-empty
+  password: z
+    .string()
+    .optional()
+    .refine((val) => !val || val.length >= 8, "At least 8 characters")
+    .refine(
+      (val) => !val || /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(val),
+      "Must contain uppercase, lowercase, and a number",
+    ),
 });
 
 type FormInput = z.infer<typeof schema>;
@@ -48,10 +56,6 @@ export function UserModal({ isOpen, onClose, user }: UserModalProps) {
       setError("password", { message: "Password is required" });
       return;
     }
-    if (!isEditing && data.password && data.password.length < 8) {
-      setError("password", { message: "Password must be at least 8 characters" });
-      return;
-    }
     try {
       if (isEditing) {
         await updateUser.mutateAsync({ id: user.id, payload: { name: data.name, email: data.email } });
@@ -70,7 +74,7 @@ export function UserModal({ isOpen, onClose, user }: UserModalProps) {
         <p className="text-sm text-muted-foreground -mt-0.5">
           {isEditing
             ? "Update this user's basic information."
-            : "We'll send them an email to set their password."}
+            : "Set a temporary password the user can change after signing in."}
         </p>
 
         {errors.root && (
@@ -106,13 +110,13 @@ export function UserModal({ isOpen, onClose, user }: UserModalProps) {
             htmlFor="user-password"
             required
             error={errors.password?.message}
-            hint={!errors.password?.message ? "User will be asked to change this on first sign-in." : undefined}
+            hint={!errors.password?.message ? "Lowercase, uppercase, and at least one number required." : undefined}
           >
             <Input
               id="user-password"
               type="password"
               {...register("password")}
-              placeholder="Min 8 characters"
+              placeholder="Uppercase, number, min 8 chars"
               iconLeft={<Lock size={15} />}
               error={errors.password?.message}
             />
