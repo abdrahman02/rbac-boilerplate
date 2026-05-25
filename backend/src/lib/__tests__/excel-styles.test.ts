@@ -11,18 +11,19 @@ import {
 
 type MockCell = Record<string, unknown>
 
-/** Row mock with N cells; styles are applied per-cell via eachCell. */
-function makeMockRow(cellCount = 2) {
-  const cells: MockCell[] = Array.from({ length: cellCount }, () => ({}))
+/**
+ * Row mock whose style functions access cells via getCell(col) and
+ * derive column count from values.length - 1 (1-indexed ExcelJS convention).
+ */
+function makeMockRow(cellValues: unknown[]) {
+  const mockCells: MockCell[] = cellValues.map(() => ({}))
   return {
     height: 0 as number,
-    eachCell(
-      _opts: { includeEmpty: boolean },
-      cb: (cell: ExcelJS.Cell, col: number) => void,
-    ) {
-      cells.forEach((cell, i) => cb(cell as unknown as ExcelJS.Cell, i + 1))
+    values: [null, ...cellValues] as unknown[], // 1-indexed; index 0 is null
+    getCell(col: number) {
+      return mockCells[col - 1] as unknown as ExcelJS.Cell
     },
-    cells,
+    cells: mockCells,
   }
 }
 
@@ -57,42 +58,44 @@ function makeMockSheet(rows: Array<Array<{ value: unknown }>>) {
 // ── styleHeaderRow ─────────────────────────────────────────────────────────────
 
 describe('styleHeaderRow', () => {
-  it('applies navy fill and white bold font to each cell', () => {
-    const row = makeMockRow(3)
+  it('applies navy fill and white bold Calibri font to each data cell', () => {
+    const row = makeMockRow(['Metric', 'Value'])
     styleHeaderRow(row as unknown as ExcelJS.Row)
 
     for (const cell of row.cells) {
       expect((cell.font as ExcelJS.Font).bold).toBe(true)
+      expect((cell.font as ExcelJS.Font).name).toBe('Calibri')
+      expect((cell.font as ExcelJS.Font).size).toBe(11)
       expect((cell.font as ExcelJS.Font).color).toEqual({ argb: 'FFFFFFFF' })
       expect((cell.fill as ExcelJS.FillPattern).pattern).toBe('solid')
       expect((cell.fill as ExcelJS.FillPattern).fgColor).toEqual({ argb: 'FF1E3A5F' })
     }
   })
 
-  it('sets font family and size on each header cell', () => {
-    const row = makeMockRow(2)
+  it('sets thin border on all sides of each header cell', () => {
+    const row = makeMockRow(['ID', 'Name', 'Email'])
     styleHeaderRow(row as unknown as ExcelJS.Row)
 
     for (const cell of row.cells) {
-      expect((cell.font as ExcelJS.Font).name).toBe('Calibri')
-      expect((cell.font as ExcelJS.Font).size).toBe(11)
+      const border = cell.border as ExcelJS.Borders
+      expect(border.top?.style).toBe('thin')
+      expect(border.left?.style).toBe('thin')
+      expect(border.bottom?.style).toBe('thin')
+      expect(border.right?.style).toBe('thin')
     }
   })
 
-  it('sets border with medium bottom weight on each cell', () => {
-    const row = makeMockRow(2)
+  it('styles exactly the data columns — no overflow beyond column count', () => {
+    const row = makeMockRow(['A', 'B']) // only 2 columns
     styleHeaderRow(row as unknown as ExcelJS.Row)
 
-    for (const cell of row.cells) {
-      expect((cell.border as ExcelJS.Borders).bottom?.style).toBe('medium')
-      expect((cell.border as ExcelJS.Borders).top?.style).toBe('thin')
-      expect((cell.border as ExcelJS.Borders).left?.style).toBe('thin')
-      expect((cell.border as ExcelJS.Borders).right?.style).toBe('thin')
-    }
+    expect(row.cells).toHaveLength(2)
+    expect(row.cells[0]?.fill).toBeDefined()
+    expect(row.cells[1]?.fill).toBeDefined()
   })
 
   it('sets row height to 20', () => {
-    const row = makeMockRow()
+    const row = makeMockRow(['X'])
     styleHeaderRow(row as unknown as ExcelJS.Row)
     expect(row.height).toBe(20)
   })
@@ -101,8 +104,8 @@ describe('styleHeaderRow', () => {
 // ── styleDataRow ───────────────────────────────────────────────────────────────
 
 describe('styleDataRow', () => {
-  it('applies Calibri font with size 10 to each cell', () => {
-    const row = makeMockRow(3)
+  it('applies Calibri size-10 font to each data cell', () => {
+    const row = makeMockRow([1, 'Alice', 'alice@example.com', true, 'admin', new Date()])
     styleDataRow(row as unknown as ExcelJS.Row)
 
     for (const cell of row.cells) {
@@ -112,7 +115,7 @@ describe('styleDataRow', () => {
   })
 
   it('sets thin border on all sides of each cell', () => {
-    const row = makeMockRow(2)
+    const row = makeMockRow([1, 'Alice', 'alice@example.com'])
     styleDataRow(row as unknown as ExcelJS.Row)
 
     for (const cell of row.cells) {
@@ -124,8 +127,17 @@ describe('styleDataRow', () => {
     }
   })
 
+  it('styles exactly the data columns — no overflow', () => {
+    const row = makeMockRow([1, 'text']) // only 2 columns
+    styleDataRow(row as unknown as ExcelJS.Row)
+
+    expect(row.cells).toHaveLength(2)
+    expect(row.cells[0]?.border).toBeDefined()
+    expect(row.cells[1]?.border).toBeDefined()
+  })
+
   it('sets row height to 18', () => {
-    const row = makeMockRow()
+    const row = makeMockRow(['X'])
     styleDataRow(row as unknown as ExcelJS.Row)
     expect(row.height).toBe(18)
   })
@@ -152,46 +164,34 @@ describe('autoFitColumns', () => {
 
     autoFitColumns(sheet as unknown as ExcelJS.Worksheet)
 
-    // col 1: max('Name'=4, 'Alice'=5) + 2 = 7 → clamped to MIN 8
-    expect(sheet.cols[1]?.width).toBe(8)
-    // col 2: max('Email'=5, 'alice@example.com'=17) + 2 = 19
-    expect(sheet.cols[2]?.width).toBe(19)
+    expect(sheet.cols[1]?.width).toBe(8)  // max(4,5)+2=7 → MIN 8
+    expect(sheet.cols[2]?.width).toBe(19) // max(5,17)+2=19
   })
 
   it('respects MIN_COL_WIDTH of 8', () => {
     const sheet = makeMockSheet([[{ value: 'ID' }, { value: '1' }]])
-
     autoFitColumns(sheet as unknown as ExcelJS.Worksheet)
-
     expect(sheet.cols[1]?.width).toBe(8)
     expect(sheet.cols[2]?.width).toBe(8)
   })
 
   it('caps width at MAX_COL_WIDTH of 50', () => {
-    const longValue = 'x'.repeat(60)
-    const sheet = makeMockSheet([[{ value: longValue }]])
-
+    const sheet = makeMockSheet([[{ value: 'x'.repeat(60) }]])
     autoFitColumns(sheet as unknown as ExcelJS.Worksheet)
-
     expect(sheet.cols[1]?.width).toBe(50)
   })
 
   it('converts Date values to string before measuring', () => {
     const date = new Date('2024-01-15')
     const sheet = makeMockSheet([[{ value: date }]])
-
     autoFitColumns(sheet as unknown as ExcelJS.Worksheet)
-
-    const dateStr = date.toLocaleDateString()
-    const expected = Math.min(Math.max(dateStr.length + 2, 8), 50)
+    const expected = Math.min(Math.max(date.toLocaleDateString().length + 2, 8), 50)
     expect(sheet.cols[1]?.width).toBe(expected)
   })
 
   it('does nothing when sheet has no rows', () => {
     const sheet = makeMockSheet([])
-
     autoFitColumns(sheet as unknown as ExcelJS.Worksheet)
-
     expect(Object.keys(sheet.cols)).toHaveLength(0)
   })
 })

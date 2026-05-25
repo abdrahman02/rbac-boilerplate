@@ -18,22 +18,26 @@ const MAX_COL_WIDTH = 50
 
 export function styleHeaderRow(row: ExcelJS.Row): void {
   row.height = 20
-  row.eachCell({ includeEmpty: false }, (cell) => {
+  const colCount = (row.values as unknown[]).length - 1
+  for (let col = 1; col <= colCount; col++) {
+    const cell = row.getCell(col)
     cell.font = { name: 'Calibri', bold: true, color: { argb: COLORS.headerText }, size: 11 }
     cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: COLORS.headerBg } }
     cell.alignment = { vertical: 'middle', horizontal: 'left' }
     cell.border = {
       top: { style: 'thin', color: { argb: COLORS.borderAccent } },
       left: { style: 'thin', color: { argb: COLORS.borderAccent } },
-      bottom: { style: 'medium', color: { argb: COLORS.borderAccent } },
+      bottom: { style: 'thin', color: { argb: COLORS.borderAccent } },
       right: { style: 'thin', color: { argb: COLORS.borderAccent } },
     }
-  })
+  }
 }
 
 export function styleDataRow(row: ExcelJS.Row): void {
   row.height = 18
-  row.eachCell({ includeEmpty: false }, (cell) => {
+  const colCount = (row.values as unknown[]).length - 1
+  for (let col = 1; col <= colCount; col++) {
+    const cell = row.getCell(col)
     cell.font = { name: 'Calibri', size: 10 }
     cell.alignment = { vertical: 'middle' }
     cell.border = {
@@ -42,7 +46,7 @@ export function styleDataRow(row: ExcelJS.Row): void {
       bottom: { style: 'thin', color: { argb: COLORS.borderLight } },
       right: { style: 'thin', color: { argb: COLORS.borderLight } },
     }
-  })
+  }
 }
 
 // ── Sheet-level helpers ────────────────────────────────────────────────────────

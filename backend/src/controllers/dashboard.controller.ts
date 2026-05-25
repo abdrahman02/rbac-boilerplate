@@ -15,9 +15,11 @@ export async function exportDashboard(req: Request, res: Response): Promise<void
   try {
     const permissions = req.user?.permissions ?? []
     const buffer = await svc.buildExportWorkbook(permissions)
-    const date = new Date().toISOString().slice(0, 10)
+    const now = new Date()
+    const dateStr = now.toISOString().slice(0, 10)
+    const timeStr = now.toISOString().slice(11, 19).replace(/:/g, '-')
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-    res.setHeader('Content-Disposition', `attachment; filename="rbac-report-${date}.xlsx"`)
+    res.setHeader('Content-Disposition', `attachment; filename="rbac-report-${dateStr}-${timeStr}.xlsx"`)
     res.send(buffer)
   } catch (err) {
     handleError(res, err)

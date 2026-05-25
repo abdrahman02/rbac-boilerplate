@@ -14,10 +14,12 @@ export function useExportDashboard(): {
     try {
       const res = await apiClient.get<Blob>('/dashboard/export', { responseType: 'blob' })
       const url = URL.createObjectURL(res.data)
-      const date = new Date().toISOString().slice(0, 10)
+      const now = new Date()
+      const dateStr = now.toISOString().slice(0, 10)
+      const timeStr = now.toISOString().slice(11, 19).replace(/:/g, '-')
       const anchor = document.createElement('a')
       anchor.href = url
-      anchor.download = `rbac-report-${date}.xlsx`
+      anchor.download = `rbac-report-${dateStr}-${timeStr}.xlsx`
       anchor.click()
       URL.revokeObjectURL(url)
     } finally {
