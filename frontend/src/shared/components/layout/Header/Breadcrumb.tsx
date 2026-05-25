@@ -18,7 +18,7 @@ export function Breadcrumb() {
 
   return (
     <nav className="flex items-center gap-1.5 text-sm min-w-0" aria-label="Breadcrumb">
-      <span className="text-muted-foreground shrink-0">Bedrock</span>
+      <span className="text-muted-foreground shrink-0">RBAC</span>
       <ChevronRight size={14} className="text-muted-foreground shrink-0" />
       <span className="font-semibold tracking-[-0.005em] truncate">{label}</span>
     </nav>
