@@ -2,7 +2,7 @@ import type { Request, Response } from 'express'
 import * as svc from '../services/user.service.js'
 import { handleError } from '../lib/handle-error.js'
 import type { ApiResponse, UserWithRoles, PaginatedResponse } from '../types/index.js'
-import type { CreateUserInput, UpdateUserInput, AssignRoleInput } from '../schemas/user.schema.js'
+import type { CreateUserInput, UpdateUserInput, AssignRoleInput, SyncRolesInput } from '../schemas/user.schema.js'
 
 export async function listUsers(req: Request, res: Response): Promise<void> {
   try {
@@ -206,6 +206,33 @@ export async function assignRole(req: Request, res: Response): Promise<void> {
       data: user,
       message: null,
     }
+    res.status(200).json(body)
+  } catch (error) {
+    handleError(res, error)
+  }
+}
+
+export async function syncRoles(req: Request, res: Response): Promise<void> {
+  try {
+    const id = typeof req.params.id === 'string' ? req.params.id : undefined
+    if (!id) {
+      const body: ApiResponse<null> = { success: false, data: null, message: 'Invalid user ID' }
+      res.status(400).json(body)
+      return
+    }
+
+    const userId = parseInt(id, 10)
+    if (Number.isNaN(userId)) {
+      const body: ApiResponse<null> = { success: false, data: null, message: 'Invalid user ID' }
+      res.status(400).json(body)
+      return
+    }
+
+    const input = req.body as SyncRolesInput
+    await svc.syncRoles(userId, input.role_ids)
+
+    const user = await svc.getUser(userId)
+    const body: ApiResponse<UserWithRoles> = { success: true, data: user, message: null }
     res.status(200).json(body)
   } catch (error) {
     handleError(res, error)

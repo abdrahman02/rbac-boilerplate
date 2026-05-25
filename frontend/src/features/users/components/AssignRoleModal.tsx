@@ -3,7 +3,7 @@
 import { Shield } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useRoles } from "@/features/roles/hooks/useRoles";
-import { useAssignRole, useRemoveRole } from "@/features/users/hooks/useUsers";
+import { useSyncRoles } from "@/features/users/hooks/useUsers";
 import { Avatar, Badge, Button, Modal } from "@/shared/components/ui";
 import { getErrorMessage } from "@/shared/lib/api-error";
 import type { RoleWithPermissions, UserWithRoles } from "@/shared/types";
@@ -16,8 +16,7 @@ interface AssignRoleModalProps {
 
 export function AssignRoleModal({ isOpen, onClose, user }: AssignRoleModalProps) {
   const { data: roles = [] } = useRoles();
-  const assignRole = useAssignRole();
-  const removeRole = useRemoveRole();
+  const syncRoles = useSyncRoles();
 
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [error, setError] = useState<string | null>(null);
@@ -46,15 +45,12 @@ export function AssignRoleModal({ isOpen, onClose, user }: AssignRoleModalProps)
   const added = [...selectedIds].filter((id) => !originalRoleIds.has(id));
   const removed = [...originalRoleIds].filter((id) => !selectedIds.has(id));
   const isDirty = added.length > 0 || removed.length > 0;
-  const isPending = assignRole.isPending || removeRole.isPending;
+  const isPending = syncRoles.isPending;
 
   const handleSave = async () => {
     setError(null);
     try {
-      await Promise.all([
-        ...added.map((roleId) => assignRole.mutateAsync({ userId: user.id, roleId })),
-        ...removed.map((roleId) => removeRole.mutateAsync({ userId: user.id, roleId })),
-      ]);
+      await syncRoles.mutateAsync({ userId: user.id, roleIds: [...selectedIds] });
       onClose();
     } catch (err) {
       setError(getErrorMessage(err));

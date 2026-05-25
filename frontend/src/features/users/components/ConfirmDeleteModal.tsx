@@ -1,8 +1,16 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
 import { TriangleAlert } from "lucide-react";
-import { useState } from "react";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 import { Button, FormField, Input, Modal } from "@/shared/components/ui";
+
+const schema = z.object({
+  confirm: z.string().min(1),
+});
+type FormInput = z.infer<typeof schema>;
 
 interface ConfirmDeleteModalProps {
   isOpen: boolean;
@@ -26,16 +34,32 @@ export function ConfirmDeleteModal({
   confirmLabel = "Delete",
   isLoading,
 }: ConfirmDeleteModalProps) {
-  const [text, setText] = useState("");
+  const { register, watch, reset } = useForm<FormInput>({
+    resolver: zodResolver(schema),
+    defaultValues: { confirm: "" },
+    mode: "onChange",
+  });
+
+  const confirmValue = watch("confirm");
+  const isMatch = confirmValue === confirmText;
+
+  useEffect(() => {
+    if (!isOpen) reset({ confirm: "" });
+  }, [isOpen, reset]);
 
   const handleClose = () => {
-    setText("");
+    reset({ confirm: "" });
     onClose();
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (isMatch) onConfirm();
   };
 
   return (
     <Modal isOpen={isOpen} onClose={handleClose} title={title} maxWidth="sm">
-      <div className="flex flex-col gap-3.5 pt-1">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-3.5 pt-1">
         <p className="text-sm text-muted-foreground">{description}</p>
 
         <div className="flex items-start gap-2.5 p-3 rounded-lg bg-destructive/[.08] border border-destructive/[.22] text-destructive text-[13px]">
@@ -57,8 +81,7 @@ export function ConfirmDeleteModal({
         >
           <Input
             id="confirm-delete-input"
-            value={text}
-            onChange={(e) => setText(e.target.value)}
+            {...register("confirm")}
             placeholder={confirmText}
           />
         </FormField>
@@ -67,17 +90,11 @@ export function ConfirmDeleteModal({
           <Button type="button" variant="secondary" onClick={handleClose}>
             Cancel
           </Button>
-          <Button
-            type="button"
-            variant="danger"
-            disabled={text !== confirmText}
-            isLoading={isLoading}
-            onClick={onConfirm}
-          >
+          <Button type="submit" variant="danger" disabled={!isMatch} isLoading={isLoading}>
             {confirmLabel}
           </Button>
         </div>
-      </div>
+      </form>
     </Modal>
   );
 }

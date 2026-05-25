@@ -106,3 +106,9 @@ export async function assignRole(userId: number, roleId: number): Promise<void> 
 export async function removeRole(userId: number, roleId: number): Promise<boolean> {
   return repo.removeRoleFromUser(userId, roleId)
 }
+
+export async function syncRoles(userId: number, roleIds: number[]): Promise<void> {
+  const user = await repo.findUserById(userId)
+  if (!user) throw new Error('USER_NOT_FOUND')
+  await repo.syncUserRoles(userId, roleIds)
+}

@@ -2,7 +2,7 @@ import { Router } from 'express'
 import { authMiddleware } from '../middleware/auth.middleware.js'
 import { requirePermission } from '../middleware/permission.middleware.js'
 import { validate } from '../middleware/validate.middleware.js'
-import { createUserSchema, updateUserSchema, assignRoleSchema } from '../schemas/user.schema.js'
+import { createUserSchema, updateUserSchema, assignRoleSchema, syncRolesSchema } from '../schemas/user.schema.js'
 import { auditLog } from '../middleware/audit-log.middleware.js'
 import * as ctrl from '../controllers/user.controller.js'
 
@@ -155,6 +155,8 @@ router.delete('/:id', authMiddleware, requirePermission('users:delete'), auditLo
  *         description: Role assigned
  */
 router.post('/:id/roles', authMiddleware, requirePermission('users:update'), validate(assignRoleSchema), auditLog('assign_role', 'user'), ctrl.assignRole)
+
+router.put('/:id/roles', authMiddleware, requirePermission('users:update'), validate(syncRolesSchema), auditLog('sync_roles', 'user'), ctrl.syncRoles)
 
 /**
  * @swagger

@@ -94,6 +94,15 @@ export async function removeRoleFromUser(userId: number, roleId: number): Promis
   return result.count > 0
 }
 
+export async function syncUserRoles(userId: number, roleIds: number[]): Promise<void> {
+  await prisma.$transaction(async (tx) => {
+    await tx.userRole.deleteMany({ where: { userId } })
+    if (roleIds.length > 0) {
+      await tx.userRole.createMany({ data: roleIds.map((roleId) => ({ userId, roleId })) })
+    }
+  })
+}
+
 export async function anonymizeDeletedEmail(email: string): Promise<void> {
   const user = await prisma.user.findFirst({
     where: { email, deletedAt: { not: null } },
