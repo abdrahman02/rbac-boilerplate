@@ -41,6 +41,7 @@ export const RoleDistribution = memo(function RoleDistribution() {
     return (
       <div className="flex flex-col gap-3">
         {Array.from({ length: 4 }).map((_, i) => (
+          // biome-ignore lint/suspicious/noArrayIndexKey: skeleton items are static placeholders with no identity
           <div key={i} className="space-y-1.5">
             <div className="h-3 bg-muted rounded animate-pulse w-24" />
             <div className="h-1.5 bg-muted rounded-full animate-pulse" />

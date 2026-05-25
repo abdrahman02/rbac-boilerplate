@@ -1,11 +1,11 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Modal, Button, Input, FormField } from "@/shared/components/ui";
 import { useCreatePermission, useUpdatePermission } from "@/features/permissions/hooks/usePermissionsCrud";
+import { Button, FormField, Input, Modal } from "@/shared/components/ui";
 import { getErrorMessage } from "@/shared/lib/api-error";
 import type { Permission } from "@/shared/types";
 

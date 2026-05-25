@@ -1,13 +1,13 @@
 "use client";
 
-import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 import type { BaseSyntheticEvent } from "react";
 import type { UseFormReturn } from "react-hook-form";
-import { registerSchema, type RegisterInput } from "./register.schema";
+import { useForm, useWatch } from "react-hook-form";
 import { registerApi } from "./register.api";
+import { type RegisterInput, registerSchema } from "./register.schema";
 
 interface UseRegisterFormReturn {
   form: UseFormReturn<RegisterInput>;

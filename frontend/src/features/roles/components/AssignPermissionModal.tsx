@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Modal, Button } from "@/shared/components/ui";
 import { usePermissionList } from "@/features/permissions/hooks/usePermissionsCrud";
 import { useAssignPermissionToRole, useRemovePermissionFromRole } from "@/features/roles/hooks/useRoles";
+import { Button, Modal } from "@/shared/components/ui";
 import { getErrorMessage } from "@/shared/lib/api-error";
 import type { RoleWithPermissions } from "@/shared/types";
 

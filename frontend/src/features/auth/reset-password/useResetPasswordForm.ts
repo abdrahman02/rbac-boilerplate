@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import type { BaseSyntheticEvent } from "react";
+import { useCallback, useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
-import { resetPasswordSchema, type ResetPasswordInput } from "./resetPassword.schema";
+import { useForm, useWatch } from "react-hook-form";
+import { type ResetPasswordInput, resetPasswordSchema } from "./resetPassword.schema";
 
 interface UseResetPasswordFormReturn {
   form: UseFormReturn<ResetPasswordInput>;

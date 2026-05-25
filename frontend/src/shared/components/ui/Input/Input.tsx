@@ -1,6 +1,6 @@
 "use client";
 
-import { forwardRef, type ComponentPropsWithoutRef, type ReactNode } from "react";
+import { type ComponentPropsWithoutRef, forwardRef, type ReactNode } from "react";
 import { inputVariants } from "./Input.variants";
 
 interface InputProps extends ComponentPropsWithoutRef<"input"> {

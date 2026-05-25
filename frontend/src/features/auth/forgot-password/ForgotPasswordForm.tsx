@@ -1,8 +1,8 @@
 "use client";
 
-import { memo } from "react";
-import Link from "next/link";
 import { Check, ChevronLeft, Mail } from "lucide-react";
+import Link from "next/link";
+import { memo } from "react";
 import { AuthShell } from "@/features/auth/components/AuthShell";
 import { Button, FormField, Input } from "@/shared/components/ui";
 import { useForgotPasswordForm } from "./useForgotPasswordForm";

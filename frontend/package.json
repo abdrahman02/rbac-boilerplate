@@ -9,6 +9,12 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "coverage": "vitest run --coverage",
+    "format:fix": "biome format --write src/",
+    "format:check": "biome format src/",
+    "lint:fix": "biome lint --write --diagnostic-level=error src/",
+    "lint:check": "biome lint --diagnostic-level=error src/",
+    "check:fix": "biome check --write --diagnostic-level=error src/",
+    "check:check": "biome check --diagnostic-level=error src/",
     "lint": "biome check src/",
     "format": "biome format --write src/",
     "typecheck": "tsc --noEmit"

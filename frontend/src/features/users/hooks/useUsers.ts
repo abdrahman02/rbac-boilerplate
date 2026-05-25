@@ -1,8 +1,8 @@
 "use client";
 
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/shared/lib/api-client";
-import type { UserWithRoles, PaginatedResponse } from "@/shared/types";
+import type { PaginatedResponse, UserWithRoles } from "@/shared/types";
 
 interface CreateUserPayload {
   name: string;

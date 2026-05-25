@@ -1,11 +1,11 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Modal, Button, Input, FormField } from "@/shared/components/ui";
 import { useCreateRole, useUpdateRole } from "@/features/roles/hooks/useRoles";
+import { Button, FormField, Input, Modal } from "@/shared/components/ui";
 import { getErrorMessage } from "@/shared/lib/api-error";
 import type { RoleWithPermissions } from "@/shared/types";
 

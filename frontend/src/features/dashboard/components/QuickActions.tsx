@@ -1,6 +1,6 @@
-import { memo } from "react";
+import { ChevronRight, Key, ScrollText, Shield, Users } from "lucide-react";
 import Link from "next/link";
-import { Users, Shield, Key, ScrollText, ChevronRight } from "lucide-react";
+import { memo } from "react";
 import { Button } from "@/shared/components/ui/Button";
 
 interface QuickAction {

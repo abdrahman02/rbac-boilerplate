@@ -30,14 +30,7 @@ export function PasswordStrengthMeter({ password }: PasswordStrengthMeterProps) 
   if (!password) return null;
 
   return (
-    <div
-      className="flex items-center gap-2 mt-1.5"
-      role="meter"
-      aria-valuenow={level}
-      aria-valuemin={0}
-      aria-valuemax={4}
-      aria-label={`Password strength: ${STRENGTH_LABELS[level]}`}
-    >
+    <div className="flex items-center gap-2 mt-1.5">
       <div className="flex gap-[3px] flex-1">
         {[1, 2, 3, 4].map((i) => (
           <span

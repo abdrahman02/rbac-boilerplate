@@ -1,15 +1,15 @@
 "use client";
 
+import { FileText, Key, LayoutDashboard, Shield, ShieldCheck, Users } from "lucide-react";
 import type { ReactNode } from "react";
-import { LayoutDashboard, Users, Shield, ShieldCheck, Key, FileText } from "lucide-react";
-import { NavItem } from "./NavItem";
-import { NavGroup } from "./NavGroup";
-import { sidebarVariants } from "./Sidebar.variants";
+import { BrandMark } from "@/shared/components/common/BrandMark";
 import { PermissionGate } from "@/shared/components/guard/PermissionGate";
 import { useAnyPermission } from "@/shared/hooks/useAnyPermission";
-import { BrandMark } from "@/shared/components/common/BrandMark";
+import { NavGroup } from "./NavGroup";
+import { NavItem } from "./NavItem";
 import type { NavEntry, NavGroupDef } from "./Sidebar.types";
 import { isNavGroup } from "./Sidebar.types";
+import { sidebarVariants } from "./Sidebar.variants";
 
 const NAV_CONFIG: NavEntry[] = [
   { href: "/dashboard", label: "Dashboard", icon: <LayoutDashboard size={18} />, permission: null },

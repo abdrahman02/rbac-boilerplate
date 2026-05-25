@@ -1,5 +1,5 @@
-import { describe, it, expect } from "vitest";
-import { navItemVariants, navBadgeVariants } from "./NavItem.variants";
+import { describe, expect, it } from "vitest";
+import { navBadgeVariants, navItemVariants } from "./NavItem.variants";
 
 describe("navItemVariants", () => {
   it("applies primary bg when active", () => {

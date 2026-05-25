@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
-import { AuthAside } from "./AuthAside";
 import { BrandMark } from "@/shared/components/common";
+import { AuthAside } from "./AuthAside";
 
 interface AuthShellProps {
   children: ReactNode;

@@ -1,8 +1,8 @@
 "use client";
 
-import { memo } from "react";
-import Link from "next/link";
 import { Check, Lock } from "lucide-react";
+import Link from "next/link";
+import { memo } from "react";
 import { AuthShell } from "@/features/auth/components/AuthShell";
 import { Button, FormField, Input, PasswordStrengthMeter } from "@/shared/components/ui";
 import { useResetPasswordForm } from "./useResetPasswordForm";

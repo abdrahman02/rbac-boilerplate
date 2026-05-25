@@ -1,11 +1,11 @@
 "use client";
 
-import { memo } from "react";
+import { Lock, Mail } from "lucide-react";
 import Link from "next/link";
-import { Mail, Lock } from "lucide-react";
-import { getErrorMessage } from "@/shared/lib/api-error";
+import { memo } from "react";
 import { AuthShell } from "@/features/auth/components/AuthShell";
 import { Alert, Button, FormField, Input, PasswordStrengthMeter } from "@/shared/components/ui";
+import { getErrorMessage } from "@/shared/lib/api-error";
 import { useRegisterForm } from "./useRegisterForm";
 
 /**

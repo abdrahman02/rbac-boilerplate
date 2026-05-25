@@ -1,16 +1,16 @@
 "use client";
 
-import { useMemo, type ReactNode } from "react";
+import { Activity, ChevronRight, Download, Key, Loader2, Shield, UserPlus, Users } from "lucide-react";
 import Link from "next/link";
-import { Users, Shield, Key, Activity, ChevronRight, Download, UserPlus, Loader2 } from "lucide-react";
+import { type ReactNode, useMemo } from "react";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { Button, buttonVariants } from "@/shared/components/ui";
 import { useDashboardStats } from "../hooks/useDashboardStats";
 import { useExportDashboard } from "../hooks/useExportDashboard";
-import { StatCard } from "./StatCard";
 import { ActivityFeed } from "./ActivityFeed";
 import { QuickActions } from "./QuickActions";
 import { RoleDistribution } from "./RoleDistribution";
+import { StatCard } from "./StatCard";
 
 interface StatCardConfig {
   label: string;

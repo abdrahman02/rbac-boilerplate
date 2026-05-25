@@ -2,8 +2,8 @@
 
 import { Menu, Moon, Sun } from "lucide-react";
 import { Button } from "@/shared/components/ui/Button";
-import { Breadcrumb } from "./Breadcrumb";
 import { AvatarMenu } from "./AvatarMenu";
+import { Breadcrumb } from "./Breadcrumb";
 
 interface HeaderProps {
   onToggleSidebar: () => void;

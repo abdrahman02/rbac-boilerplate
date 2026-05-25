@@ -1,5 +1,5 @@
-import { describe, it, expect } from "vitest";
-import { navGroupTriggerVariants, navGroupChildVariants } from "./NavGroup.variants";
+import { describe, expect, it } from "vitest";
+import { navGroupChildVariants, navGroupTriggerVariants } from "./NavGroup.variants";
 
 describe("navGroupTriggerVariants", () => {
   it("applies primary/18 bg when activeParent=true", () => {

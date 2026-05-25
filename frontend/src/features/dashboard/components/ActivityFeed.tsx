@@ -1,9 +1,9 @@
 import { memo } from "react";
-import type { RecentActivityItem } from "@/shared/types";
 import type { VariantProps } from "tailwind-variants";
 import { Avatar, Badge } from "@/shared/components/ui";
 import type { badgeVariants } from "@/shared/components/ui/Badge/Badge.variants";
-import { formatRelative, formatDateTime } from "@/shared/lib/format-date";
+import { formatDateTime, formatRelative } from "@/shared/lib/format-date";
+import type { RecentActivityItem } from "@/shared/types";
 
 interface ActivityFeedProps {
   logs: RecentActivityItem[];
@@ -73,6 +73,7 @@ export const ActivityFeed = memo(function ActivityFeed({ logs, isLoading }: Acti
     return (
       <div className="flex flex-col">
         {Array.from({ length: 5 }).map((_, i) => (
+          // biome-ignore lint/suspicious/noArrayIndexKey: skeleton items are static placeholders with no identity
           <div key={i} className="flex items-center gap-3 px-5 py-3 border-t border-border first:border-t-0">
             <div className="w-7 h-7 rounded-full bg-muted animate-pulse shrink-0" />
             <div className="flex-1 space-y-1.5">

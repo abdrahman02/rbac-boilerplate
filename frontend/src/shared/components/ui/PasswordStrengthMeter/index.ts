@@ -1,1 +1,1 @@
-export { PasswordStrengthMeter, getPasswordStrength } from "./PasswordStrengthMeter";
+export { getPasswordStrength, PasswordStrengthMeter } from "./PasswordStrengthMeter";

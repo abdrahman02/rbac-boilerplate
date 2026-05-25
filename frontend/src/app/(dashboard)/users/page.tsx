@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { Button, Badge } from "@/shared/components/ui";
-import { PermissionGate } from "@/shared/components/guard/PermissionGate";
-import { useUsers, useDeleteUser } from "@/features/users/hooks/useUsers";
-import { UserModal } from "@/features/users/components/UserModal";
 import { AssignRoleModal } from "@/features/users/components/AssignRoleModal";
+import { UserModal } from "@/features/users/components/UserModal";
+import { useDeleteUser, useUsers } from "@/features/users/hooks/useUsers";
+import { PermissionGate } from "@/shared/components/guard/PermissionGate";
+import { Badge, Button } from "@/shared/components/ui";
 import { getErrorMessage } from "@/shared/lib/api-error";
 import type { UserWithRoles } from "@/shared/types";
 

@@ -1,7 +1,7 @@
 "use client";
 
-import { usePathname } from "next/navigation";
 import { ChevronRight } from "lucide-react";
+import { usePathname } from "next/navigation";
 
 const ROUTE_LABELS: Record<string, string> = {
   "/dashboard": "Dashboard",

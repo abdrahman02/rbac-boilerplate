@@ -1,4 +1,4 @@
-import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from "axios";
+import axios, { type AxiosError, type AxiosInstance, type InternalAxiosRequestConfig } from "axios";
 import { useAuthStore } from "@/features/auth/stores/authStore";
 
 interface PendingRequest {
@@ -50,7 +50,7 @@ apiClient.interceptors.response.use(
 
       try {
         await axios.post(`${baseURL}/auth/refresh`, {}, { withCredentials: true });
-        failedQueue.forEach(({ config, resolve }) => resolve(""));
+        for (const { resolve } of failedQueue) resolve("");
         failedQueue = [];
         isRefreshing = false;
         return apiClient(originalRequest);

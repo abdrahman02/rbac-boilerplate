@@ -1,10 +1,10 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { Sidebar } from "../Sidebar";
-import { Header } from "../Header";
-import { useSidebar } from "@/shared/hooks/useSidebar";
 import { useDarkMode } from "@/shared/hooks/useDarkMode";
+import { useSidebar } from "@/shared/hooks/useSidebar";
+import { Header } from "../Header";
+import { Sidebar } from "../Sidebar";
 
 interface DashboardShellProps {
   children: ReactNode;

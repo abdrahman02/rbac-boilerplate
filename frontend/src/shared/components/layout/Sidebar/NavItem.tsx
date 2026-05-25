@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
-import { navItemVariants, navBadgeVariants } from "./NavItem.variants";
+import { navBadgeVariants, navItemVariants } from "./NavItem.variants";
 
 interface NavItemProps {
   href: string;

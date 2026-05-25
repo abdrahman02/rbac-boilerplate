@@ -1,10 +1,10 @@
 "use client";
 
+import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 import Link from "next/link";
-import { Mail, Lock, Eye, EyeOff } from "lucide-react";
-import { getErrorMessage } from "@/shared/lib/api-error";
 import { AuthShell } from "@/features/auth/components/AuthShell";
 import { Alert, Button, Divider, FormField, Input } from "@/shared/components/ui";
+import { getErrorMessage } from "@/shared/lib/api-error";
 import { useLoginForm } from "./useLoginForm";
 
 /**

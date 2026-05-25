@@ -1,12 +1,12 @@
 "use client";
 
-import { User, LogOut } from "lucide-react";
+import { LogOut, User } from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { useLogout } from "@/features/auth/hooks/useLogout";
+import { Avatar } from "@/shared/components/ui/Avatar";
 import { Button } from "@/shared/components/ui/Button";
 import { Dropdown } from "@/shared/components/ui/Dropdown";
-import { Avatar } from "@/shared/components/ui/Avatar";
 
 export function AvatarMenu() {
   const { user } = useAuth();

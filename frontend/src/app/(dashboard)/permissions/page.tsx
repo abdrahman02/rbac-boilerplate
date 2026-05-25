@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/shared/components/ui";
-import { PermissionGate } from "@/shared/components/guard/PermissionGate";
-import { usePermissionList, useDeletePermission } from "@/features/permissions/hooks/usePermissionsCrud";
 import { PermissionModal } from "@/features/permissions/components/PermissionModal";
+import { useDeletePermission, usePermissionList } from "@/features/permissions/hooks/usePermissionsCrud";
+import { PermissionGate } from "@/shared/components/guard/PermissionGate";
+import { Button } from "@/shared/components/ui";
 import { getErrorMessage } from "@/shared/lib/api-error";
 import type { Permission } from "@/shared/types";
 

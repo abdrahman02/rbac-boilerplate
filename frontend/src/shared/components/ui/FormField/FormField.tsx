@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 
 interface FormFieldProps {
   label: ReactNode;
+  htmlFor?: string;
   labelRight?: ReactNode;
   error?: string;
   hint?: string;
@@ -9,11 +10,11 @@ interface FormFieldProps {
   children: ReactNode;
 }
 
-export function FormField({ label, labelRight, error, hint, required, children }: FormFieldProps) {
+export function FormField({ label, htmlFor, labelRight, error, hint, required, children }: FormFieldProps) {
   return (
     <div className="flex flex-col gap-1.5">
       <div className="flex items-center justify-between">
-        <label className="text-sm font-medium text-foreground flex items-center">
+        <label htmlFor={htmlFor} className="text-sm font-medium text-foreground flex items-center">
           {label}
           {required && (
             <span className="text-destructive ml-0.5" aria-hidden>

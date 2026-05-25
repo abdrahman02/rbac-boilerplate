@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import type { BaseSyntheticEvent } from "react";
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import type { BaseSyntheticEvent } from "react";
+import { useCallback, useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
-import { forgotPasswordSchema, type ForgotPasswordInput } from "./forgotPassword.schema";
+import { useForm } from "react-hook-form";
+import { type ForgotPasswordInput, forgotPasswordSchema } from "./forgotPassword.schema";
 
 interface UseForgotPasswordFormReturn {
   form: UseFormReturn<ForgotPasswordInput>;
