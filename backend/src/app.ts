@@ -1,6 +1,7 @@
 import express, { type Application } from 'express'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
+import morgan from 'morgan'
 import { env } from './config/env.js'
 import { setupSwagger } from './config/swagger.js'
 import authRouter from './routes/auth.js'
@@ -20,6 +21,7 @@ export function createApp(): Application {
     allowedHeaders: ['Content-Type'],
   }))
 
+  app.use(morgan('dev'))
   app.use(express.json({ limit: '10kb' }))
   app.use(cookieParser())
 
