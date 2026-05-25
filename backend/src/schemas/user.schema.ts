@@ -25,15 +25,10 @@ export const updateUserSchema = z
     message: 'At least one field must be provided',
   })
 
-export const assignRoleSchema = z.object({
-  role_id: z.number().int().positive(),
-})
-
 export const syncRolesSchema = z.object({
   role_ids: z.array(z.number().int().positive()),
 })
 
 export type CreateUserInput = z.infer<typeof createUserSchema>
 export type UpdateUserInput = z.infer<typeof updateUserSchema>
-export type AssignRoleInput = z.infer<typeof assignRoleSchema>
 export type SyncRolesInput = z.infer<typeof syncRolesSchema>

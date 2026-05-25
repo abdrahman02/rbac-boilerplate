@@ -58,16 +58,6 @@ export function useDeleteUser() {
   });
 }
 
-export function useAssignRole() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: async ({ userId, roleId }: { userId: number; roleId: number }) => {
-      await apiClient.post(`/users/${userId}/roles`, { role_id: roleId });
-    },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["users"] }),
-  });
-}
-
 export function useSyncRoles() {
   const queryClient = useQueryClient();
   return useMutation({

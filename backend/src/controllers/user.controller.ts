@@ -2,7 +2,7 @@ import type { Request, Response } from 'express'
 import * as svc from '../services/user.service.js'
 import { handleError } from '../lib/handle-error.js'
 import type { ApiResponse, UserWithRoles, PaginatedResponse } from '../types/index.js'
-import type { CreateUserInput, UpdateUserInput, AssignRoleInput, SyncRolesInput } from '../schemas/user.schema.js'
+import type { CreateUserInput, UpdateUserInput, SyncRolesInput } from '../schemas/user.schema.js'
 
 export async function listUsers(req: Request, res: Response): Promise<void> {
   try {
@@ -165,45 +165,6 @@ export async function deleteUser(req: Request, res: Response): Promise<void> {
     const body: ApiResponse<null> = {
       success: true,
       data: null,
-      message: null,
-    }
-    res.status(200).json(body)
-  } catch (error) {
-    handleError(res, error)
-  }
-}
-
-export async function assignRole(req: Request, res: Response): Promise<void> {
-  try {
-    const id = typeof req.params.id === 'string' ? req.params.id : undefined
-    if (!id) {
-      const body: ApiResponse<null> = {
-        success: false,
-        data: null,
-        message: 'Invalid user ID',
-      }
-      res.status(400).json(body)
-      return
-    }
-
-    const userId = parseInt(id, 10)
-    if (Number.isNaN(userId)) {
-      const body: ApiResponse<null> = {
-        success: false,
-        data: null,
-        message: 'Invalid user ID',
-      }
-      res.status(400).json(body)
-      return
-    }
-
-    const input = req.body as AssignRoleInput
-    await svc.assignRole(userId, input.role_id)
-
-    const user = await svc.getUser(userId)
-    const body: ApiResponse<UserWithRoles> = {
-      success: true,
-      data: user,
       message: null,
     }
     res.status(200).json(body)

@@ -2,7 +2,7 @@ import { Router } from 'express'
 import { authMiddleware } from '../middleware/auth.middleware.js'
 import { requirePermission } from '../middleware/permission.middleware.js'
 import { validate } from '../middleware/validate.middleware.js'
-import { createUserSchema, updateUserSchema, assignRoleSchema, syncRolesSchema } from '../schemas/user.schema.js'
+import { createUserSchema, updateUserSchema, syncRolesSchema } from '../schemas/user.schema.js'
 import { auditLog } from '../middleware/audit-log.middleware.js'
 import * as ctrl from '../controllers/user.controller.js'
 
@@ -128,33 +128,6 @@ router.patch('/:id', authMiddleware, requirePermission('users:update'), validate
  *         description: User not found
  */
 router.delete('/:id', authMiddleware, requirePermission('users:delete'), auditLog('delete_user', 'user'), ctrl.deleteUser)
-
-/**
- * @swagger
- * /api/users/{id}/roles:
- *   post:
- *     summary: Assign role to user
- *     tags: [Users]
- *     security:
- *       - cookieAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema: { type: integer }
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               role_id: { type: integer }
- *     responses:
- *       200:
- *         description: Role assigned
- */
-router.post('/:id/roles', authMiddleware, requirePermission('users:update'), validate(assignRoleSchema), auditLog('assign_role', 'user'), ctrl.assignRole)
 
 router.put('/:id/roles', authMiddleware, requirePermission('users:update'), validate(syncRolesSchema), auditLog('sync_roles', 'user'), ctrl.syncRoles)
 

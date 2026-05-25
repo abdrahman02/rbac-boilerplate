@@ -96,13 +96,6 @@ export async function deleteUser(userId: number): Promise<boolean> {
   return repo.softDeleteUser(userId)
 }
 
-export async function assignRole(userId: number, roleId: number): Promise<void> {
-  const user = await repo.findUserById(userId)
-  if (!user) throw new Error('USER_NOT_FOUND')
-
-  await repo.assignRoleToUser(userId, roleId)
-}
-
 export async function removeRole(userId: number, roleId: number): Promise<boolean> {
   return repo.removeRoleFromUser(userId, roleId)
 }
