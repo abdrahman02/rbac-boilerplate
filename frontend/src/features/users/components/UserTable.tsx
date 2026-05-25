@@ -9,7 +9,6 @@ import { UserRowMenu } from "./UserRowMenu";
 
 interface UserTableProps {
   users: UserWithRoles[];
-  isLoading: boolean;
   isFetching: boolean;
   canEdit: boolean;
   canDelete: boolean;
@@ -21,7 +20,6 @@ interface UserTableProps {
 
 export function UserTable({
   users,
-  isLoading,
   isFetching,
   canEdit,
   canDelete,
@@ -43,28 +41,22 @@ export function UserTable({
           </tr>
         </thead>
         <tbody>
-          {isLoading ? (
-            <LoadingRow />
+          {isFetching && <LoadingRow />}
+          {!isFetching && users.length === 0 ? (
+            <EmptyRow />
           ) : (
-            <>
-              {isFetching && <LoadingRow />}
-              {users.length === 0 ? (
-                <EmptyRow />
-              ) : (
-                users.map((user) => (
-                  <UserRow
-                    key={user.id}
-                    user={user}
-                    canEdit={canEdit}
-                    canDelete={canDelete}
-                    onEdit={() => onEdit(user)}
-                    onManageRoles={() => onManageRoles(user)}
-                    onDelete={() => onDelete(user)}
-                    onRemoveRole={(roleName) => onRemoveRole(user, roleName)}
-                  />
-                ))
-              )}
-            </>
+            users.map((user) => (
+              <UserRow
+                key={user.id}
+                user={user}
+                canEdit={canEdit}
+                canDelete={canDelete}
+                onEdit={() => onEdit(user)}
+                onManageRoles={() => onManageRoles(user)}
+                onDelete={() => onDelete(user)}
+                onRemoveRole={(roleName) => onRemoveRole(user, roleName)}
+              />
+            ))
           )}
         </tbody>
       </table>
@@ -177,7 +169,7 @@ function LoadingRow() {
   return (
     <tr>
       <td colSpan={5} className="px-4 py-3 border-b border-border">
-        <div className="flex items-center gap-2.5 text-[13px] text-muted-foreground">
+        <div className="flex justify-center items-center gap-2.5 text-[13px] text-muted-foreground">
           <Spinner size="sm" />
           <span>Fetching latest data…</span>
         </div>
