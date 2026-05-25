@@ -1,0 +1,190 @@
+"use client";
+
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useState } from "react";
+import { useRoles } from "@/features/roles/hooks/useRoles";
+import { Button } from "@/shared/components/ui";
+import { usePermission } from "@/shared/hooks/usePermission";
+import type { UserWithRoles } from "@/shared/types";
+import { useDeleteUser, useRemoveRole, useUsers } from "../hooks/useUsers";
+import { AssignRoleModal } from "./AssignRoleModal";
+import { ConfirmDeleteModal } from "./ConfirmDeleteModal";
+import { UserModal } from "./UserModal";
+import { UserTable } from "./UserTable";
+import { UserToolbar } from "./UserToolbar";
+
+interface FilterState {
+  role: string;
+  status: string;
+}
+
+export function UsersPage() {
+  const [page, setPage] = useState(1);
+  const [search, setSearch] = useState("");
+  const [filters, setFilters] = useState<FilterState>({ role: "", status: "" });
+
+  const [editingUser, setEditingUser] = useState<UserWithRoles | null>(null);
+  const [isUserModalOpen, setUserModalOpen] = useState(false);
+  const [assigningUser, setAssigningUser] = useState<UserWithRoles | null>(null);
+  const [deletingUser, setDeletingUser] = useState<UserWithRoles | null>(null);
+
+  const { data, isLoading } = useUsers(page);
+  const { data: roles = [] } = useRoles();
+  const deleteUser = useDeleteUser();
+  const removeRole = useRemoveRole();
+
+  const canCreate = usePermission("users:create");
+  const canEdit = usePermission("users:update");
+  const canDelete = usePermission("users:delete");
+
+  const allUsers = data?.data ?? [];
+  const meta = data?.meta;
+  const totalPages = meta ? Math.ceil(meta.total / meta.limit) : 1;
+
+  // Client-side filter within the current page
+  const filteredUsers = allUsers.filter((user) => {
+    const q = search.toLowerCase();
+    if (q && !(user.name.toLowerCase().includes(q) || user.email.toLowerCase().includes(q))) return false;
+    if (filters.role && !user.roles.includes(filters.role)) return false;
+    if (filters.status === "active" && !user.is_active) return false;
+    if (filters.status === "inactive" && user.is_active) return false;
+    return true;
+  });
+
+  const handleSearchChange = (v: string) => {
+    setSearch(v);
+    setPage(1);
+  };
+
+  const handleFiltersChange = (f: FilterState) => {
+    setFilters(f);
+    setPage(1);
+  };
+
+  const openCreate = () => {
+    setEditingUser(null);
+    setUserModalOpen(true);
+  };
+
+  const openEdit = (user: UserWithRoles) => {
+    setEditingUser(user);
+    setUserModalOpen(true);
+  };
+
+  const handleRemoveRole = async (user: UserWithRoles, roleName: string) => {
+    const role = roles.find((r) => r.name === roleName);
+    if (!role) return;
+    try {
+      await removeRole.mutateAsync({ userId: user.id, roleId: role.id });
+    } catch {
+      // API error silently ignored; the list will not update if the request failed
+    }
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deletingUser) return;
+    try {
+      await deleteUser.mutateAsync(deletingUser.id);
+      setDeletingUser(null);
+    } catch {
+      // Error is shown by the isLoading/disabled state; keep modal open for retry
+    }
+  };
+
+  return (
+    <div className="flex flex-col gap-5">
+      {/* Page header */}
+      <div>
+        <h1 className="text-[22px] font-semibold tracking-tight">Users</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          People who can sign into this workspace, and the roles assigned to them.
+        </p>
+      </div>
+
+      {/* Toolbar: search + filters + actions */}
+      <UserToolbar
+        search={search}
+        onSearchChange={handleSearchChange}
+        filters={filters}
+        onFiltersChange={handleFiltersChange}
+        roles={roles}
+        canCreate={canCreate}
+        onAddUser={openCreate}
+      />
+
+      {/* Users table */}
+      <UserTable
+        users={filteredUsers}
+        isLoading={isLoading}
+        canEdit={canEdit}
+        canDelete={canDelete}
+        onEdit={openEdit}
+        onManageRoles={(user) => setAssigningUser(user)}
+        onDelete={(user) => setDeletingUser(user)}
+        onRemoveRole={handleRemoveRole}
+      />
+
+      {/* Pagination */}
+      {meta && meta.total > meta.limit && (
+        <div className="flex items-center justify-between flex-wrap gap-3">
+          <span className="text-[12.5px] text-muted-foreground">
+            Showing{" "}
+            <b className="text-foreground">{(page - 1) * meta.limit + 1}–{Math.min(page * meta.limit, meta.total)}</b>{" "}
+            of <b className="text-foreground">{meta.total}</b> users
+          </span>
+          <div className="flex items-center gap-1.5">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page <= 1}
+              className="gap-1"
+            >
+              <ChevronLeft size={14} />
+              Prev
+            </Button>
+            <span className="px-3 py-1.5 text-sm text-muted-foreground">
+              {page} / {totalPages}
+            </span>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setPage((p) => p + 1)}
+              disabled={page >= totalPages}
+              className="gap-1"
+            >
+              Next
+              <ChevronRight size={14} />
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* Create / Edit user modal */}
+      <UserModal isOpen={isUserModalOpen} onClose={() => setUserModalOpen(false)} user={editingUser} />
+
+      {/* Assign roles modal */}
+      {assigningUser && (
+        <AssignRoleModal
+          isOpen={!!assigningUser}
+          onClose={() => setAssigningUser(null)}
+          user={assigningUser}
+        />
+      )}
+
+      {/* Confirm delete modal */}
+      {deletingUser && (
+        <ConfirmDeleteModal
+          isOpen={!!deletingUser}
+          onClose={() => setDeletingUser(null)}
+          onConfirm={handleConfirmDelete}
+          title={`Delete ${deletingUser.name}?`}
+          description="This will permanently remove their account and revoke all active sessions."
+          confirmText={deletingUser.email}
+          confirmLabel="Delete user"
+          isLoading={deleteUser.isPending}
+        />
+      )}
+    </div>
+  );
+}

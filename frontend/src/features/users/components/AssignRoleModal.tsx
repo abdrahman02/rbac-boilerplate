@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { Shield } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import { useRoles } from "@/features/roles/hooks/useRoles";
 import { useAssignRole, useRemoveRole } from "@/features/users/hooks/useUsers";
-import { Button, Modal } from "@/shared/components/ui";
+import { Avatar, Badge, Button, Modal } from "@/shared/components/ui";
 import { getErrorMessage } from "@/shared/lib/api-error";
-import type { UserWithRoles } from "@/shared/types";
+import type { RoleWithPermissions, UserWithRoles } from "@/shared/types";
 
 interface AssignRoleModalProps {
   isOpen: boolean;
@@ -17,58 +18,160 @@ export function AssignRoleModal({ isOpen, onClose, user }: AssignRoleModalProps)
   const { data: roles = [] } = useRoles();
   const assignRole = useAssignRole();
   const removeRole = useRemoveRole();
+
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [error, setError] = useState<string | null>(null);
 
-  const handleToggle = async (roleId: number, hasRole: boolean) => {
+  // Compute the role IDs the user currently has (derived from role names in user.roles)
+  const originalRoleIds = useMemo(
+    () => new Set(roles.filter((r) => user.roles.includes(r.name)).map((r) => r.id)),
+    [roles, user.roles],
+  );
+
+  // Reset selection when modal opens or user changes
+  useEffect(() => {
+    if (!isOpen) return;
+    setSelectedIds(new Set(originalRoleIds));
+    setError(null);
+  }, [isOpen, user.id]); // intentionally omitting originalRoleIds to avoid mid-session resets
+
+  const toggle = (id: number) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  };
+
+  const added = [...selectedIds].filter((id) => !originalRoleIds.has(id));
+  const removed = [...originalRoleIds].filter((id) => !selectedIds.has(id));
+  const isDirty = added.length > 0 || removed.length > 0;
+  const isPending = assignRole.isPending || removeRole.isPending;
+
+  const handleSave = async () => {
     setError(null);
     try {
-      if (hasRole) {
-        await removeRole.mutateAsync({ userId: user.id, roleId });
-      } else {
-        await assignRole.mutateAsync({ userId: user.id, roleId });
-      }
+      await Promise.all([
+        ...added.map((roleId) => assignRole.mutateAsync({ userId: user.id, roleId })),
+        ...removed.map((roleId) => removeRole.mutateAsync({ userId: user.id, roleId })),
+      ]);
+      onClose();
     } catch (err) {
       setError(getErrorMessage(err));
     }
   };
 
-  const isPending = assignRole.isPending || removeRole.isPending;
+  const handleClose = () => {
+    setSelectedIds(new Set(originalRoleIds));
+    setError(null);
+    onClose();
+  };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title={`Assign Roles — ${user.name}`}>
-      <div className="space-y-2">
+    <Modal isOpen={isOpen} onClose={handleClose} title={`Manage roles — ${user.name}`} maxWidth="md">
+      <div className="flex flex-col gap-3.5 pt-1">
+        <p className="text-sm text-muted-foreground">
+          Users can hold any number of roles. Check the ones to grant; uncheck to revoke.
+        </p>
+
         {error && (
           <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3">
             <p className="text-sm font-medium text-red-800">{error}</p>
           </div>
         )}
 
-        {roles.map((role) => {
-          const hasRole = user.roles.includes(role.name);
-          return (
-            <div key={role.id} className="flex items-center justify-between rounded border p-3">
-              <div>
-                <p className="font-medium text-gray-900">{role.name}</p>
-                {role.description && <p className="text-sm text-gray-500">{role.description}</p>}
-              </div>
-              <Button
-                size="sm"
-                variant={hasRole ? "danger" : "primary"}
-                onClick={() => handleToggle(role.id, hasRole)}
-                isLoading={isPending}
-              >
-                {hasRole ? "Remove" : "Assign"}
-              </Button>
-            </div>
-          );
-        })}
+        {/* User card */}
+        <div className="flex items-center gap-3 p-3 bg-muted rounded-lg border border-border">
+          <Avatar name={user.name} size={36} />
+          <div className="flex-1 min-w-0">
+            <div className="text-[13.5px] font-semibold">{user.name}</div>
+            <div className="text-[12.5px] text-muted-foreground">{user.email}</div>
+          </div>
+          <span className="text-[12px] text-muted-foreground shrink-0">
+            {selectedIds.size} of {roles.length} selected
+          </span>
+        </div>
 
-        <div className="flex justify-end pt-2">
-          <Button variant="secondary" onClick={onClose}>
-            Done
+        {/* Role checklist */}
+        <div className="flex flex-col gap-1.5 max-h-[340px] overflow-y-auto pr-1">
+          {roles.map((role) => {
+            const isChecked = selectedIds.has(role.id);
+            const wasChecked = originalRoleIds.has(role.id);
+            return (
+              <RoleCheckbox
+                key={role.id}
+                role={role}
+                checked={isChecked}
+                adding={isChecked && !wasChecked}
+                removing={!isChecked && wasChecked}
+                onToggle={() => toggle(role.id)}
+              />
+            );
+          })}
+        </div>
+
+        {/* Diff summary */}
+        {isDirty && (
+          <div className="text-[12.5px] text-muted-foreground px-2.5 py-2 bg-muted rounded-md">
+            {added.length > 0 && (
+              <span>
+                Adding <b className="text-success">{added.length}</b>
+                {removed.length > 0 ? " · " : ""}
+              </span>
+            )}
+            {removed.length > 0 && (
+              <span>
+                Removing <b className="text-destructive">{removed.length}</b>
+              </span>
+            )}
+          </div>
+        )}
+
+        <div className="flex justify-end gap-2 pt-1">
+          <Button type="button" variant="secondary" onClick={handleClose}>
+            Cancel
+          </Button>
+          <Button type="button" disabled={!isDirty} isLoading={isPending} onClick={handleSave}>
+            {isDirty ? `Save ${selectedIds.size} role${selectedIds.size === 1 ? "" : "s"}` : "No changes"}
           </Button>
         </div>
       </div>
     </Modal>
+  );
+}
+
+interface RoleCheckboxProps {
+  role: RoleWithPermissions;
+  checked: boolean;
+  adding: boolean;
+  removing: boolean;
+  onToggle: () => void;
+}
+
+function RoleCheckbox({ role, checked, adding, removing, onToggle }: RoleCheckboxProps) {
+  return (
+    <label
+      className={`flex items-center gap-3 p-2.5 rounded-lg border-[1.5px] cursor-pointer transition-colors ${
+        checked ? "border-primary bg-primary/[.05]" : "border-border bg-background hover:border-border/60"
+      }`}
+    >
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={onToggle}
+        className="accent-primary shrink-0"
+      />
+      <span className="w-7 h-7 flex items-center justify-center rounded-lg bg-muted text-muted-foreground shrink-0">
+        <Shield size={14} />
+      </span>
+      <div className="flex-1 min-w-0">
+        <div className="text-[13.5px] font-semibold">{role.name}</div>
+        <div className="text-[12px] text-muted-foreground">
+          {role.permissions.length} permission{role.permissions.length === 1 ? "" : "s"}
+        </div>
+      </div>
+      {adding && <Badge variant="success">Adding</Badge>}
+      {removing && <Badge variant="danger">Removing</Badge>}
+    </label>
   );
 }

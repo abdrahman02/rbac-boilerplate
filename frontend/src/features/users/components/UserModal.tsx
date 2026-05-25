@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Lock, Mail, User } from "lucide-react";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -34,9 +35,7 @@ export function UserModal({ isOpen, onClose, user }: UserModalProps) {
     reset,
     setError,
     formState: { errors, isSubmitting },
-  } = useForm<FormInput>({
-    resolver: zodResolver(schema),
-  });
+  } = useForm<FormInput>({ resolver: zodResolver(schema) });
 
   useEffect(() => {
     if (isOpen) {
@@ -66,25 +65,57 @@ export function UserModal({ isOpen, onClose, user }: UserModalProps) {
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title={isEditing ? "Edit User" : "Create User"}>
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <Modal isOpen={isOpen} onClose={onClose} title={isEditing ? "Edit user" : "Add user"}>
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-3.5 pt-1">
+        <p className="text-sm text-muted-foreground -mt-0.5">
+          {isEditing
+            ? "Update this user's basic information."
+            : "We'll send them an email to set their password."}
+        </p>
+
         {errors.root && (
           <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3">
             <p className="text-sm font-medium text-red-800">{errors.root.message}</p>
           </div>
         )}
 
-        <FormField label="Name" error={errors.name?.message}>
-          <Input {...register("name")} placeholder="John Doe" error={errors.name?.message} />
+        <FormField label="Full name" htmlFor="user-name" required error={errors.name?.message}>
+          <Input
+            id="user-name"
+            {...register("name")}
+            placeholder="Ada Lovelace"
+            iconLeft={<User size={15} />}
+            error={errors.name?.message}
+          />
         </FormField>
 
-        <FormField label="Email" error={errors.email?.message}>
-          <Input type="email" {...register("email")} placeholder="john@example.com" error={errors.email?.message} />
+        <FormField label="Email" htmlFor="user-email" required error={errors.email?.message}>
+          <Input
+            id="user-email"
+            type="email"
+            {...register("email")}
+            placeholder="ada@company.com"
+            iconLeft={<Mail size={15} />}
+            error={errors.email?.message}
+          />
         </FormField>
 
         {!isEditing && (
-          <FormField label="Password" error={errors.password?.message}>
-            <Input type="password" {...register("password")} placeholder="••••••••" error={errors.password?.message} />
+          <FormField
+            label="Temporary password"
+            htmlFor="user-password"
+            required
+            error={errors.password?.message}
+            hint={!errors.password?.message ? "User will be asked to change this on first sign-in." : undefined}
+          >
+            <Input
+              id="user-password"
+              type="password"
+              {...register("password")}
+              placeholder="Min 8 characters"
+              iconLeft={<Lock size={15} />}
+              error={errors.password?.message}
+            />
           </FormField>
         )}
 
@@ -93,7 +124,7 @@ export function UserModal({ isOpen, onClose, user }: UserModalProps) {
             Cancel
           </Button>
           <Button type="submit" isLoading={isSubmitting}>
-            {isEditing ? "Save Changes" : "Create User"}
+            {isEditing ? "Save changes" : "Add user"}
           </Button>
         </div>
       </form>
