@@ -12,13 +12,33 @@ interface ActivityFeedProps {
 
 type BadgeVariant = NonNullable<VariantProps<typeof badgeVariants>['variant']>
 
+// Maps every backend action string to a badge variant.
+// danger=destroy, warning=unlink, info=modify/assign, primary=create, success=auth ok, default=neutral
+const ACTION_VARIANT_MAP: Record<string, BadgeVariant> = {
+  // auth
+  login:             'success',
+  logout:            'default',
+  register:          'primary',
+  // users
+  create_user:       'primary',
+  update_user:       'info',
+  delete_user:       'danger',
+  assign_role:       'info',
+  remove_role:       'warning',
+  // roles
+  create_role:       'primary',
+  update_role:       'info',
+  delete_role:       'danger',
+  assign_permission: 'info',
+  remove_permission: 'warning',
+  // permissions
+  create_permission: 'primary',
+  update_permission: 'info',
+  delete_permission: 'danger',
+}
+
 function getActionBadgeVariant(action: string): BadgeVariant {
-  if (action.startsWith('auth.fail')) return 'danger'
-  if (action.startsWith('auth')) return 'success'
-  if (action.includes('delete')) return 'danger'
-  if (action.includes('create')) return 'primary'
-  if (action.includes('assign') || action.includes('update')) return 'info'
-  return 'default'
+  return ACTION_VARIANT_MAP[action] ?? 'default'
 }
 
 const ActivityRow = memo(function ActivityRow({ log }: { log: RecentActivityItem }) {
