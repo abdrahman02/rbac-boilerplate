@@ -17,7 +17,12 @@ vi.mock('exceljs', () => ({
     // Regular function required — arrow functions cannot be used as constructors
     Workbook: vi.fn(function () {
       return {
-        addWorksheet: vi.fn(() => ({ addRow: vi.fn() })),
+        addWorksheet: vi.fn(() => ({
+          addRow: vi.fn(() => ({})),
+          eachRow: vi.fn(),
+          getColumn: vi.fn(() => ({ width: 0 })),
+          views: [],
+        })),
         xlsx: { writeBuffer: vi.fn().mockResolvedValue(Buffer.from('xlsx')) },
       }
     }),
