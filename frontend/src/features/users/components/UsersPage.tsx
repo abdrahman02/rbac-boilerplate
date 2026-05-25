@@ -28,7 +28,7 @@ export function UsersPage() {
   const [assigningUser, setAssigningUser] = useState<UserWithRoles | null>(null);
   const [deletingUser, setDeletingUser] = useState<UserWithRoles | null>(null);
 
-  const { data, isLoading } = useUsers(page);
+  const { data, isLoading, isFetching } = useUsers(page);
   const { data: roles = [] } = useRoles();
   const deleteUser = useDeleteUser();
   const removeRole = useRemoveRole();
@@ -116,6 +116,7 @@ export function UsersPage() {
       <UserTable
         users={filteredUsers}
         isLoading={isLoading}
+        isFetching={isFetching}
         canEdit={canEdit}
         canDelete={canDelete}
         onEdit={openEdit}

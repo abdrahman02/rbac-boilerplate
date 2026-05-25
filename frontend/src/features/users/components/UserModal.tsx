@@ -6,7 +6,7 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useCreateUser, useUpdateUser } from "@/features/users/hooks/useUsers";
-import { Button, FormField, Input, Modal } from "@/shared/components/ui";
+import { Alert, Button, FormField, Input, Modal } from "@/shared/components/ui";
 import { getErrorMessage } from "@/shared/lib/api-error";
 import type { UserWithRoles } from "@/shared/types";
 
@@ -77,11 +77,7 @@ export function UserModal({ isOpen, onClose, user }: UserModalProps) {
             : "Set a temporary password the user can change after signing in."}
         </p>
 
-        {errors.root && (
-          <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3">
-            <p className="text-sm font-medium text-red-800">{errors.root.message}</p>
-          </div>
-        )}
+        {errors.root && <Alert message={errors.root.message ?? "An error occurred"} />}
 
         <FormField label="Full name" htmlFor="user-name" required error={errors.name?.message}>
           <Input

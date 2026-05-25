@@ -4,7 +4,7 @@ import { Shield } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useRoles } from "@/features/roles/hooks/useRoles";
 import { useSyncRoles } from "@/features/users/hooks/useUsers";
-import { Avatar, Badge, Button, Modal } from "@/shared/components/ui";
+import { Alert, Avatar, Badge, Button, Modal } from "@/shared/components/ui";
 import { getErrorMessage } from "@/shared/lib/api-error";
 import type { RoleWithPermissions, UserWithRoles } from "@/shared/types";
 
@@ -70,11 +70,7 @@ export function AssignRoleModal({ isOpen, onClose, user }: AssignRoleModalProps)
           Users can hold any number of roles. Check the ones to grant; uncheck to revoke.
         </p>
 
-        {error && (
-          <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3">
-            <p className="text-sm font-medium text-red-800">{error}</p>
-          </div>
-        )}
+        {error && <Alert message={error} />}
 
         {/* User card */}
         <div className="flex items-center gap-3 p-3 bg-muted rounded-lg border border-border">

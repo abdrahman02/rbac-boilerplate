@@ -1,8 +1,8 @@
 "use client";
 
-import { ChevronDown, Filter, Plus, Search, X } from "lucide-react";
+import { Check, ChevronDown, Filter, Plus, Search, X } from "lucide-react";
 import type { ReactNode } from "react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import type { RoleWithPermissions } from "@/shared/types";
 import { Button, Input } from "@/shared/components/ui";
 
@@ -95,18 +95,13 @@ export function UserToolbar({
               </div>
               <div className="p-3.5 flex flex-col gap-3.5">
                 <FilterField label="Role">
-                  <select
+                  <SearchableSelect
                     value={filters.role}
-                    onChange={(e) => onFiltersChange({ ...filters, role: e.target.value })}
-                    className="w-full h-9 pl-3 pr-8 rounded-lg border border-input bg-background text-sm appearance-none text-foreground cursor-pointer"
-                  >
-                    <option value="">All roles</option>
-                    {roles.map((r) => (
-                      <option key={r.id} value={r.name}>
-                        {r.name}
-                      </option>
-                    ))}
-                  </select>
+                    onChange={(v) => onFiltersChange({ ...filters, role: v })}
+                    options={roles.map((r) => ({ value: r.name, label: r.name }))}
+                    allLabel="All roles"
+                    searchPlaceholder="Search roles…"
+                  />
                 </FilterField>
                 <FilterField label="Status">
                   <select
@@ -153,6 +148,128 @@ function FilterField({ label, children }: { label: string; children: ReactNode }
         {label}
       </span>
       {children}
+    </div>
+  );
+}
+
+interface SearchableSelectProps {
+  value: string;
+  onChange: (v: string) => void;
+  options: { value: string; label: string }[];
+  allLabel?: string;
+  searchPlaceholder?: string;
+}
+
+function SearchableSelect({
+  value,
+  onChange,
+  options,
+  allLabel = "All",
+  searchPlaceholder = "Search…",
+}: SearchableSelectProps) {
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const filtered = query
+    ? options.filter((o) => o.label.toLowerCase().includes(query.toLowerCase()))
+    : options;
+
+  const selectedLabel = value ? (options.find((o) => o.value === value)?.label ?? value) : allLabel;
+
+  const handleOpen = () => {
+    setOpen(true);
+    // Focus the search input after the dropdown renders
+    setTimeout(() => inputRef.current?.focus(), 0);
+  };
+
+  const select = (v: string) => {
+    onChange(v);
+    setOpen(false);
+    setQuery("");
+  };
+
+  const close = () => {
+    setOpen(false);
+    setQuery("");
+  };
+
+  return (
+    <div className="relative w-full">
+      <button
+        type="button"
+        onClick={handleOpen}
+        className={`w-full h-9 pl-3 pr-8 relative flex items-center text-left rounded-lg border border-input bg-background text-sm transition-colors hover:bg-muted/50 ${
+          value ? "text-foreground" : "text-muted-foreground"
+        }`}
+      >
+        <span className="flex-1 truncate">{selectedLabel}</span>
+        <ChevronDown
+          size={13}
+          className={`absolute right-2.5 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`}
+        />
+      </button>
+
+      {open && (
+        <>
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 z-40"
+            onClick={close}
+            onKeyDown={(e) => e.key === "Escape" && close()}
+            role="presentation"
+          />
+          <div className="absolute top-[calc(100%+4px)] left-0 right-0 bg-popover border border-border rounded-lg shadow-lg z-50 overflow-hidden min-w-[160px]">
+            {/* Search input */}
+            <div className="p-2 border-b border-border">
+              <div className="flex items-center gap-1.5 h-7 px-2 bg-muted rounded-md">
+                <Search size={12} className="text-muted-foreground shrink-0" />
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder={searchPlaceholder}
+                  className="flex-1 text-[12.5px] bg-transparent outline-none placeholder:text-muted-foreground"
+                />
+              </div>
+            </div>
+
+            {/* Options list */}
+            <div className="max-h-44 overflow-y-auto py-1">
+              {/* "All" option */}
+              <button
+                type="button"
+                onClick={() => select("")}
+                className={`w-full text-left px-3 py-1.5 text-[13px] hover:bg-muted transition-colors flex items-center gap-2 ${
+                  !value ? "text-primary font-medium" : "text-muted-foreground"
+                }`}
+              >
+                {!value ? <Check size={12} className="shrink-0" /> : <span className="w-3 shrink-0" />}
+                <span>{allLabel}</span>
+              </button>
+
+              {filtered.map((o) => (
+                <button
+                  key={o.value}
+                  type="button"
+                  onClick={() => select(o.value)}
+                  className={`w-full text-left px-3 py-1.5 text-[13px] hover:bg-muted transition-colors flex items-center gap-2 ${
+                    value === o.value ? "text-primary font-medium" : "text-foreground"
+                  }`}
+                >
+                  {value === o.value ? <Check size={12} className="shrink-0" /> : <span className="w-3 shrink-0" />}
+                  <span>{o.label}</span>
+                </button>
+              ))}
+
+              {filtered.length === 0 && (
+                <p className="px-3 py-2 text-[12.5px] text-muted-foreground text-center">No roles found</p>
+              )}
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }
