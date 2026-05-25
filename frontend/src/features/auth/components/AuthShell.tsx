@@ -1,10 +1,10 @@
-import type { ReactNode } from 'react'
-import { AuthAside } from './AuthAside'
-import { BrandMark } from '@/shared/components/common'
+import type { ReactNode } from "react";
+import { AuthAside } from "./AuthAside";
+import { BrandMark } from "@/shared/components/common";
 
 interface AuthShellProps {
-  children: ReactNode
-  footer?: ReactNode
+  children: ReactNode;
+  footer?: ReactNode;
 }
 
 export function AuthShell({ children, footer }: AuthShellProps) {
@@ -14,14 +14,10 @@ export function AuthShell({ children, footer }: AuthShellProps) {
         <div className="w-full max-w-[380px]">
           <BrandMark />
           <div className="animate-fade-in">{children}</div>
-          {footer && (
-            <p className="mt-6 text-[13.5px] text-muted-foreground text-center">
-              {footer}
-            </p>
-          )}
+          {footer && <p className="mt-6 text-[13.5px] text-muted-foreground text-center">{footer}</p>}
         </div>
       </div>
       <AuthAside />
     </div>
-  )
+  );
 }

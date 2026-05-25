@@ -1,31 +1,31 @@
-'use client'
+"use client";
 
-import { useEffect } from 'react'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
-import { Modal, Button, Input, FormField } from '@/shared/components/ui'
-import { useCreateRole, useUpdateRole } from '@/features/roles/hooks/useRoles'
-import { getErrorMessage } from '@/shared/lib/api-error'
-import type { RoleWithPermissions } from '@/shared/types'
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { Modal, Button, Input, FormField } from "@/shared/components/ui";
+import { useCreateRole, useUpdateRole } from "@/features/roles/hooks/useRoles";
+import { getErrorMessage } from "@/shared/lib/api-error";
+import type { RoleWithPermissions } from "@/shared/types";
 
 const schema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters'),
+  name: z.string().min(2, "Name must be at least 2 characters"),
   description: z.string().optional(),
-})
+});
 
-type FormInput = z.infer<typeof schema>
+type FormInput = z.infer<typeof schema>;
 
 interface RoleModalProps {
-  isOpen: boolean
-  onClose: () => void
-  role?: RoleWithPermissions | null
+  isOpen: boolean;
+  onClose: () => void;
+  role?: RoleWithPermissions | null;
 }
 
 export function RoleModal({ isOpen, onClose, role }: RoleModalProps) {
-  const isEditing = !!role
-  const createRole = useCreateRole()
-  const updateRole = useUpdateRole()
+  const isEditing = !!role;
+  const createRole = useCreateRole();
+  const updateRole = useUpdateRole();
 
   const {
     register,
@@ -33,29 +33,29 @@ export function RoleModal({ isOpen, onClose, role }: RoleModalProps) {
     reset,
     setError,
     formState: { errors, isSubmitting },
-  } = useForm<FormInput>({ resolver: zodResolver(schema) })
+  } = useForm<FormInput>({ resolver: zodResolver(schema) });
 
   useEffect(() => {
     if (isOpen) {
-      reset(isEditing ? { name: role.name, description: role.description ?? '' } : {})
+      reset(isEditing ? { name: role.name, description: role.description ?? "" } : {});
     }
-  }, [isOpen, isEditing, role, reset])
+  }, [isOpen, isEditing, role, reset]);
 
   const onSubmit = async (data: FormInput) => {
     try {
       if (isEditing) {
-        await updateRole.mutateAsync({ id: role.id, payload: data })
+        await updateRole.mutateAsync({ id: role.id, payload: data });
       } else {
-        await createRole.mutateAsync(data)
+        await createRole.mutateAsync(data);
       }
-      onClose()
+      onClose();
     } catch (err) {
-      setError('root', { message: getErrorMessage(err) })
+      setError("root", { message: getErrorMessage(err) });
     }
-  }
+  };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title={isEditing ? 'Edit Role' : 'Create Role'}>
+    <Modal isOpen={isOpen} onClose={onClose} title={isEditing ? "Edit Role" : "Create Role"}>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         {errors.root && (
           <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3">
@@ -64,15 +64,11 @@ export function RoleModal({ isOpen, onClose, role }: RoleModalProps) {
         )}
 
         <FormField label="Name" error={errors.name?.message}>
-          <Input {...register('name')} placeholder="admin" error={errors.name?.message} />
+          <Input {...register("name")} placeholder="admin" error={errors.name?.message} />
         </FormField>
 
         <FormField label="Description" error={errors.description?.message}>
-          <Input
-            {...register('description')}
-            placeholder="Administrator role"
-            error={errors.description?.message}
-          />
+          <Input {...register("description")} placeholder="Administrator role" error={errors.description?.message} />
         </FormField>
 
         <div className="flex justify-end gap-2 pt-2">
@@ -80,10 +76,10 @@ export function RoleModal({ isOpen, onClose, role }: RoleModalProps) {
             Cancel
           </Button>
           <Button type="submit" isLoading={isSubmitting}>
-            {isEditing ? 'Save Changes' : 'Create Role'}
+            {isEditing ? "Save Changes" : "Create Role"}
           </Button>
         </div>
       </form>
     </Modal>
-  )
+  );
 }

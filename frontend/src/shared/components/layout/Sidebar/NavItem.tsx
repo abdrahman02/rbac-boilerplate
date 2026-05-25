@@ -1,22 +1,22 @@
-'use client'
+"use client";
 
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import type { ReactNode } from 'react'
-import { navItemVariants, navBadgeVariants } from './NavItem.variants'
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import type { ReactNode } from "react";
+import { navItemVariants, navBadgeVariants } from "./NavItem.variants";
 
 interface NavItemProps {
-  href: string
-  label: string
-  icon: ReactNode
-  badge?: string | number
-  collapsed?: boolean
-  onClick?: () => void
+  href: string;
+  label: string;
+  icon: ReactNode;
+  badge?: string | number;
+  collapsed?: boolean;
+  onClick?: () => void;
 }
 
 export function NavItem({ href, label, icon, badge, collapsed = false, onClick }: NavItemProps) {
-  const pathname = usePathname()
-  const active = href === '/dashboard' ? pathname === href : pathname.startsWith(href)
+  const pathname = usePathname();
+  const active = href === "/dashboard" ? pathname === href : pathname.startsWith(href);
 
   return (
     <Link
@@ -29,11 +29,9 @@ export function NavItem({ href, label, icon, badge, collapsed = false, onClick }
       {!collapsed && (
         <>
           <span className="flex-1 text-left">{label}</span>
-          {badge != null && (
-            <span className={navBadgeVariants({ active })}>{badge}</span>
-          )}
+          {badge != null && <span className={navBadgeVariants({ active })}>{badge}</span>}
         </>
       )}
     </Link>
-  )
+  );
 }

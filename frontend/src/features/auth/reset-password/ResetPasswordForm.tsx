@@ -1,24 +1,19 @@
-'use client'
+"use client";
 
-import { memo } from 'react'
-import Link from 'next/link'
-import { Check, Lock } from 'lucide-react'
-import { AuthShell } from '@/features/auth/components/AuthShell'
-import {
-  Button,
-  FormField,
-  Input,
-  PasswordStrengthMeter,
-} from '@/shared/components/ui'
-import { useResetPasswordForm } from './useResetPasswordForm'
+import { memo } from "react";
+import Link from "next/link";
+import { Check, Lock } from "lucide-react";
+import { AuthShell } from "@/features/auth/components/AuthShell";
+import { Button, FormField, Input, PasswordStrengthMeter } from "@/shared/components/ui";
+import { useResetPasswordForm } from "./useResetPasswordForm";
 
 // Memoised at module level to avoid re-creating the wrapped component on every render
-const PasswordStrengthMeterMemo = memo(PasswordStrengthMeter)
+const PasswordStrengthMeterMemo = memo(PasswordStrengthMeter);
 
 // --- SuccessState sub-component ---
 
 interface SuccessStateProps {
-  onContinue: () => void
+  onContinue: () => void;
 }
 
 const SuccessState = memo(function SuccessState({ onContinue }: SuccessStateProps) {
@@ -37,8 +32,8 @@ const SuccessState = memo(function SuccessState({ onContinue }: SuccessStateProp
         Continue to sign in
       </Button>
     </div>
-  )
-})
+  );
+});
 
 // --- Shared footer link ---
 
@@ -46,32 +41,30 @@ const footer = (
   <Link href="/login" className="text-primary font-medium no-underline">
     Back to sign in
   </Link>
-)
+);
 
 // --- Main component (pure JSX — no useState, no useRouter, no async) ---
 
 export function ResetPasswordForm() {
-  const { form, isLoading, done, password, onContinue, onSubmit } = useResetPasswordForm()
+  const { form, isLoading, done, password, onContinue, onSubmit } = useResetPasswordForm();
 
   const {
     register,
     formState: { errors },
-  } = form
+  } = form;
 
   if (done) {
     return (
       <AuthShell footer={footer}>
         <SuccessState onContinue={onContinue} />
       </AuthShell>
-    )
+    );
   }
 
   return (
     <AuthShell footer={footer}>
       <h1 className="text-[26px] font-semibold tracking-tight m-0">Set a new password</h1>
-      <p className="mt-1.5 mb-7 text-sm text-muted-foreground">
-        Choose a password you haven&apos;t used before.
-      </p>
+      <p className="mt-1.5 mb-7 text-sm text-muted-foreground">Choose a password you haven&apos;t used before.</p>
 
       <form onSubmit={onSubmit} className="flex flex-col gap-3.5">
         <FormField label="New password" required error={errors.password?.message}>
@@ -81,7 +74,7 @@ export function ResetPasswordForm() {
             autoComplete="new-password"
             iconLeft={<Lock size={16} />}
             error={errors.password?.message}
-            {...register('password')}
+            {...register("password")}
           />
           <PasswordStrengthMeterMemo password={password} />
         </FormField>
@@ -93,7 +86,7 @@ export function ResetPasswordForm() {
             autoComplete="new-password"
             iconLeft={<Lock size={16} />}
             error={errors.confirmPassword?.message}
-            {...register('confirmPassword')}
+            {...register("confirmPassword")}
           />
         </FormField>
 
@@ -102,5 +95,5 @@ export function ResetPasswordForm() {
         </Button>
       </form>
     </AuthShell>
-  )
+  );
 }

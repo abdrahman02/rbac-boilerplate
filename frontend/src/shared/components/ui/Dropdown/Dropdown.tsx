@@ -1,6 +1,6 @@
-'use client'
+"use client";
 
-import { useState, type ReactNode } from 'react'
+import { useState, type ReactNode } from "react";
 import {
   useFloating,
   useClick,
@@ -12,43 +12,38 @@ import {
   flip,
   shift,
   type Placement,
-} from '@floating-ui/react'
+} from "@floating-ui/react";
 
 interface DropdownProps {
   /** Elemen pemicu yang diklik untuk membuka dropdown */
-  trigger: ReactNode
+  trigger: ReactNode;
   /** Konten dropdown yang akan ditampilkan */
-  children: ReactNode
+  children: ReactNode;
   /** Posisi dropdown relatif terhadap trigger */
-  placement?: Placement
+  placement?: Placement;
   /** Jarak antara trigger dan dropdown dalam piksel */
-  offsetPx?: number
+  offsetPx?: number;
 }
 
 /**
  * Komponen Dropdown generik menggunakan @floating-ui/react.
  * Mendukung keyboard navigation, dismissal otomatis, dan portal rendering.
  */
-export function Dropdown({
-  trigger,
-  children,
-  placement = 'bottom-end',
-  offsetPx = 6,
-}: DropdownProps) {
-  const [open, setOpen] = useState(false)
+export function Dropdown({ trigger, children, placement = "bottom-end", offsetPx = 6 }: DropdownProps) {
+  const [open, setOpen] = useState(false);
 
   const { refs, floatingStyles, context } = useFloating({
     open,
     onOpenChange: setOpen,
     placement,
     middleware: [offset(offsetPx), flip(), shift({ padding: 8 })],
-  })
+  });
 
-  const click = useClick(context)
-  const dismiss = useDismiss(context)
-  const role = useRole(context)
+  const click = useClick(context);
+  const dismiss = useDismiss(context);
+  const role = useRole(context);
 
-  const { getReferenceProps, getFloatingProps } = useInteractions([click, dismiss, role])
+  const { getReferenceProps, getFloatingProps } = useInteractions([click, dismiss, role]);
 
   return (
     <>
@@ -57,16 +52,11 @@ export function Dropdown({
       </div>
       {open && (
         <FloatingPortal>
-          <div
-            ref={refs.setFloating}
-            style={floatingStyles}
-            {...getFloatingProps()}
-            className="z-50"
-          >
+          <div ref={refs.setFloating} style={floatingStyles} {...getFloatingProps()} className="z-50">
             {children}
           </div>
         </FloatingPortal>
       )}
     </>
-  )
+  );
 }

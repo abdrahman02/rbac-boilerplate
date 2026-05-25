@@ -1,7 +1,7 @@
-import type { ReactNode } from 'react'
+import type { ReactNode } from "react";
 
 interface AuthLayoutProps {
-  children: ReactNode
+  children: ReactNode;
 }
 
 /**
@@ -9,5 +9,5 @@ interface AuthLayoutProps {
  * Visual layout is handled by AuthShell inside each form component.
  */
 export default function AuthLayout({ children }: AuthLayoutProps) {
-  return <>{children}</>
+  return <>{children}</>;
 }

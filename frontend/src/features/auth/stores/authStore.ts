@@ -1,12 +1,12 @@
-import { create } from 'zustand'
-import { persist, createJSONStorage } from 'zustand/middleware'
-import type { AuthenticatedUser } from '@/features/auth/types'
+import { create } from "zustand";
+import { persist, createJSONStorage } from "zustand/middleware";
+import type { AuthenticatedUser } from "@/features/auth/types";
 
 interface AuthState {
-  user: AuthenticatedUser | null
-  isAuthenticated: boolean
-  setUser: (user: AuthenticatedUser | null) => void
-  clearAuth: () => void
+  user: AuthenticatedUser | null;
+  isAuthenticated: boolean;
+  setUser: (user: AuthenticatedUser | null) => void;
+  clearAuth: () => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -18,7 +18,7 @@ export const useAuthStore = create<AuthState>()(
       clearAuth: () => set({ user: null, isAuthenticated: false }),
     }),
     {
-      name: 'rbac-auth',
+      name: "rbac-auth",
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
         user: state.user,
@@ -26,4 +26,4 @@ export const useAuthStore = create<AuthState>()(
       }),
     },
   ),
-)
+);

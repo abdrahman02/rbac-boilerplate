@@ -1,20 +1,20 @@
-import { memo } from 'react'
-import Link from 'next/link'
-import { Users, Shield, Key, ScrollText, ChevronRight } from 'lucide-react'
-import { Button } from '@/shared/components/ui/Button'
+import { memo } from "react";
+import Link from "next/link";
+import { Users, Shield, Key, ScrollText, ChevronRight } from "lucide-react";
+import { Button } from "@/shared/components/ui/Button";
 
 interface QuickAction {
-  icon: typeof Users
-  label: string
-  href: string
+  icon: typeof Users;
+  label: string;
+  href: string;
 }
 
 const QUICK_ACTIONS: QuickAction[] = [
-  { icon: Users,      label: 'Invite a user',     href: '/users' },
-  { icon: Shield,     label: 'Create a role',     href: '/roles' },
-  { icon: Key,        label: 'Add a permission',  href: '/permissions' },
-  { icon: ScrollText, label: 'Review audit log',  href: '/audit-logs' },
-]
+  { icon: Users, label: "Invite a user", href: "/users" },
+  { icon: Shield, label: "Create a role", href: "/roles" },
+  { icon: Key, label: "Add a permission", href: "/permissions" },
+  { icon: ScrollText, label: "Review audit log", href: "/audit-logs" },
+];
 
 export const QuickActions = memo(function QuickActions() {
   return (
@@ -31,10 +31,13 @@ export const QuickActions = memo(function QuickActions() {
               <Icon size={16} />
             </span>
             <span className="flex-1">{label}</span>
-            <ChevronRight size={15} className="text-muted-foreground group-hover:text-accent-foreground transition-colors" />
+            <ChevronRight
+              size={15}
+              className="text-muted-foreground group-hover:text-accent-foreground transition-colors"
+            />
           </Link>
         </Button>
       ))}
     </div>
-  )
-})
+  );
+});

@@ -1,57 +1,57 @@
-'use client'
+"use client";
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { apiClient } from '@/shared/lib/api-client'
-import type { Permission } from '@/shared/types'
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiClient } from "@/shared/lib/api-client";
+import type { Permission } from "@/shared/types";
 
 interface CreatePermissionPayload {
-  name: string
-  description?: string
+  name: string;
+  description?: string;
 }
 
 interface UpdatePermissionPayload {
-  name?: string
-  description?: string
+  name?: string;
+  description?: string;
 }
 
 export function usePermissionList() {
   return useQuery<Permission[]>({
-    queryKey: ['permissions'],
+    queryKey: ["permissions"],
     queryFn: async () => {
-      const res = await apiClient.get('/permissions')
-      return res.data.data
+      const res = await apiClient.get("/permissions");
+      return res.data.data;
     },
-  })
+  });
 }
 
 export function useCreatePermission() {
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (payload: CreatePermissionPayload) => {
-      const res = await apiClient.post('/permissions', payload)
-      return res.data
+      const res = await apiClient.post("/permissions", payload);
+      return res.data;
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['permissions'] }),
-  })
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["permissions"] }),
+  });
 }
 
 export function useUpdatePermission() {
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ id, payload }: { id: number; payload: UpdatePermissionPayload }) => {
-      const res = await apiClient.patch(`/permissions/${id}`, payload)
-      return res.data
+      const res = await apiClient.patch(`/permissions/${id}`, payload);
+      return res.data;
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['permissions'] }),
-  })
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["permissions"] }),
+  });
 }
 
 export function useDeletePermission() {
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (id: number) => {
-      await apiClient.delete(`/permissions/${id}`)
+      await apiClient.delete(`/permissions/${id}`);
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['permissions'] }),
-  })
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["permissions"] }),
+  });
 }

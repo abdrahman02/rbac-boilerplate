@@ -1,21 +1,17 @@
-'use client'
+"use client";
 
-import { memo } from 'react'
-import Link from 'next/link'
-import { Check, ChevronLeft, Mail } from 'lucide-react'
-import { AuthShell } from '@/features/auth/components/AuthShell'
-import {
-  Button,
-  FormField,
-  Input,
-} from '@/shared/components/ui'
-import { useForgotPasswordForm } from './useForgotPasswordForm'
+import { memo } from "react";
+import Link from "next/link";
+import { Check, ChevronLeft, Mail } from "lucide-react";
+import { AuthShell } from "@/features/auth/components/AuthShell";
+import { Button, FormField, Input } from "@/shared/components/ui";
+import { useForgotPasswordForm } from "./useForgotPasswordForm";
 
 // --- SuccessState sub-component ---
 
 interface SuccessStateProps {
-  email: string
-  onRetry: () => void
+  email: string;
+  onRetry: () => void;
 }
 
 const SuccessState = memo(function SuccessState({ email, onRetry }: SuccessStateProps) {
@@ -27,43 +23,40 @@ const SuccessState = memo(function SuccessState({ email, onRetry }: SuccessState
 
       <h1 className="text-2xl font-semibold tracking-tight m-0">Check your inbox</h1>
       <p className="mt-2 mb-6 text-sm text-muted-foreground leading-relaxed">
-        We&apos;ve sent a reset link to{' '}
-        <b className="text-foreground font-semibold">{email}</b>. The link expires in 30 minutes.
+        We&apos;ve sent a reset link to <b className="text-foreground font-semibold">{email}</b>. The link expires in 30
+        minutes.
       </p>
 
       <Button type="button" variant="outline" onClick={onRetry}>
         Try a different email
       </Button>
     </div>
-  )
-})
+  );
+});
 
 // --- Main component ---
 
 const backLink = (
-  <Link
-    href="/login"
-    className="text-primary font-medium no-underline inline-flex items-center gap-1"
-  >
+  <Link href="/login" className="text-primary font-medium no-underline inline-flex items-center gap-1">
     <ChevronLeft size={14} />
     Back to sign in
   </Link>
-)
+);
 
 export function ForgotPasswordForm() {
-  const { form, isLoading, success, submittedEmail, onRetry, onSubmit } = useForgotPasswordForm()
+  const { form, isLoading, success, submittedEmail, onRetry, onSubmit } = useForgotPasswordForm();
 
   const {
     register,
     formState: { errors },
-  } = form
+  } = form;
 
   if (success) {
     return (
       <AuthShell footer={backLink}>
         <SuccessState email={submittedEmail} onRetry={onRetry} />
       </AuthShell>
-    )
+    );
   }
 
   return (
@@ -81,7 +74,7 @@ export function ForgotPasswordForm() {
             autoComplete="email"
             iconLeft={<Mail size={16} />}
             error={errors.email?.message}
-            {...register('email')}
+            {...register("email")}
           />
         </FormField>
 
@@ -90,5 +83,5 @@ export function ForgotPasswordForm() {
         </Button>
       </form>
     </AuthShell>
-  )
+  );
 }

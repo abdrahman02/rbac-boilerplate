@@ -1,2 +1,2 @@
-export { Sidebar } from './Sidebar'
-export { NavGroup } from './NavGroup'
+export { Sidebar } from "./Sidebar";
+export { NavGroup } from "./NavGroup";

@@ -1,42 +1,42 @@
-'use client'
+"use client";
 
-import { useEffect, ReactNode } from 'react'
-import { useRouter } from 'next/navigation'
-import { useAuth } from '@/features/auth/hooks/useAuth'
+import { useEffect, ReactNode } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/features/auth/hooks/useAuth";
 
 interface ProtectedRouteProps {
-  children: ReactNode
-  requiredPermission?: string
+  children: ReactNode;
+  requiredPermission?: string;
 }
 
 export function ProtectedRoute({ children, requiredPermission }: ProtectedRouteProps) {
-  const router = useRouter()
-  const { isLoading, isAuthenticated, user } = useAuth()
+  const router = useRouter();
+  const { isLoading, isAuthenticated, user } = useAuth();
 
   useEffect(() => {
-    if (isLoading) return
+    if (isLoading) return;
 
     if (!isAuthenticated) {
-      router.replace('/login')
-      return
+      router.replace("/login");
+      return;
     }
 
     if (requiredPermission && !user?.permissions?.includes(requiredPermission)) {
-      router.replace('/unauthorized')
+      router.replace("/unauthorized");
     }
-  }, [isLoading, isAuthenticated, requiredPermission, user, router])
+  }, [isLoading, isAuthenticated, requiredPermission, user, router]);
 
   if (isLoading) {
-    return <div className="flex h-screen items-center justify-center">Loading...</div>
+    return <div className="flex h-screen items-center justify-center">Loading...</div>;
   }
 
   if (!isAuthenticated) {
-    return null
+    return null;
   }
 
   if (requiredPermission && !user?.permissions?.includes(requiredPermission)) {
-    return null
+    return null;
   }
 
-  return <>{children}</>
+  return <>{children}</>;
 }

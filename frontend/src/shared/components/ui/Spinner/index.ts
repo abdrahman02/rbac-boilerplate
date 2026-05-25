@@ -1,2 +1,2 @@
-export { Spinner } from './Spinner'
-export { spinnerVariants } from './Spinner.variants'
+export { Spinner } from "./Spinner";
+export { spinnerVariants } from "./Spinner.variants";

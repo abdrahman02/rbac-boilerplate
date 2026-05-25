@@ -1,10 +1,10 @@
-'use client'
+"use client";
 
-import { useAuth } from '@/features/auth/hooks/useAuth'
+import { useAuth } from "@/features/auth/hooks/useAuth";
 
 export default function ProfilePage() {
-  const { user } = useAuth()
-  console.log({user})
+  const { user } = useAuth();
+  console.log({ user });
 
   return (
     <div className="space-y-6">
@@ -38,5 +38,5 @@ export default function ProfilePage() {
         </dl>
       </div>
     </div>
-  )
+  );
 }

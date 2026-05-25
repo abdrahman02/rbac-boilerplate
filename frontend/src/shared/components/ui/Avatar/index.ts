@@ -1,1 +1,1 @@
-export { Avatar, getInitials } from './Avatar'
+export { Avatar, getInitials } from "./Avatar";

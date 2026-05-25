@@ -1,13 +1,13 @@
-import { memo, type ReactNode } from 'react'
-import { Spinner } from '@/shared/components/ui'
+import { memo, type ReactNode } from "react";
+import { Spinner } from "@/shared/components/ui";
 
 interface StatCardProps {
-  label: string
-  value: number
-  delta?: string
-  sub?: string
-  icon: ReactNode
-  isLoading?: boolean
+  label: string;
+  value: number;
+  delta?: string;
+  sub?: string;
+  icon: ReactNode;
+  isLoading?: boolean;
 }
 
 export const StatCard = memo(function StatCard({ label, value, delta, sub, icon, isLoading }: StatCardProps) {
@@ -23,17 +23,13 @@ export const StatCard = memo(function StatCard({ label, value, delta, sub, icon,
       {isLoading ? (
         <Spinner size="sm" />
       ) : (
-        <div className="text-[30px] font-semibold leading-none tracking-tight">
-          {value.toLocaleString()}
-        </div>
+        <div className="text-[30px] font-semibold leading-none tracking-tight">{value.toLocaleString()}</div>
       )}
 
       <div className="flex items-center justify-between text-xs text-muted-foreground">
         <span>{sub}</span>
-        {delta && (
-          <span className="font-mono">{delta}</span>
-        )}
+        {delta && <span className="font-mono">{delta}</span>}
       </div>
     </div>
-  )
-})
+  );
+});

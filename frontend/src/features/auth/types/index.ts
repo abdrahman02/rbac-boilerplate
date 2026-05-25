@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z } from "zod";
 
 export const authenticatedUserSchema = z.object({
   id: z.number(),
@@ -6,6 +6,6 @@ export const authenticatedUserSchema = z.object({
   name: z.string(),
   roles: z.array(z.string()),
   permissions: z.array(z.string()),
-})
+});
 
-export type AuthenticatedUser = z.infer<typeof authenticatedUserSchema>
+export type AuthenticatedUser = z.infer<typeof authenticatedUserSchema>;

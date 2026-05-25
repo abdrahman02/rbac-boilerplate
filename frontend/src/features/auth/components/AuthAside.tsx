@@ -1,23 +1,23 @@
 const PREVIEW_STATS = [
-  { label: 'Users', value: '1,284', delta: '+12' },
-  { label: 'Roles', value: '6', delta: '—' },
-  { label: 'Permissions', value: '10', delta: '+2' },
-] as const
+  { label: "Users", value: "1,284", delta: "+12" },
+  { label: "Roles", value: "6", delta: "—" },
+  { label: "Permissions", value: "10", delta: "+2" },
+] as const;
 
 const PREVIEW_ACTIVITY = [
-  { user: 'maya.h', action: 'logged in', tone: 'success' },
-  { user: 'daniel.w', action: 'assigned Auditor role', tone: 'info' },
-  { user: 'priya.l', action: 'updated profile', tone: 'warning' },
-] as const
+  { user: "maya.h", action: "logged in", tone: "success" },
+  { user: "daniel.w", action: "assigned Auditor role", tone: "info" },
+  { user: "priya.l", action: "updated profile", tone: "warning" },
+] as const;
 
 const TONE_DOT_CLASSES: Record<string, string> = {
-  success: 'bg-success',
-  info:    'bg-primary',
-  warning: 'bg-warning',
-}
+  success: "bg-success",
+  info: "bg-primary",
+  warning: "bg-warning",
+};
 
 function MiniAvatar({ name }: { name: string }) {
-  const hue = name.charCodeAt(0) * 37 + name.charCodeAt(1) * 17
+  const hue = name.charCodeAt(0) * 37 + name.charCodeAt(1) * 17;
   return (
     <span
       className="inline-flex items-center justify-center w-5 h-5 rounded-full text-[9px] font-semibold shrink-0"
@@ -28,7 +28,7 @@ function MiniAvatar({ name }: { name: string }) {
     >
       {name.slice(0, 2).toUpperCase()}
     </span>
-  )
+  );
 }
 
 export function AuthAside() {
@@ -46,9 +46,7 @@ export function AuthAside() {
         <div className="grid grid-cols-3 gap-2">
           {PREVIEW_STATS.map(({ label, value, delta }) => (
             <div key={label} className="p-2.5 border border-border rounded-[10px] bg-muted">
-              <div className="text-[10.5px] text-muted-foreground uppercase tracking-widest">
-                {label}
-              </div>
+              <div className="text-[10.5px] text-muted-foreground uppercase tracking-widest">{label}</div>
               <div className="text-lg font-semibold tracking-tight mt-0.5">{value}</div>
               <div className="text-[11px] text-muted-foreground font-mono">{delta}</div>
             </div>
@@ -60,7 +58,7 @@ export function AuthAside() {
             <div key={user} className="flex items-center gap-2.5 text-xs">
               <MiniAvatar name={user} />
               <span className="flex-1 text-muted-foreground">
-                <b className="text-foreground font-semibold">{user}</b>{' '}{action}
+                <b className="text-foreground font-semibold">{user}</b> {action}
               </span>
               <span className={`w-[7px] h-[7px] rounded-full shrink-0 ${TONE_DOT_CLASSES[tone]}`} />
             </div>
@@ -73,10 +71,10 @@ export function AuthAside() {
           Granular access. Auditable history. Zero surprises.
         </h2>
         <p className="m-0 text-sm text-muted-foreground max-w-[440px] leading-relaxed">
-          Pair role-based access with a forensic-grade audit trail so every permission
-          change has an answer to &ldquo;who, what, and when&rdquo;.
+          Pair role-based access with a forensic-grade audit trail so every permission change has an answer to
+          &ldquo;who, what, and when&rdquo;.
         </p>
       </div>
     </aside>
-  )
+  );
 }

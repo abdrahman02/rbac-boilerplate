@@ -1,6 +1,6 @@
-import { useAuthStore } from '@/features/auth/stores/authStore'
+import { useAuthStore } from "@/features/auth/stores/authStore";
 
 export function usePermission(permission: string): boolean {
-  const { user } = useAuthStore()
-  return user?.permissions?.includes(permission) ?? false
+  const { user } = useAuthStore();
+  return user?.permissions?.includes(permission) ?? false;
 }

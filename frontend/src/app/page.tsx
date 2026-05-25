@@ -1,26 +1,26 @@
-'use client'
+"use client";
 
-import { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import { useAuth } from '@/features/auth/hooks/useAuth'
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/features/auth/hooks/useAuth";
 
 export default function HomePage() {
-  const router = useRouter()
-  const { isLoading, isAuthenticated } = useAuth()
+  const router = useRouter();
+  const { isLoading, isAuthenticated } = useAuth();
 
   useEffect(() => {
-    if (isLoading) return
+    if (isLoading) return;
 
     if (isAuthenticated) {
-      router.push('/dashboard')
+      router.push("/dashboard");
     } else {
-      router.push('/login')
+      router.push("/login");
     }
-  }, [isLoading, isAuthenticated, router])
+  }, [isLoading, isAuthenticated, router]);
 
   return (
     <div className="flex h-screen items-center justify-center">
       <div>Loading...</div>
     </div>
-  )
+  );
 }

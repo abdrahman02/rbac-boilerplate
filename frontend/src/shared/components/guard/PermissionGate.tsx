@@ -1,15 +1,15 @@
-'use client'
+"use client";
 
-import { ReactNode } from 'react'
-import { usePermission } from '@/shared/hooks/usePermission'
+import { ReactNode } from "react";
+import { usePermission } from "@/shared/hooks/usePermission";
 
 interface PermissionGateProps {
-  permission: string
-  children: ReactNode
-  fallback?: ReactNode
+  permission: string;
+  children: ReactNode;
+  fallback?: ReactNode;
 }
 
 export function PermissionGate({ permission, children, fallback = null }: PermissionGateProps) {
-  const hasPermission = usePermission(permission)
-  return <>{hasPermission ? children : fallback}</>
+  const hasPermission = usePermission(permission);
+  return <>{hasPermission ? children : fallback}</>;
 }

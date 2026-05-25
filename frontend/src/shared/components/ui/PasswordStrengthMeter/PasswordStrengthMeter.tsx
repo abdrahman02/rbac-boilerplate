@@ -1,39 +1,33 @@
-const STRENGTH_LABELS = ['Too short', 'Weak', 'Fair', 'Good', 'Strong'] as const
+const STRENGTH_LABELS = ["Too short", "Weak", "Fair", "Good", "Strong"] as const;
 
-const STRENGTH_BAR_CLASSES = [
-  'bg-destructive',
-  'bg-destructive',
-  'bg-warning',
-  'bg-primary',
-  'bg-success',
-] as const
+const STRENGTH_BAR_CLASSES = ["bg-destructive", "bg-destructive", "bg-warning", "bg-primary", "bg-success"] as const;
 
 const STRENGTH_TEXT_CLASSES = [
-  'text-destructive',
-  'text-destructive',
-  'text-warning',
-  'text-primary',
-  'text-success',
-] as const
+  "text-destructive",
+  "text-destructive",
+  "text-warning",
+  "text-primary",
+  "text-success",
+] as const;
 
 export function getPasswordStrength(password: string): number {
-  if (!password) return 0
-  let score = 0
-  if (password.length >= 8) score++
-  if (/[A-Z]/.test(password)) score++
-  if (/[0-9]/.test(password)) score++
-  if (/[^A-Za-z0-9]/.test(password)) score++
-  return score
+  if (!password) return 0;
+  let score = 0;
+  if (password.length >= 8) score++;
+  if (/[A-Z]/.test(password)) score++;
+  if (/[0-9]/.test(password)) score++;
+  if (/[^A-Za-z0-9]/.test(password)) score++;
+  return score;
 }
 
 interface PasswordStrengthMeterProps {
-  password: string
+  password: string;
 }
 
 export function PasswordStrengthMeter({ password }: PasswordStrengthMeterProps) {
-  const level = getPasswordStrength(password)
+  const level = getPasswordStrength(password);
 
-  if (!password) return null
+  if (!password) return null;
 
   return (
     <div
@@ -49,7 +43,7 @@ export function PasswordStrengthMeter({ password }: PasswordStrengthMeterProps) 
           <span
             key={i}
             className={`flex-1 h-1 rounded-sm transition-colors ${
-              i <= level ? STRENGTH_BAR_CLASSES[level] : 'bg-muted'
+              i <= level ? STRENGTH_BAR_CLASSES[level] : "bg-muted"
             }`}
           />
         ))}
@@ -58,5 +52,5 @@ export function PasswordStrengthMeter({ password }: PasswordStrengthMeterProps) 
         {STRENGTH_LABELS[level]}
       </span>
     </div>
-  )
+  );
 }

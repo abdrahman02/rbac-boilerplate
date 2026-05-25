@@ -1,15 +1,15 @@
-'use client'
+"use client";
 
-import { Menu, Moon, Sun } from 'lucide-react'
-import { Button } from '@/shared/components/ui/Button'
-import { Breadcrumb } from './Breadcrumb'
-import { AvatarMenu } from './AvatarMenu'
+import { Menu, Moon, Sun } from "lucide-react";
+import { Button } from "@/shared/components/ui/Button";
+import { Breadcrumb } from "./Breadcrumb";
+import { AvatarMenu } from "./AvatarMenu";
 
 interface HeaderProps {
-  onToggleSidebar: () => void
-  onOpenMobileNav: () => void
-  isDark: boolean
-  onToggleDark: () => void
+  onToggleSidebar: () => void;
+  onOpenMobileNav: () => void;
+  isDark: boolean;
+  onToggleDark: () => void;
 }
 
 export function Header({ onToggleSidebar, onOpenMobileNav, isDark, onToggleDark }: HeaderProps) {
@@ -45,7 +45,7 @@ export function Header({ onToggleSidebar, onOpenMobileNav, isDark, onToggleDark 
           variant="ghost"
           size="iconOnly"
           onClick={onToggleDark}
-          aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+          aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
         >
           {isDark ? <Sun size={17} /> : <Moon size={17} />}
         </Button>
@@ -53,5 +53,5 @@ export function Header({ onToggleSidebar, onOpenMobileNav, isDark, onToggleDark 
         <AvatarMenu />
       </div>
     </header>
-  )
+  );
 }

@@ -1,23 +1,23 @@
-'use client'
+"use client";
 
-import { useMemo, type ReactNode } from 'react'
-import Link from 'next/link'
-import { Users, Shield, Key, Activity, ChevronRight, Download, UserPlus, Loader2 } from 'lucide-react'
-import { useAuth } from '@/features/auth/hooks/useAuth'
-import { Button, buttonVariants } from '@/shared/components/ui'
-import { useDashboardStats } from '../hooks/useDashboardStats'
-import { useExportDashboard } from '../hooks/useExportDashboard'
-import { StatCard } from './StatCard'
-import { ActivityFeed } from './ActivityFeed'
-import { QuickActions } from './QuickActions'
-import { RoleDistribution } from './RoleDistribution'
+import { useMemo, type ReactNode } from "react";
+import Link from "next/link";
+import { Users, Shield, Key, Activity, ChevronRight, Download, UserPlus, Loader2 } from "lucide-react";
+import { useAuth } from "@/features/auth/hooks/useAuth";
+import { Button, buttonVariants } from "@/shared/components/ui";
+import { useDashboardStats } from "../hooks/useDashboardStats";
+import { useExportDashboard } from "../hooks/useExportDashboard";
+import { StatCard } from "./StatCard";
+import { ActivityFeed } from "./ActivityFeed";
+import { QuickActions } from "./QuickActions";
+import { RoleDistribution } from "./RoleDistribution";
 
 interface StatCardConfig {
-  label: string
-  value: number
-  delta?: string
-  sub?: string
-  icon: ReactNode
+  label: string;
+  value: number;
+  delta?: string;
+  sub?: string;
+  icon: ReactNode;
 }
 
 const STAT_ICONS = {
@@ -25,67 +25,62 @@ const STAT_ICONS = {
   roles: <Shield size={16} />,
   permissions: <Key size={16} />,
   events: <Activity size={16} />,
-} as const
+} as const;
 
 export function DashboardPage() {
-  const { user } = useAuth()
-  const { data: stats, isLoading } = useDashboardStats()
-  const { exportDashboard, isExporting } = useExportDashboard()
+  const { user } = useAuth();
+  const { data: stats, isLoading } = useDashboardStats();
+  const { exportDashboard, isExporting } = useExportDashboard();
 
-  const firstName = user?.name?.split(' ')[0] ?? 'there'
+  const firstName = user?.name?.split(" ")[0] ?? "there";
 
-  const statCards = useMemo<StatCardConfig[]>(() => [
-    {
-      label: 'Total users',
-      value: stats?.totalUsers ?? 0,
-      delta: stats ? `+${stats.newUsersThisWeek} this week` : undefined,
-      sub: stats ? `${stats.inactiveUsers} inactive` : undefined,
-      icon: STAT_ICONS.users,
-    },
-    {
-      label: 'Active roles',
-      value: stats?.totalRoles ?? 0,
-      sub: stats ? `${stats.totalPermissionsAssigned} permissions assigned` : undefined,
-      icon: STAT_ICONS.roles,
-    },
-    {
-      label: 'Permissions',
-      value: stats?.totalPermissions ?? 0,
-      sub: 'Across all roles',
-      icon: STAT_ICONS.permissions,
-    },
-    {
-      label: 'Recent events',
-      value: stats?.recentActivity.length ?? 0,
-      sub: 'Last 5 events shown',
-      icon: STAT_ICONS.events,
-    },
-  ], [stats])
+  const statCards = useMemo<StatCardConfig[]>(
+    () => [
+      {
+        label: "Total users",
+        value: stats?.totalUsers ?? 0,
+        delta: stats ? `+${stats.newUsersThisWeek} this week` : undefined,
+        sub: stats ? `${stats.inactiveUsers} inactive` : undefined,
+        icon: STAT_ICONS.users,
+      },
+      {
+        label: "Active roles",
+        value: stats?.totalRoles ?? 0,
+        sub: stats ? `${stats.totalPermissionsAssigned} permissions assigned` : undefined,
+        icon: STAT_ICONS.roles,
+      },
+      {
+        label: "Permissions",
+        value: stats?.totalPermissions ?? 0,
+        sub: "Across all roles",
+        icon: STAT_ICONS.permissions,
+      },
+      {
+        label: "Recent events",
+        value: stats?.recentActivity.length ?? 0,
+        sub: "Last 5 events shown",
+        icon: STAT_ICONS.events,
+      },
+    ],
+    [stats],
+  );
 
   return (
     <div className="flex flex-col gap-6">
       {/* Greeting */}
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">
-            Welcome back, {firstName}
-          </h1>
+          <h1 className="text-2xl font-semibold tracking-tight">Welcome back, {firstName}</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             {"Here's what's happened in your workspace since you last signed in."}
           </p>
         </div>
         <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            className="gap-1.5"
-            onClick={exportDashboard}
-            disabled={isExporting}
-          >
+          <Button variant="outline" size="sm" className="gap-1.5" onClick={exportDashboard} disabled={isExporting}>
             {isExporting ? <Loader2 size={14} className="animate-spin" /> : <Download size={14} />}
-            {isExporting ? 'Exporting...' : 'Export'}
+            {isExporting ? "Exporting..." : "Export"}
           </Button>
-          <Link href="/users" className={buttonVariants({ size: 'sm', className: 'gap-1.5' })}>
+          <Link href="/users" className={buttonVariants({ size: "sm", className: "gap-1.5" })}>
             <UserPlus size={14} />
             Invite user
           </Link>
@@ -108,7 +103,10 @@ export function DashboardPage() {
               <h2 className="text-[15px] font-semibold">Recent activity</h2>
               <p className="text-xs text-muted-foreground mt-0.5">Last five events across the workspace</p>
             </div>
-            <Link href="/audit-logs" className={buttonVariants({ variant: 'ghost', size: 'sm', className: 'gap-1.5 text-sm' })}>
+            <Link
+              href="/audit-logs"
+              className={buttonVariants({ variant: "ghost", size: "sm", className: "gap-1.5 text-sm" })}
+            >
               View all
               <ChevronRight size={14} />
             </Link>
@@ -132,5 +130,5 @@ export function DashboardPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

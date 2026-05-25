@@ -1,24 +1,18 @@
-'use client'
+"use client";
 
-import { memo } from 'react'
-import Link from 'next/link'
-import { Mail, Lock } from 'lucide-react'
-import { getErrorMessage } from '@/shared/lib/api-error'
-import { AuthShell } from '@/features/auth/components/AuthShell'
-import {
-  Alert,
-  Button,
-  FormField,
-  Input,
-  PasswordStrengthMeter,
-} from '@/shared/components/ui'
-import { useRegisterForm } from './useRegisterForm'
+import { memo } from "react";
+import Link from "next/link";
+import { Mail, Lock } from "lucide-react";
+import { getErrorMessage } from "@/shared/lib/api-error";
+import { AuthShell } from "@/features/auth/components/AuthShell";
+import { Alert, Button, FormField, Input, PasswordStrengthMeter } from "@/shared/components/ui";
+import { useRegisterForm } from "./useRegisterForm";
 
 /**
  * Memoised wrapper to avoid re-rendering the meter on every keystroke
  * unless the password value itself changes.
  */
-const PasswordStrengthMeterMemo = memo(PasswordStrengthMeter)
+const PasswordStrengthMeterMemo = memo(PasswordStrengthMeter);
 
 /**
  * Pure JSX registration form.
@@ -26,21 +20,21 @@ const PasswordStrengthMeterMemo = memo(PasswordStrengthMeter)
  * All behaviour is delegated to useRegisterForm.
  */
 export function RegisterForm() {
-  const { form, isPending, error, password, onSubmit } = useRegisterForm()
+  const { form, isPending, error, password, onSubmit } = useRegisterForm();
 
   const {
     register,
     formState: { errors },
-  } = form
+  } = form;
 
   const footer = (
     <>
-      Already have an account?{' '}
+      Already have an account?{" "}
       <Link href="/login" className="text-primary font-medium no-underline">
         Sign in
       </Link>
     </>
-  )
+  );
 
   return (
     <AuthShell footer={footer}>
@@ -58,7 +52,7 @@ export function RegisterForm() {
             placeholder="Ada Lovelace"
             autoComplete="name"
             error={errors.name?.message}
-            {...register('name')}
+            {...register("name")}
           />
         </FormField>
 
@@ -69,7 +63,7 @@ export function RegisterForm() {
             autoComplete="email"
             iconLeft={<Mail size={16} />}
             error={errors.email?.message}
-            {...register('email')}
+            {...register("email")}
           />
         </FormField>
 
@@ -77,7 +71,7 @@ export function RegisterForm() {
           label="Password"
           required
           error={errors.password?.message}
-          hint={!errors.password?.message ? '8+ characters, mix of letters and numbers' : undefined}
+          hint={!errors.password?.message ? "8+ characters, mix of letters and numbers" : undefined}
         >
           <Input
             type="password"
@@ -85,7 +79,7 @@ export function RegisterForm() {
             autoComplete="new-password"
             iconLeft={<Lock size={16} />}
             error={errors.password?.message}
-            {...register('password')}
+            {...register("password")}
           />
           <PasswordStrengthMeterMemo password={password} />
         </FormField>
@@ -97,7 +91,7 @@ export function RegisterForm() {
             autoComplete="new-password"
             iconLeft={<Lock size={16} />}
             error={errors.confirmPassword?.message}
-            {...register('confirmPassword')}
+            {...register("confirmPassword")}
           />
         </FormField>
 
@@ -110,5 +104,5 @@ export function RegisterForm() {
         </p>
       </form>
     </AuthShell>
-  )
+  );
 }

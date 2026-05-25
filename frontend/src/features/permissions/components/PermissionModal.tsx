@@ -1,34 +1,34 @@
-'use client'
+"use client";
 
-import { useEffect } from 'react'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
-import { Modal, Button, Input, FormField } from '@/shared/components/ui'
-import { useCreatePermission, useUpdatePermission } from '@/features/permissions/hooks/usePermissionsCrud'
-import { getErrorMessage } from '@/shared/lib/api-error'
-import type { Permission } from '@/shared/types'
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { Modal, Button, Input, FormField } from "@/shared/components/ui";
+import { useCreatePermission, useUpdatePermission } from "@/features/permissions/hooks/usePermissionsCrud";
+import { getErrorMessage } from "@/shared/lib/api-error";
+import type { Permission } from "@/shared/types";
 
 const schema = z.object({
   name: z
     .string()
-    .min(2, 'Name must be at least 2 characters')
-    .regex(/^[a-z_]+:[a-z_]+$/, 'Format must be resource:action (e.g. users:read)'),
+    .min(2, "Name must be at least 2 characters")
+    .regex(/^[a-z_]+:[a-z_]+$/, "Format must be resource:action (e.g. users:read)"),
   description: z.string().optional(),
-})
+});
 
-type FormInput = z.infer<typeof schema>
+type FormInput = z.infer<typeof schema>;
 
 interface PermissionModalProps {
-  isOpen: boolean
-  onClose: () => void
-  permission?: Permission | null
+  isOpen: boolean;
+  onClose: () => void;
+  permission?: Permission | null;
 }
 
 export function PermissionModal({ isOpen, onClose, permission }: PermissionModalProps) {
-  const isEditing = !!permission
-  const createPermission = useCreatePermission()
-  const updatePermission = useUpdatePermission()
+  const isEditing = !!permission;
+  const createPermission = useCreatePermission();
+  const updatePermission = useUpdatePermission();
 
   const {
     register,
@@ -36,37 +36,29 @@ export function PermissionModal({ isOpen, onClose, permission }: PermissionModal
     reset,
     setError,
     formState: { errors, isSubmitting },
-  } = useForm<FormInput>({ resolver: zodResolver(schema) })
+  } = useForm<FormInput>({ resolver: zodResolver(schema) });
 
   useEffect(() => {
     if (isOpen) {
-      reset(
-        isEditing
-          ? { name: permission.name, description: permission.description ?? '' }
-          : {},
-      )
+      reset(isEditing ? { name: permission.name, description: permission.description ?? "" } : {});
     }
-  }, [isOpen, isEditing, permission, reset])
+  }, [isOpen, isEditing, permission, reset]);
 
   const onSubmit = async (data: FormInput) => {
     try {
       if (isEditing) {
-        await updatePermission.mutateAsync({ id: permission.id, payload: data })
+        await updatePermission.mutateAsync({ id: permission.id, payload: data });
       } else {
-        await createPermission.mutateAsync(data)
+        await createPermission.mutateAsync(data);
       }
-      onClose()
+      onClose();
     } catch (err) {
-      setError('root', { message: getErrorMessage(err) })
+      setError("root", { message: getErrorMessage(err) });
     }
-  }
+  };
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      title={isEditing ? 'Edit Permission' : 'Create Permission'}
-    >
+    <Modal isOpen={isOpen} onClose={onClose} title={isEditing ? "Edit Permission" : "Create Permission"}>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         {errors.root && (
           <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3">
@@ -75,20 +67,11 @@ export function PermissionModal({ isOpen, onClose, permission }: PermissionModal
         )}
 
         <FormField label="Name (resource:action)" error={errors.name?.message}>
-          <Input
-            {...register('name')}
-            placeholder="users:read"
-            className="font-mono"
-            error={errors.name?.message}
-          />
+          <Input {...register("name")} placeholder="users:read" className="font-mono" error={errors.name?.message} />
         </FormField>
 
         <FormField label="Description" error={errors.description?.message}>
-          <Input
-            {...register('description')}
-            placeholder="Can read users"
-            error={errors.description?.message}
-          />
+          <Input {...register("description")} placeholder="Can read users" error={errors.description?.message} />
         </FormField>
 
         <div className="flex justify-end gap-2 pt-2">
@@ -96,10 +79,10 @@ export function PermissionModal({ isOpen, onClose, permission }: PermissionModal
             Cancel
           </Button>
           <Button type="submit" isLoading={isSubmitting}>
-            {isEditing ? 'Save Changes' : 'Create Permission'}
+            {isEditing ? "Save Changes" : "Create Permission"}
           </Button>
         </div>
       </form>
     </Modal>
-  )
+  );
 }

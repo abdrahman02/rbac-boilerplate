@@ -1,32 +1,32 @@
-'use client'
+"use client";
 
-import { useEffect, type ReactNode } from 'react'
-import { createPortal } from 'react-dom'
-import { Button } from '@/shared/components/ui/Button'
+import { useEffect, type ReactNode } from "react";
+import { createPortal } from "react-dom";
+import { Button } from "@/shared/components/ui/Button";
 
 interface ModalProps {
-  isOpen: boolean
-  onClose: () => void
-  title: string
-  children: ReactNode
-  maxWidth?: 'sm' | 'md' | 'lg'
+  isOpen: boolean;
+  onClose: () => void;
+  title: string;
+  children: ReactNode;
+  maxWidth?: "sm" | "md" | "lg";
 }
 
 const maxWidthClass = {
-  sm: 'max-w-sm',
-  md: 'max-w-md',
-  lg: 'max-w-lg',
-}
+  sm: "max-w-sm",
+  md: "max-w-md",
+  lg: "max-w-lg",
+};
 
-export function Modal({ isOpen, onClose, title, children, maxWidth = 'md' }: ModalProps) {
+export function Modal({ isOpen, onClose, title, children, maxWidth = "md" }: ModalProps) {
   useEffect(() => {
-    if (!isOpen) return
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
-    document.addEventListener('keydown', onKey)
-    return () => document.removeEventListener('keydown', onKey)
-  }, [isOpen, onClose])
+    if (!isOpen) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [isOpen, onClose]);
 
-  if (!isOpen) return null
+  if (!isOpen) return null;
 
   return createPortal(
     <div
@@ -50,5 +50,5 @@ export function Modal({ isOpen, onClose, title, children, maxWidth = 'md' }: Mod
       </div>
     </div>,
     document.body,
-  )
+  );
 }

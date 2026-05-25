@@ -1,2 +1,2 @@
-export { Alert } from './Alert'
-export { alertVariants } from './Alert.variants'
+export { Alert } from "./Alert";
+export { alertVariants } from "./Alert.variants";

@@ -1,13 +1,13 @@
 interface BrandMarkProps {
-  collapsed?: boolean
+  collapsed?: boolean;
 }
 
 export function BrandMark({ collapsed = false }: BrandMarkProps) {
   return (
-    <div className={`flex items-center ${collapsed ? 'justify-center' : 'gap-2.5'}`}>
+    <div className={`flex items-center ${collapsed ? "justify-center" : "gap-2.5"}`}>
       <div
         className="w-8 h-8 rounded-[9px] bg-primary text-primary-foreground flex items-center justify-center shrink-0"
-        style={{ boxShadow: 'inset 0 -1px 0 rgb(255 255 255 / 0.08), 0 1px 2px rgb(0 0 0 / 0.08)' }}
+        style={{ boxShadow: "inset 0 -1px 0 rgb(255 255 255 / 0.08), 0 1px 2px rgb(0 0 0 / 0.08)" }}
       >
         <svg
           width="16"
@@ -31,5 +31,5 @@ export function BrandMark({ collapsed = false }: BrandMarkProps) {
         </div>
       )}
     </div>
-  )
+  );
 }

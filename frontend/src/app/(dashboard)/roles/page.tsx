@@ -1,47 +1,47 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { Button, Badge } from '@/shared/components/ui'
-import { PermissionGate } from '@/shared/components/guard/PermissionGate'
-import { useRoles, useDeleteRole } from '@/features/roles/hooks/useRoles'
-import { RoleModal } from '@/features/roles/components/RoleModal'
-import { AssignPermissionModal } from '@/features/roles/components/AssignPermissionModal'
-import { getErrorMessage } from '@/shared/lib/api-error'
-import type { RoleWithPermissions } from '@/shared/types'
+import { useState } from "react";
+import { Button, Badge } from "@/shared/components/ui";
+import { PermissionGate } from "@/shared/components/guard/PermissionGate";
+import { useRoles, useDeleteRole } from "@/features/roles/hooks/useRoles";
+import { RoleModal } from "@/features/roles/components/RoleModal";
+import { AssignPermissionModal } from "@/features/roles/components/AssignPermissionModal";
+import { getErrorMessage } from "@/shared/lib/api-error";
+import type { RoleWithPermissions } from "@/shared/types";
 
 export default function RolesPage() {
-  const [modalOpen, setModalOpen] = useState(false)
-  const [permModalOpen, setPermModalOpen] = useState(false)
-  const [selectedRole, setSelectedRole] = useState<RoleWithPermissions | null>(null)
-  const [deleteError, setDeleteError] = useState<string | null>(null)
+  const [modalOpen, setModalOpen] = useState(false);
+  const [permModalOpen, setPermModalOpen] = useState(false);
+  const [selectedRole, setSelectedRole] = useState<RoleWithPermissions | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
-  const { data: roles = [], isLoading } = useRoles()
-  const deleteRole = useDeleteRole()
+  const { data: roles = [], isLoading } = useRoles();
+  const deleteRole = useDeleteRole();
 
   const openCreate = () => {
-    setSelectedRole(null)
-    setModalOpen(true)
-  }
+    setSelectedRole(null);
+    setModalOpen(true);
+  };
 
   const openEdit = (role: RoleWithPermissions) => {
-    setSelectedRole(role)
-    setModalOpen(true)
-  }
+    setSelectedRole(role);
+    setModalOpen(true);
+  };
 
   const openPermissions = (role: RoleWithPermissions) => {
-    setSelectedRole(role)
-    setPermModalOpen(true)
-  }
+    setSelectedRole(role);
+    setPermModalOpen(true);
+  };
 
   const handleDelete = async (role: RoleWithPermissions) => {
-    if (!confirm(`Delete role "${role.name}"?`)) return
-    setDeleteError(null)
+    if (!confirm(`Delete role "${role.name}"?`)) return;
+    setDeleteError(null);
     try {
-      await deleteRole.mutateAsync(role.id)
+      await deleteRole.mutateAsync(role.id);
     } catch (err) {
-      setDeleteError(getErrorMessage(err))
+      setDeleteError(getErrorMessage(err));
     }
-  }
+  };
 
   return (
     <div className="space-y-6">
@@ -61,11 +61,8 @@ export default function RolesPage() {
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              {['Name', 'Description', 'Permissions', 'Created', 'Actions'].map((h) => (
-                <th
-                  key={h}
-                  className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500"
-                >
+              {["Name", "Description", "Permissions", "Created", "Actions"].map((h) => (
+                <th key={h} className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">
                   {h}
                 </th>
               ))}
@@ -88,7 +85,7 @@ export default function RolesPage() {
               roles.map((role) => (
                 <tr key={role.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 text-sm font-medium text-gray-900">{role.name}</td>
-                  <td className="px-6 py-4 text-sm text-gray-600">{role.description ?? '—'}</td>
+                  <td className="px-6 py-4 text-sm text-gray-600">{role.description ?? "—"}</td>
                   <td className="px-6 py-4">
                     <div className="flex flex-wrap gap-1">
                       {role.permissions.slice(0, 3).map((p) => (
@@ -99,9 +96,7 @@ export default function RolesPage() {
                       )}
                     </div>
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-500">
-                    {new Date(role.created_at).toLocaleDateString()}
-                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-500">{new Date(role.created_at).toLocaleDateString()}</td>
                   <td className="px-6 py-4">
                     <div className="flex gap-2">
                       <PermissionGate permission="roles:update">
@@ -134,12 +129,8 @@ export default function RolesPage() {
       <RoleModal isOpen={modalOpen} onClose={() => setModalOpen(false)} role={selectedRole} />
 
       {selectedRole && (
-        <AssignPermissionModal
-          isOpen={permModalOpen}
-          onClose={() => setPermModalOpen(false)}
-          role={selectedRole}
-        />
+        <AssignPermissionModal isOpen={permModalOpen} onClose={() => setPermModalOpen(false)} role={selectedRole} />
       )}
     </div>
-  )
+  );
 }

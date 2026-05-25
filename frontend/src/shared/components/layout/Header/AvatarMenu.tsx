@@ -1,31 +1,25 @@
-'use client'
+"use client";
 
-import { User, LogOut } from 'lucide-react'
-import Link from 'next/link'
-import { useAuth } from '@/features/auth/hooks/useAuth'
-import { useLogout } from '@/features/auth/hooks/useLogout'
-import { Button } from '@/shared/components/ui/Button'
-import { Dropdown } from '@/shared/components/ui/Dropdown'
-import { Avatar } from '@/shared/components/ui/Avatar'
+import { User, LogOut } from "lucide-react";
+import Link from "next/link";
+import { useAuth } from "@/features/auth/hooks/useAuth";
+import { useLogout } from "@/features/auth/hooks/useLogout";
+import { Button } from "@/shared/components/ui/Button";
+import { Dropdown } from "@/shared/components/ui/Dropdown";
+import { Avatar } from "@/shared/components/ui/Avatar";
 
 export function AvatarMenu() {
-  const { user } = useAuth()
-  const logout = useLogout()
+  const { user } = useAuth();
+  const logout = useLogout();
 
-  const name = user?.name ?? 'User'
-  const email = user?.email ?? ''
+  const name = user?.name ?? "User";
+  const email = user?.email ?? "";
 
   const trigger = (
-    <Button
-      type="button"
-      variant="ghost"
-      size="iconOnly"
-      aria-label="Account menu"
-      className="rounded-full p-0.5"
-    >
+    <Button type="button" variant="ghost" size="iconOnly" aria-label="Account menu" className="rounded-full p-0.5">
       <Avatar name={name} size={32} />
     </Button>
-  )
+  );
 
   return (
     <Dropdown trigger={trigger}>
@@ -41,7 +35,11 @@ export function AvatarMenu() {
         <div className="h-px bg-border" />
 
         <div className="p-1">
-          <Button asChild variant="ghost" className="w-full justify-start gap-2.5 text-[13.5px] h-auto py-2 px-2.5 rounded-lg">
+          <Button
+            asChild
+            variant="ghost"
+            className="w-full justify-start gap-2.5 text-[13.5px] h-auto py-2 px-2.5 rounded-lg"
+          >
             <Link href="/profile">
               <User size={16} className="shrink-0" />
               Profile
@@ -64,5 +62,5 @@ export function AvatarMenu() {
         </div>
       </div>
     </Dropdown>
-  )
+  );
 }

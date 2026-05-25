@@ -1,60 +1,58 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { Button, Badge } from '@/shared/components/ui'
-import { PermissionGate } from '@/shared/components/guard/PermissionGate'
-import { useUsers, useDeleteUser } from '@/features/users/hooks/useUsers'
-import { UserModal } from '@/features/users/components/UserModal'
-import { AssignRoleModal } from '@/features/users/components/AssignRoleModal'
-import { getErrorMessage } from '@/shared/lib/api-error'
-import type { UserWithRoles } from '@/shared/types'
+import { useState } from "react";
+import { Button, Badge } from "@/shared/components/ui";
+import { PermissionGate } from "@/shared/components/guard/PermissionGate";
+import { useUsers, useDeleteUser } from "@/features/users/hooks/useUsers";
+import { UserModal } from "@/features/users/components/UserModal";
+import { AssignRoleModal } from "@/features/users/components/AssignRoleModal";
+import { getErrorMessage } from "@/shared/lib/api-error";
+import type { UserWithRoles } from "@/shared/types";
 
 export default function UsersPage() {
-  const [page, setPage] = useState(1)
-  const [modalOpen, setModalOpen] = useState(false)
-  const [roleModalOpen, setRoleModalOpen] = useState(false)
-  const [selectedUser, setSelectedUser] = useState<UserWithRoles | null>(null)
-  const [deleteError, setDeleteError] = useState<string | null>(null)
+  const [page, setPage] = useState(1);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [roleModalOpen, setRoleModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<UserWithRoles | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
-  const { data, isLoading } = useUsers(page)
-  const deleteUser = useDeleteUser()
+  const { data, isLoading } = useUsers(page);
+  const deleteUser = useDeleteUser();
 
-  const users = data?.data ?? []
-  const meta = data?.meta
+  const users = data?.data ?? [];
+  const meta = data?.meta;
 
   const openCreate = () => {
-    setSelectedUser(null)
-    setModalOpen(true)
-  }
+    setSelectedUser(null);
+    setModalOpen(true);
+  };
 
   const openEdit = (user: UserWithRoles) => {
-    setSelectedUser(user)
-    setModalOpen(true)
-  }
+    setSelectedUser(user);
+    setModalOpen(true);
+  };
 
   const openRoles = (user: UserWithRoles) => {
-    setSelectedUser(user)
-    setRoleModalOpen(true)
-  }
+    setSelectedUser(user);
+    setRoleModalOpen(true);
+  };
 
   const handleDelete = async (user: UserWithRoles) => {
-    if (!confirm(`Delete user "${user.name}"?`)) return
-    setDeleteError(null)
+    if (!confirm(`Delete user "${user.name}"?`)) return;
+    setDeleteError(null);
     try {
-      await deleteUser.mutateAsync(user.id)
+      await deleteUser.mutateAsync(user.id);
     } catch (err) {
-      setDeleteError(getErrorMessage(err))
+      setDeleteError(getErrorMessage(err));
     }
-  }
+  };
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Users</h1>
-          <p className="mt-1 text-sm text-gray-500">
-            {meta ? `${meta.total} total users` : ''}
-          </p>
+          <p className="mt-1 text-sm text-gray-500">{meta ? `${meta.total} total users` : ""}</p>
         </div>
         <PermissionGate permission="users:create">
           <Button onClick={openCreate}>+ Create User</Button>
@@ -67,11 +65,8 @@ export default function UsersPage() {
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              {['Name', 'Email', 'Status', 'Roles', 'Created', 'Actions'].map((h) => (
-                <th
-                  key={h}
-                  className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500"
-                >
+              {["Name", "Email", "Status", "Roles", "Created", "Actions"].map((h) => (
+                <th key={h} className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">
                   {h}
                 </th>
               ))}
@@ -96,8 +91,8 @@ export default function UsersPage() {
                   <td className="px-6 py-4 text-sm font-medium text-gray-900">{user.name}</td>
                   <td className="px-6 py-4 text-sm text-gray-600">{user.email}</td>
                   <td className="px-6 py-4">
-                    <Badge variant={user.is_active ? 'success' : 'danger'}>
-                      {user.is_active ? 'Active' : 'Inactive'}
+                    <Badge variant={user.is_active ? "success" : "danger"}>
+                      {user.is_active ? "Active" : "Inactive"}
                     </Badge>
                   </td>
                   <td className="px-6 py-4">
@@ -107,9 +102,7 @@ export default function UsersPage() {
                       ))}
                     </div>
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-500">
-                    {new Date(user.created_at).toLocaleDateString()}
-                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-500">{new Date(user.created_at).toLocaleDateString()}</td>
                   <td className="px-6 py-4">
                     <div className="flex gap-2">
                       <PermissionGate permission="users:update">
@@ -141,7 +134,9 @@ export default function UsersPage() {
 
       {meta && meta.total > meta.limit && (
         <div className="flex items-center justify-between text-sm text-gray-600">
-          <span>Page {meta.page} of {Math.ceil(meta.total / meta.limit)}</span>
+          <span>
+            Page {meta.page} of {Math.ceil(meta.total / meta.limit)}
+          </span>
           <div className="flex gap-2">
             <Button
               size="sm"
@@ -166,12 +161,8 @@ export default function UsersPage() {
       <UserModal isOpen={modalOpen} onClose={() => setModalOpen(false)} user={selectedUser} />
 
       {selectedUser && (
-        <AssignRoleModal
-          isOpen={roleModalOpen}
-          onClose={() => setRoleModalOpen(false)}
-          user={selectedUser}
-        />
+        <AssignRoleModal isOpen={roleModalOpen} onClose={() => setRoleModalOpen(false)} user={selectedUser} />
       )}
     </div>
-  )
+  );
 }

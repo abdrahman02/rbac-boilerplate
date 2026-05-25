@@ -1,5 +1,5 @@
 interface DividerProps {
-  label?: string
+  label?: string;
 }
 
 export function Divider({ label }: DividerProps) {
@@ -9,5 +9,5 @@ export function Divider({ label }: DividerProps) {
       {label}
       <span className="flex-1 h-px bg-border" />
     </div>
-  )
+  );
 }

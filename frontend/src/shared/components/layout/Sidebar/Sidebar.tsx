@@ -1,45 +1,45 @@
-'use client'
+"use client";
 
-import type { ReactNode } from 'react'
-import { LayoutDashboard, Users, Shield, ShieldCheck, Key, FileText } from 'lucide-react'
-import { NavItem } from './NavItem'
-import { NavGroup } from './NavGroup'
-import { sidebarVariants } from './Sidebar.variants'
-import { PermissionGate } from '@/shared/components/guard/PermissionGate'
-import { useAnyPermission } from '@/shared/hooks/useAnyPermission'
-import { BrandMark } from '@/shared/components/common/BrandMark'
-import type { NavEntry, NavGroupDef } from './Sidebar.types'
-import { isNavGroup } from './Sidebar.types'
+import type { ReactNode } from "react";
+import { LayoutDashboard, Users, Shield, ShieldCheck, Key, FileText } from "lucide-react";
+import { NavItem } from "./NavItem";
+import { NavGroup } from "./NavGroup";
+import { sidebarVariants } from "./Sidebar.variants";
+import { PermissionGate } from "@/shared/components/guard/PermissionGate";
+import { useAnyPermission } from "@/shared/hooks/useAnyPermission";
+import { BrandMark } from "@/shared/components/common/BrandMark";
+import type { NavEntry, NavGroupDef } from "./Sidebar.types";
+import { isNavGroup } from "./Sidebar.types";
 
 const NAV_CONFIG: NavEntry[] = [
-  { href: '/dashboard',  label: 'Dashboard',  icon: <LayoutDashboard size={18} />, permission: null },
-  { href: '/users',      label: 'Users',      icon: <Users size={18} />,           permission: 'users:read' },
+  { href: "/dashboard", label: "Dashboard", icon: <LayoutDashboard size={18} />, permission: null },
+  { href: "/users", label: "Users", icon: <Users size={18} />, permission: "users:read" },
   {
-    label: 'Access Control',
+    label: "Access Control",
     icon: <Shield size={18} />,
-    permissions: ['roles:read', 'permissions:read'],
+    permissions: ["roles:read", "permissions:read"],
     children: [
-      { href: '/roles',       label: 'Roles',       icon: <ShieldCheck size={18} />, permission: 'roles:read' },
-      { href: '/permissions', label: 'Permissions', icon: <Key size={18} />,         permission: 'permissions:read' },
+      { href: "/roles", label: "Roles", icon: <ShieldCheck size={18} />, permission: "roles:read" },
+      { href: "/permissions", label: "Permissions", icon: <Key size={18} />, permission: "permissions:read" },
     ],
   },
-  { href: '/audit-logs', label: 'Audit Logs', icon: <FileText size={18} />,        permission: 'audit_logs:read' },
-]
+  { href: "/audit-logs", label: "Audit Logs", icon: <FileText size={18} />, permission: "audit_logs:read" },
+];
 
 interface SidebarProps {
-  collapsed?: boolean
-  onMobileClose?: () => void
+  collapsed?: boolean;
+  onMobileClose?: () => void;
 }
 
 interface NavGroupWrapperProps {
-  entry: NavGroupDef
-  collapsed: boolean
-  onMobileClose?: () => void
+  entry: NavGroupDef;
+  collapsed: boolean;
+  onMobileClose?: () => void;
 }
 
 function NavGroupWrapper({ entry, collapsed, onMobileClose }: NavGroupWrapperProps) {
-  const visible = useAnyPermission(entry.permissions)
-  if (!visible) return null
+  const visible = useAnyPermission(entry.permissions);
+  if (!visible) return null;
   return (
     <NavGroup
       label={entry.label}
@@ -48,7 +48,7 @@ function NavGroupWrapper({ entry, collapsed, onMobileClose }: NavGroupWrapperPro
       collapsed={collapsed}
       onChildClick={onMobileClose}
     />
-  )
+  );
 }
 
 export function Sidebar({ collapsed = false, onMobileClose }: SidebarProps) {
@@ -57,7 +57,7 @@ export function Sidebar({ collapsed = false, onMobileClose }: SidebarProps) {
       {/* Brand */}
       <div
         className={`flex items-center h-16 border-b border-sidebar-border shrink-0 ${
-          collapsed ? 'justify-center px-3' : 'px-[18px]'
+          collapsed ? "justify-center px-3" : "px-[18px]"
         }`}
       >
         <BrandMark collapsed={collapsed} />
@@ -73,13 +73,8 @@ export function Sidebar({ collapsed = false, onMobileClose }: SidebarProps) {
         {NAV_CONFIG.map((entry) => {
           if (isNavGroup(entry)) {
             return (
-              <NavGroupWrapper
-                key={entry.label}
-                entry={entry}
-                collapsed={collapsed}
-                onMobileClose={onMobileClose}
-              />
-            )
+              <NavGroupWrapper key={entry.label} entry={entry} collapsed={collapsed} onMobileClose={onMobileClose} />
+            );
           }
           return entry.permission !== null ? (
             <PermissionGate key={entry.href} permission={entry.permission}>
@@ -100,9 +95,9 @@ export function Sidebar({ collapsed = false, onMobileClose }: SidebarProps) {
               collapsed={collapsed}
               onClick={onMobileClose}
             />
-          )
+          );
         })}
       </nav>
     </aside>
-  )
+  );
 }

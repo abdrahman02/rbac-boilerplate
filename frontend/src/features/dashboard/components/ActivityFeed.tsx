@@ -1,49 +1,49 @@
-import { memo } from 'react'
-import type { RecentActivityItem } from '@/shared/types'
-import type { VariantProps } from 'tailwind-variants'
-import { Avatar, Badge } from '@/shared/components/ui'
-import type { badgeVariants } from '@/shared/components/ui/Badge/Badge.variants'
-import { formatRelative, formatDateTime } from '@/shared/lib/format-date'
+import { memo } from "react";
+import type { RecentActivityItem } from "@/shared/types";
+import type { VariantProps } from "tailwind-variants";
+import { Avatar, Badge } from "@/shared/components/ui";
+import type { badgeVariants } from "@/shared/components/ui/Badge/Badge.variants";
+import { formatRelative, formatDateTime } from "@/shared/lib/format-date";
 
 interface ActivityFeedProps {
-  logs: RecentActivityItem[]
-  isLoading?: boolean
+  logs: RecentActivityItem[];
+  isLoading?: boolean;
 }
 
-type BadgeVariant = NonNullable<VariantProps<typeof badgeVariants>['variant']>
+type BadgeVariant = NonNullable<VariantProps<typeof badgeVariants>["variant"]>;
 
 // Maps every backend action string to a badge variant.
 // danger=destroy, warning=unlink, info=modify/assign, primary=create, success=auth ok, default=neutral
 const ACTION_VARIANT_MAP: Record<string, BadgeVariant> = {
   // auth
-  login:             'success',
-  logout:            'default',
-  register:          'primary',
+  login: "success",
+  logout: "default",
+  register: "primary",
   // users
-  create_user:       'primary',
-  update_user:       'info',
-  delete_user:       'danger',
-  assign_role:       'info',
-  remove_role:       'warning',
+  create_user: "primary",
+  update_user: "info",
+  delete_user: "danger",
+  assign_role: "info",
+  remove_role: "warning",
   // roles
-  create_role:       'primary',
-  update_role:       'info',
-  delete_role:       'danger',
-  assign_permission: 'info',
-  remove_permission: 'warning',
+  create_role: "primary",
+  update_role: "info",
+  delete_role: "danger",
+  assign_permission: "info",
+  remove_permission: "warning",
   // permissions
-  create_permission: 'primary',
-  update_permission: 'info',
-  delete_permission: 'danger',
-}
+  create_permission: "primary",
+  update_permission: "info",
+  delete_permission: "danger",
+};
 
 function getActionBadgeVariant(action: string): BadgeVariant {
-  return ACTION_VARIANT_MAP[action] ?? 'default'
+  return ACTION_VARIANT_MAP[action] ?? "default";
 }
 
 const ActivityRow = memo(function ActivityRow({ log }: { log: RecentActivityItem }) {
-  const displayName = log.userName ?? 'Unknown'
-  const variant = getActionBadgeVariant(log.action)
+  const displayName = log.userName ?? "Unknown";
+  const variant = getActionBadgeVariant(log.action);
 
   return (
     <div className="flex items-center gap-3 px-5 py-3 border-t border-border first:border-t-0">
@@ -65,8 +65,8 @@ const ActivityRow = memo(function ActivityRow({ log }: { log: RecentActivityItem
         {formatRelative(log.createdAt)}
       </span>
     </div>
-  )
-})
+  );
+});
 
 export const ActivityFeed = memo(function ActivityFeed({ logs, isLoading }: ActivityFeedProps) {
   if (isLoading) {
@@ -84,15 +84,13 @@ export const ActivityFeed = memo(function ActivityFeed({ logs, isLoading }: Acti
           </div>
         ))}
       </div>
-    )
+    );
   }
 
   if (logs.length === 0) {
     return (
-      <div className="flex items-center justify-center py-12 text-sm text-muted-foreground">
-        No recent activity
-      </div>
-    )
+      <div className="flex items-center justify-center py-12 text-sm text-muted-foreground">No recent activity</div>
+    );
   }
 
   return (
@@ -101,5 +99,5 @@ export const ActivityFeed = memo(function ActivityFeed({ logs, isLoading }: Acti
         <ActivityRow key={log.id} log={log} />
       ))}
     </div>
-  )
-})
+  );
+});
