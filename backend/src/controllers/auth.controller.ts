@@ -12,6 +12,7 @@ export async function register(req: Request, res: Response): Promise<void> {
   try {
     const result = await authService.register(req.body)
     setAuthCookies(res, result.accessToken, result.refreshToken)
+    res.locals.loggedInUserId = result.user.id
     const body: ApiResponse<AuthenticatedUser> = {
       success: true,
       data: result.user,
@@ -27,6 +28,7 @@ export async function login(req: Request, res: Response): Promise<void> {
   try {
     const result = await authService.login(req.body)
     setAuthCookies(res, result.accessToken, result.refreshToken)
+    res.locals.loggedInUserId = result.user.id
     const body: ApiResponse<AuthenticatedUser> = {
       success: true,
       data: result.user,

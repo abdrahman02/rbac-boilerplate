@@ -10,7 +10,7 @@ export function auditLog(action: string, resourceType: string) {
 				const resourceId = parsedId !== null && !Number.isNaN(parsedId) ? parsedId : null
 
 				insertAuditLog({
-					userId: req.user?.id ?? null,
+					userId: (res.locals.loggedInUserId as number | undefined) ?? req.user?.id ?? null,
 					action,
 					resourceType,
 					resourceId,
