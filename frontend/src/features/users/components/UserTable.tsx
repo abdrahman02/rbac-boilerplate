@@ -41,23 +41,20 @@ export function UserTable({
           </tr>
         </thead>
         <tbody>
-          {isFetching && <LoadingRow />}
-          {!isFetching && users.length === 0 ? (
-            <EmptyRow />
-          ) : (
-            users.map((user) => (
-              <UserRow
-                key={user.id}
-                user={user}
-                canEdit={canEdit}
-                canDelete={canDelete}
-                onEdit={() => onEdit(user)}
-                onManageRoles={() => onManageRoles(user)}
-                onDelete={() => onDelete(user)}
-                onRemoveRole={(roleName) => onRemoveRole(user, roleName)}
-              />
-            ))
-          )}
+          <LoadingRow isLoading={isFetching} colSpan={5} />
+          {!isFetching && users.length === 0 && <EmptyRow />}
+          {users.map((user) => (
+            <UserRow
+              key={user.id}
+              user={user}
+              canEdit={canEdit}
+              canDelete={canDelete}
+              onEdit={() => onEdit(user)}
+              onManageRoles={() => onManageRoles(user)}
+              onDelete={() => onDelete(user)}
+              onRemoveRole={(roleName) => onRemoveRole(user, roleName)}
+            />
+          ))}
         </tbody>
       </table>
     </div>
@@ -165,16 +162,18 @@ function RemovableBadge({ children, onRemove }: { children: ReactNode; onRemove:
   );
 }
 
-function LoadingRow() {
+function LoadingRow({ isLoading, colSpan }: { isLoading: boolean, colSpan: number }) {
   return (
-    <tr>
-      <td colSpan={5} className="px-4 py-3 border-b border-border">
-        <div className="flex justify-center items-center gap-2.5 text-[13px] text-muted-foreground">
-          <Spinner size="sm" />
-          <span>Fetching latest data…</span>
-        </div>
-      </td>
-    </tr>
+    isLoading && (
+      <tr>
+        <td colSpan={colSpan} className="px-4 py-3 border-b border-border">
+          <div className="flex justify-center items-center gap-2.5 text-[13px] text-muted-foreground">
+            <Spinner size="sm" />
+            <span>Fetching latest data…</span>
+          </div>
+        </td>
+      </tr>
+    )
   );
 }
 
