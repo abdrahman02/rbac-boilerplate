@@ -5,12 +5,11 @@ import Link from "next/link";
 import { type ReactNode, useMemo } from "react";
 import { Button, buttonVariants } from "@/shared/components/ui";
 import { useAuth } from "@/shared/hooks";
-import { useDashboardStats } from "../hooks/useDashboardStats";
-import { useExportDashboard } from "../hooks/useExportDashboard";
-import { ActivityFeed } from "./ActivityFeed";
-import { QuickActions } from "./QuickActions";
-import { RoleDistribution } from "./RoleDistribution";
-import { StatCard } from "./StatCard";
+import { ActivityFeed } from "./components/ActivityFeed";
+import { QuickActions } from "./components/QuickActions";
+import { RoleDistribution } from "./components/RoleDistribution";
+import { StatCard } from "./components/StatCard";
+import { useDashboardStats, useExportDashboard } from "./hooks";
 
 interface StatCardConfig {
   label: string;
