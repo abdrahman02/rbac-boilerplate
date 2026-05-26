@@ -10,6 +10,8 @@ export { Input, inputVariants } from "./Input";
 export { Modal } from "./Modal";
 export { Pagination } from "./Pagination";
 export { getPasswordStrength, PasswordStrengthMeter } from "./PasswordStrengthMeter";
+export { Select } from "./Select";
+export type { SelectOption } from "./Select";
 export { Spinner, spinnerVariants } from "./Spinner";
 export {
   TableCell,
