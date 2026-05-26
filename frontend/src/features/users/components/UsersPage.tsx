@@ -2,7 +2,7 @@
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
-import { useIsFetching } from "@tanstack/react-query";
+import { useIsFetching, useQueryClient } from "@tanstack/react-query";
 import { useRoles } from "@/features/roles/hooks/useRoles";
 import { Button } from "@/shared/components/ui";
 import { useDebounce, usePermission } from "@/shared/hooks";
@@ -29,9 +29,14 @@ export function UsersPage() {
   const [assigningUser, setAssigningUser] = useState<UserWithRoles | null>(null);
   const [deletingUser, setDeletingUser] = useState<UserWithRoles | null>(null);
 
+  const queryClient = useQueryClient();
   const debouncedSearch = useDebounce(search, 400);
   const { data } = useUsers(page, 10, debouncedSearch, filters.role, filters.status);
   const isFetching = useIsFetching({ queryKey: ["users"] }) > 0;
+
+  const handleRefresh = () => {
+    queryClient.invalidateQueries({ queryKey: ["users"] });
+  };
   const { data: roles = [] } = useRoles();
   const deleteUser = useDeleteUser();
   const removeRole = useRemoveRole();
@@ -102,7 +107,9 @@ export function UsersPage() {
         onFiltersChange={handleFiltersChange}
         roles={roles}
         canCreate={canCreate}
+        isFetching={isFetching}
         onAddUser={openCreate}
+        onRefresh={handleRefresh}
       />
 
       {/* Users table */}

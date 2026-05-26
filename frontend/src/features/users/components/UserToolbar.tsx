@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, ChevronDown, Filter, Plus, Search, X } from "lucide-react";
+import { Check, ChevronDown, Filter, Plus, RefreshCw, Search, X } from "lucide-react";
 import type { ReactNode } from "react";
 import { useRef, useState } from "react";
 import type { RoleWithPermissions } from "@/shared/types";
@@ -18,7 +18,9 @@ interface UserToolbarProps {
   onFiltersChange: (f: FilterState) => void;
   roles: RoleWithPermissions[];
   canCreate: boolean;
+  isFetching: boolean;
   onAddUser: () => void;
+  onRefresh: () => void;
 }
 
 export function UserToolbar({
@@ -28,7 +30,9 @@ export function UserToolbar({
   onFiltersChange,
   roles,
   canCreate,
+  isFetching,
   onAddUser,
+  onRefresh,
 }: UserToolbarProps) {
   const [filterOpen, setFilterOpen] = useState(false);
 
@@ -129,6 +133,19 @@ export function UserToolbar({
       )}
 
       <div className="flex-1" />
+
+      {/* Refresh */}
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={onRefresh}
+        disabled={isFetching}
+        className="gap-1.5"
+        title="Refresh"
+      >
+        <RefreshCw size={14} className={isFetching ? "animate-spin" : ""} />
+        Refresh
+      </Button>
 
       {/* Add user button (permission-gated via canCreate prop) */}
       {canCreate && (
