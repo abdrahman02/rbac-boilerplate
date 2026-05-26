@@ -5,7 +5,7 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useCreatePermission, useUpdatePermission } from "@/features/permissions/hooks/usePermissionsCrud";
-import { Button, FormField, Input, Modal } from "@/shared/components/ui";
+import { Alert, Button, FormField, Input, Modal } from "@/shared/components/ui";
 import { getErrorMessage } from "@/shared/lib/api-error";
 import type { Permission } from "@/shared/types";
 
@@ -60,11 +60,7 @@ export function PermissionModal({ isOpen, onClose, permission }: PermissionModal
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={isEditing ? "Edit Permission" : "Create Permission"}>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        {errors.root && (
-          <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3">
-            <p className="text-sm font-medium text-red-800">{errors.root.message}</p>
-          </div>
-        )}
+        {errors.root?.message && <Alert message={errors.root.message} />}
 
         <FormField label="Name (resource:action)" error={errors.name?.message}>
           <Input {...register("name")} placeholder="users:read" className="font-mono" error={errors.name?.message} />
