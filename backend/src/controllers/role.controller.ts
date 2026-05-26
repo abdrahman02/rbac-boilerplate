@@ -1,18 +1,18 @@
 import type { Request, Response } from 'express'
 import * as svc from '../services/role.service.js'
 import { handleError } from '../lib/handle-error.js'
-import type { ApiResponse, RoleWithPermissions } from '../types/index.js'
+import type { ApiResponse, RoleWithPermissions, PaginatedResponse } from '../types/index.js'
 import type { CreateRoleInput, UpdateRoleInput, AssignPermissionInput } from '../schemas/role.schema.js'
 
 export async function listRoles(req: Request, res: Response): Promise<void> {
   try {
-    const roles = await svc.listRoles()
-    const body: ApiResponse<RoleWithPermissions[]> = {
-      success: true,
-      data: roles,
-      message: null,
-    }
-    res.status(200).json(body)
+    const page = Math.max(1, parseInt(req.query.page as string, 10) || 1)
+    const rawLimit = parseInt(req.query.limit as string, 10) || 10
+    const limit = rawLimit === -1 ? -1 : Math.min(100, Math.max(1, rawLimit))
+    const search = typeof req.query.search === 'string' ? req.query.search.trim() || undefined : undefined
+
+    const result: PaginatedResponse<RoleWithPermissions> = await svc.listRoles(page, limit, search)
+    res.status(200).json(result)
   } catch (error) {
     handleError(res, error)
   }

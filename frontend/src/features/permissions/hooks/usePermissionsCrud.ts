@@ -14,11 +14,18 @@ interface UpdatePermissionPayload {
   description?: string;
 }
 
-export function usePermissionList() {
+interface PermissionListParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+}
+
+export function usePermissionList(params?: PermissionListParams) {
+  const { page = 1, limit = -1, search } = params ?? {};
   return useQuery<Permission[]>({
-    queryKey: ["permissions"],
+    queryKey: ["permissions", { page, limit, search }],
     queryFn: async () => {
-      const res = await apiClient.get("/permissions");
+      const res = await apiClient.get("/permissions", { params: { page, limit, search } });
       return res.data.data;
     },
   });

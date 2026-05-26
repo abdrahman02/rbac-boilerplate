@@ -1,8 +1,27 @@
 import type { Permission } from '../generated/prisma/index.js'
+import { Prisma } from '../generated/prisma/index.js'
 import { prisma } from '../lib/prisma.js'
 
-export async function findAllPermissions(): Promise<Permission[]> {
-  return prisma.permission.findMany({ orderBy: { name: 'asc' } })
+export async function findAllPermissions(
+  page: number,
+  limit: number,
+  search?: string,
+): Promise<{ rows: Permission[]; total: number }> {
+  const fetchAll = limit === -1
+  const offset = fetchAll ? 0 : (page - 1) * limit
+  const where: Prisma.PermissionWhereInput = search ? { name: { contains: search } } : {}
+
+  const [total, rows] = await prisma.$transaction([
+    prisma.permission.count({ where }),
+    prisma.permission.findMany({
+      where,
+      orderBy: { name: 'asc' },
+      skip: offset,
+      ...(fetchAll ? {} : { take: limit }),
+    }),
+  ])
+
+  return { rows, total }
 }
 
 export async function findPermissionById(id: number): Promise<Permission | null> {

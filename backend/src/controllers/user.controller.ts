@@ -7,7 +7,8 @@ import type { CreateUserInput, UpdateUserInput, SyncRolesInput } from '../schema
 export async function listUsers(req: Request, res: Response): Promise<void> {
   try {
     const page = Math.max(1, parseInt(req.query.page as string, 10) || 1)
-    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit as string, 10) || 10))
+    const rawLimit = parseInt(req.query.limit as string, 10) || 10
+    const limit = rawLimit === -1 ? -1 : Math.min(100, Math.max(1, rawLimit))
     const search = typeof req.query.search === 'string' ? req.query.search.trim() || undefined : undefined
     const role = typeof req.query.role === 'string' ? req.query.role.trim() || undefined : undefined
     const statusStr = typeof req.query.status === 'string' ? req.query.status : undefined

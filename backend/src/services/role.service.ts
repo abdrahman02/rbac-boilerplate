@@ -1,22 +1,25 @@
 import * as repo from '../repositories/role.repository.js'
-import type { RoleWithPermissions } from '../types/index.js'
+import type { RoleWithPermissions, PaginatedResponse } from '../types/index.js'
 import type { CreateRoleInput, UpdateRoleInput } from '../schemas/role.schema.js'
 
-export async function listRoles(): Promise<RoleWithPermissions[]> {
-  const roles = await repo.findAllRoles()
+export async function listRoles(
+  page: number,
+  limit: number,
+  search?: string,
+): Promise<PaginatedResponse<RoleWithPermissions>> {
+  const { rows, total } = await repo.findAllRoles(page, limit, search)
 
-  return Promise.all(
-    roles.map(async (r) => {
-      const permissions = await repo.getRolePermissions(r.id)
-      return {
-        id: r.id,
-        name: r.name,
-        description: r.description,
-        permissions,
-        created_at: r.createdAt,
-      }
-    }),
-  )
+  return {
+    success: true,
+    data: rows.map((r) => ({
+      id: r.id,
+      name: r.name,
+      description: r.description,
+      permissions: r.permissions,
+      created_at: r.createdAt,
+    })),
+    meta: { total, page, limit },
+  }
 }
 
 export async function getRole(roleId: number): Promise<RoleWithPermissions | null> {

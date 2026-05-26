@@ -10,7 +10,8 @@ export async function findAllUsers(
   role?: string,
   status?: boolean,
 ): Promise<{ rows: UserRow[]; total: number }> {
-  const offset = (page - 1) * limit
+  const fetchAll = limit === -1
+  const offset = fetchAll ? 0 : (page - 1) * limit
   const where = {
     deletedAt: null,
     ...(search
@@ -34,7 +35,7 @@ export async function findAllUsers(
       },
       orderBy: { createdAt: 'desc' },
       skip: offset,
-      take: limit,
+      ...(fetchAll ? {} : { take: limit }),
     }),
   ])
 

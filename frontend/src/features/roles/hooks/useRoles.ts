@@ -14,11 +14,18 @@ interface UpdateRolePayload {
   description?: string;
 }
 
-export function useRoles() {
+interface RoleListParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+}
+
+export function useRoles(params?: RoleListParams) {
+  const { page = 1, limit = -1, search } = params ?? {};
   return useQuery<RoleWithPermissions[]>({
-    queryKey: ["roles"],
+    queryKey: ["roles", { page, limit, search }],
     queryFn: async () => {
-      const res = await apiClient.get("/roles");
+      const res = await apiClient.get("/roles", { params: { page, limit, search } });
       return res.data.data;
     },
   });

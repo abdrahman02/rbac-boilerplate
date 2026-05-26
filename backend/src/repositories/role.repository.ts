@@ -1,8 +1,47 @@
 import type { Role } from '../generated/prisma/index.js'
+import { Prisma } from '../generated/prisma/index.js'
 import { prisma } from '../lib/prisma.js'
 
-export async function findAllRoles(): Promise<Role[]> {
-  return prisma.role.findMany({ orderBy: { name: 'asc' } })
+export interface RoleRow {
+  id: number
+  name: string
+  description: string | null
+  createdAt: Date
+  permissions: string[]
+}
+
+export async function findAllRoles(
+  page: number,
+  limit: number,
+  search?: string,
+): Promise<{ rows: RoleRow[]; total: number }> {
+  const fetchAll = limit === -1
+  const offset = fetchAll ? 0 : (page - 1) * limit
+  const where: Prisma.RoleWhereInput = search ? { name: { contains: search } } : {}
+
+  const [total, roles] = await prisma.$transaction([
+    prisma.role.count({ where }),
+    prisma.role.findMany({
+      where,
+      include: {
+        permissions: { include: { permission: { select: { name: true } } } },
+      },
+      orderBy: { name: 'asc' },
+      skip: offset,
+      ...(fetchAll ? {} : { take: limit }),
+    }),
+  ])
+
+  return {
+    rows: roles.map((r) => ({
+      id: r.id,
+      name: r.name,
+      description: r.description,
+      createdAt: r.createdAt,
+      permissions: r.permissions.map((rp) => rp.permission.name),
+    })),
+    total,
+  }
 }
 
 export async function findRoleById(id: number): Promise<Role | null> {

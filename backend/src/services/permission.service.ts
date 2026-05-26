@@ -1,9 +1,15 @@
 import type { Permission } from '../generated/prisma/index.js'
 import * as repo from '../repositories/permission.repository.js'
+import type { PaginatedResponse } from '../types/index.js'
 import type { CreatePermissionInput, UpdatePermissionInput } from '../schemas/permission.schema.js'
 
-export async function listPermissions(): Promise<Permission[]> {
-  return repo.findAllPermissions()
+export async function listPermissions(
+  page: number,
+  limit: number,
+  search?: string,
+): Promise<PaginatedResponse<Permission>> {
+  const { rows, total } = await repo.findAllPermissions(page, limit, search)
+  return { success: true, data: rows, meta: { total, page, limit } }
 }
 
 export async function getPermission(permissionId: number): Promise<Permission | null> {
