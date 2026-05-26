@@ -1,7 +1,11 @@
 import { tv } from "tailwind-variants";
 
 export const tableShell = tv({
-  base: "rounded-xl border border-border bg-card shadow-sm overflow-hidden",
+  base: "rounded-xl border border-border bg-card shadow-sm",
+});
+
+export const tableScrollWrapper = tv({
+  base: "overflow-x-auto",
 });
 
 export const tableHeader = tv({

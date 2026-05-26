@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { Spinner } from "@/shared/components/ui";
-import { tableCell, tableHeader, tableRow, tableShell } from "./Table.variants";
+import { tableCell, tableHeader, tableRow, tableScrollWrapper, tableShell } from "./Table.variants";
 
 interface TableShellProps {
   children: ReactNode;
@@ -8,7 +8,11 @@ interface TableShellProps {
 }
 
 export function TableShell({ children, className }: TableShellProps) {
-  return <div className={tableShell({ className })}>{children}</div>;
+  return (
+    <div className={tableShell({ className })}>
+      <div className={tableScrollWrapper()}>{children}</div>
+    </div>
+  );
 }
 
 interface TableHeaderProps {
