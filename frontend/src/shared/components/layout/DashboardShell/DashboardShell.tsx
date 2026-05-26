@@ -1,10 +1,9 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { useDarkMode } from "@/shared/hooks/useDarkMode";
-import { useSidebar } from "@/shared/hooks/useSidebar";
 import { Header } from "../Header";
 import { Sidebar } from "../Sidebar";
+import { useSidebar } from "./useSidebar";
 
 interface DashboardShellProps {
   children: ReactNode;
@@ -12,7 +11,6 @@ interface DashboardShellProps {
 
 export function DashboardShell({ children }: DashboardShellProps) {
   const { collapsed, mobileOpen, toggleCollapsed, openMobile, closeMobile } = useSidebar();
-  const { isDark, toggle: toggleDark } = useDarkMode();
 
   return (
     <div className="flex h-screen overflow-hidden bg-background">
@@ -32,12 +30,7 @@ export function DashboardShell({ children }: DashboardShellProps) {
       )}
 
       <div className="flex flex-1 flex-col overflow-hidden min-w-0">
-        <Header
-          onToggleSidebar={toggleCollapsed}
-          onOpenMobileNav={openMobile}
-          isDark={isDark}
-          onToggleDark={toggleDark}
-        />
+        <Header onToggleSidebar={toggleCollapsed} onOpenMobileNav={openMobile} />
         <main className="flex-1 overflow-y-auto p-6">{children}</main>
       </div>
     </div>

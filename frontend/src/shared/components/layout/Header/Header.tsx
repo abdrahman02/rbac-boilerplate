@@ -4,15 +4,16 @@ import { Menu, Moon, Sun } from "lucide-react";
 import { Button } from "@/shared/components/ui";
 import { AvatarMenu } from "./AvatarMenu";
 import { Breadcrumb } from "./Breadcrumb";
+import { useDarkMode } from "./useDarkMode";
 
 interface HeaderProps {
   onToggleSidebar: () => void;
   onOpenMobileNav: () => void;
-  isDark: boolean;
-  onToggleDark: () => void;
 }
 
-export function Header({ onToggleSidebar, onOpenMobileNav, isDark, onToggleDark }: HeaderProps) {
+export function Header({ onToggleSidebar, onOpenMobileNav }: HeaderProps) {
+  const { isDark, toggle: onToggleDark } = useDarkMode();
+
   return (
     <header className="h-16 px-6 border-b border-border bg-background flex items-center gap-4 sticky top-0 z-30 shrink-0">
       <div className="flex items-center gap-3.5 flex-1 min-w-0">

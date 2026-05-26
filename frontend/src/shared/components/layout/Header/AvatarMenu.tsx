@@ -2,9 +2,9 @@
 
 import { LogOut, User } from "lucide-react";
 import Link from "next/link";
-import { useAuth } from "@/features/auth/hooks/useAuth";
-import { useLogout } from "@/features/auth/hooks/useLogout";
 import { Avatar, Button, Dropdown } from "@/shared/components/ui";
+import { useAuth } from "@/shared/hooks";
+import { useLogout } from "./useLogout";
 
 export function AvatarMenu() {
   const { user } = useAuth();
