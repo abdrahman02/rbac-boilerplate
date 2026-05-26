@@ -1,11 +1,23 @@
 "use client";
 
 import { useState } from "react";
+import { tv } from "tailwind-variants";
 import { usePermissionList } from "@/features/permissions/hooks/usePermissionsCrud";
 import { useAssignPermissionToRole, useRemovePermissionFromRole } from "@/features/roles/hooks/useRoles";
-import { Button, Modal } from "@/shared/components/ui";
+import { Alert, Button, Checkbox, Modal } from "@/shared/components/ui";
 import { getErrorMessage } from "@/shared/lib/api-error";
 import type { RoleWithPermissions } from "@/shared/types";
+
+const permRow = tv({
+  base: "flex items-center gap-3 p-2.5 rounded-lg border-[1.5px] cursor-pointer transition-colors",
+  variants: {
+    checked: {
+      true: "border-primary bg-primary/[.05]",
+      false: "border-border bg-background hover:border-border/60",
+    },
+  },
+  defaultVariants: { checked: false },
+});
 
 interface AssignPermissionModalProps {
   isOpen: boolean;
@@ -40,29 +52,24 @@ export function AssignPermissionModal({ isOpen, onClose, role }: AssignPermissio
         {permissions.map((perm) => {
           const hasPerm = role.permissions.includes(perm.name);
           return (
-            <div key={perm.id} className="flex items-center justify-between rounded border p-3">
+            <label key={perm.id} className={permRow({ checked: hasPerm })}>
+              <Checkbox
+                checked={hasPerm}
+                onCheckedChange={(checked) => handleToggle(perm.id, !checked)}
+                disabled={isPending}
+              />
               <div>
-                <p className="font-mono text-sm font-medium text-gray-900">{perm.name}</p>
-                {perm.description && <p className="text-xs text-gray-500">{perm.description}</p>}
+                <p className="font-mono text-sm font-medium">{perm.name}</p>
+                {perm.description && (
+                  <p className="text-xs text-muted-foreground">{perm.description}</p>
+                )}
               </div>
-              <Button
-                size="sm"
-                variant={hasPerm ? "danger" : "primary"}
-                onClick={() => handleToggle(perm.id, hasPerm)}
-                isLoading={isPending}
-              >
-                {hasPerm ? "Remove" : "Assign"}
-              </Button>
-            </div>
+            </label>
           );
         })}
       </div>
 
-      {error && (
-        <div className="mt-2 rounded-md border border-red-200 bg-red-50 px-4 py-3">
-          <p className="text-sm font-medium text-red-800">{error}</p>
-        </div>
-      )}
+      {error && <Alert message={error} className="mt-2" />}
 
       <div className="flex justify-end pt-4">
         <Button variant="secondary" onClick={onClose}>

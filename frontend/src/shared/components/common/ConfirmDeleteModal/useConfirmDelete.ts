@@ -6,10 +6,11 @@ import { useCallback, useEffect } from "react";
 interface Params {
     isOpen: boolean
     onClose: () => void
+    onConfirm: () => void
     confirmText: string
 }
 
-export const useConfirmDelete = ({ isOpen, onClose, confirmText }: Params) => {
+export const useConfirmDelete = ({ isOpen, onClose, onConfirm, confirmText }: Params) => {
     const { control, register, reset } = useForm<ConfirmModalInput>({
         resolver: zodResolver(confirmModalSchema),
         defaultValues: { confirm: "" },
@@ -27,4 +28,16 @@ export const useConfirmDelete = ({ isOpen, onClose, confirmText }: Params) => {
         reset({ confirm: "" });
         onClose();
     }, [reset, onClose]);
+
+    const handleSubmit = useCallback((e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        if (isMatch) onConfirm();
+    }, [isMatch, onConfirm]);
+
+    return {
+        register,
+        isMatch,
+        handleClose,
+        handleSubmit
+    }
 }

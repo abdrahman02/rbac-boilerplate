@@ -1,11 +1,8 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
 import { TriangleAlert } from "lucide-react";
-import { useEffect } from "react";
-import { useForm } from "react-hook-form";
 import { Button, FormField, Input, Modal } from "@/shared/components/ui";
-import { confirmModalSchema, ConfirmModalInput } from "./ConfirmDeleteModal.schema";
+import { useConfirmDelete } from "./useConfirmDelete";
 
 interface ConfirmDeleteModalProps {
   isOpen: boolean;
@@ -29,28 +26,7 @@ export function ConfirmDeleteModal({
   confirmLabel = "Delete",
   isLoading,
 }: ConfirmDeleteModalProps) {
-  const { register, watch, reset } = useForm<ConfirmModalInput>({
-    resolver: zodResolver(confirmModalSchema),
-    defaultValues: { confirm: "" },
-    mode: "onChange",
-  });
-
-  const confirmValue = watch("confirm");
-  const isMatch = confirmValue === confirmText;
-
-  useEffect(() => {
-    if (!isOpen) reset({ confirm: "" });
-  }, [isOpen, reset]);
-
-  const handleClose = () => {
-    reset({ confirm: "" });
-    onClose();
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (isMatch) onConfirm();
-  };
+  const { register, isMatch, handleClose, handleSubmit } = useConfirmDelete({isOpen, onClose, onConfirm, confirmText});
 
   return (
     <Modal isOpen={isOpen} onClose={handleClose} title={title} maxWidth="sm">
