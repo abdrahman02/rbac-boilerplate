@@ -3,6 +3,7 @@
 import { Activity, ChevronRight, Download, Key, Loader2, Shield, UserPlus, Users } from "lucide-react";
 import Link from "next/link";
 import { type ReactNode, useMemo } from "react";
+import { PageHeader } from "@/shared/components/common";
 import { Button, buttonVariants } from "@/shared/components/ui";
 import { useAuth } from "@/shared/hooks";
 import { ActivityFeed } from "./components/ActivityFeed";
@@ -55,9 +56,9 @@ export function DashboardPage() {
         icon: STAT_ICONS.permissions,
       },
       {
-        label: "Recent events",
+        label: "Events",
         value: stats?.totalEvents ?? 0,
-        sub: stats ? `${stats.eventsToday} today` : undefined,
+        sub: stats ? `${stats.eventsToday} events today` : undefined,
         icon: STAT_ICONS.events,
       },
     ],
@@ -67,13 +68,10 @@ export function DashboardPage() {
   return (
     <div className="flex flex-col gap-6">
       {/* Greeting */}
-      <div className="flex items-start justify-between gap-4 flex-wrap">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Welcome back, {firstName}</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {"Here's what's happened in your workspace since you last signed in."}
-          </p>
-        </div>
+      <PageHeader
+        title={`Welcome back, ${firstName}`}
+        description="Here's what's happened in your workspace since you last signed in."
+      >
         <div className="flex gap-2">
           <Button variant="outline" size="sm" className="gap-1.5" onClick={exportDashboard} disabled={isExporting}>
             {isExporting ? <Loader2 size={14} className="animate-spin" /> : <Download size={14} />}
@@ -84,7 +82,7 @@ export function DashboardPage() {
             Invite user
           </Link>
         </div>
-      </div>
+      </PageHeader>
 
       {/* Stat cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
