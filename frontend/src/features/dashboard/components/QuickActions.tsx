@@ -1,7 +1,7 @@
 import { ChevronRight, Key, ScrollText, Shield, Users } from "lucide-react";
 import Link from "next/link";
 import { memo } from "react";
-import { Button } from "@/shared/components/ui/Button";
+import { Button } from "@/shared/components/ui";
 
 interface QuickAction {
   icon: typeof Users;

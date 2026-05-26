@@ -26,10 +26,7 @@ export function FilterDropdown({ activeCount = 0, onClearAll, children }: Filter
               {activeCount}
             </span>
           )}
-          <ChevronDown
-            size={13}
-            className={`text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`}
-          />
+          <ChevronDown size={13} className={`text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`} />
         </button>
       )}
     >

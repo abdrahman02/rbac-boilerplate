@@ -4,7 +4,7 @@ import { useState } from "react";
 import { AssignPermissionModal } from "@/features/roles/components/AssignPermissionModal";
 import { RoleModal } from "@/features/roles/components/RoleModal";
 import { useDeleteRole, useRoles } from "@/features/roles/hooks/useRoles";
-import { PermissionGate } from "@/shared/components/guard/PermissionGate";
+import { PermissionGate } from "@/shared/components/guard";
 import { Badge, Button } from "@/shared/components/ui";
 import { getErrorMessage } from "@/shared/lib/api-error";
 import type { RoleWithPermissions } from "@/shared/types";

@@ -1,5 +1,5 @@
-import type { ComponentProps } from "react";
 import { Search, X } from "lucide-react";
+import type { ComponentProps } from "react";
 import { Input } from "@/shared/components/ui";
 
 type SearchInputProps = Omit<ComponentProps<typeof Input>, "type" | "iconLeft" | "iconRight"> & {

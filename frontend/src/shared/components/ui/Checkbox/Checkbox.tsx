@@ -13,12 +13,5 @@ export function Checkbox({ onCheckedChange, onChange, className, ...props }: Che
     onCheckedChange?.(e.target.checked);
   };
 
-  return (
-    <input
-      type="checkbox"
-      onChange={handleChange}
-      className={checkboxVariants({ className })}
-      {...props}
-    />
-  );
+  return <input type="checkbox" onChange={handleChange} className={checkboxVariants({ className })} {...props} />;
 }

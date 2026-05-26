@@ -44,7 +44,7 @@ export function AssignRoleModal({ isOpen, onClose, user }: AssignRoleModalProps)
     if (!isOpen) return;
     setSelectedIds(new Set(originalRoleIds));
     setError(null);
-  }, [isOpen, user.id]); // intentionally omitting originalRoleIds to avoid mid-session resets
+  }, [isOpen, originalRoleIds]);
 
   const toggle = (id: number) => {
     setSelectedIds((prev) => {
@@ -154,8 +154,8 @@ interface RoleCheckboxProps {
 
 function RoleCheckbox({ role, checked, adding, removing, onToggle }: RoleCheckboxProps) {
   return (
-    <label className={roleLabel({ checked })}>
-      <Checkbox checked={checked} onChange={onToggle} />
+    <label htmlFor={`role-${role.id}`} className={roleLabel({ checked })}>
+      <Checkbox id={`role-${role.id}`} checked={checked} onChange={onToggle} />
       <span className="w-7 h-7 flex items-center justify-center rounded-lg bg-muted text-muted-foreground shrink-0">
         <Shield size={14} />
       </span>

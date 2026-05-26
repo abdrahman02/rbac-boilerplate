@@ -1,8 +1,8 @@
 export { Alert, alertVariants } from "./Alert";
 export { Avatar } from "./Avatar";
-export { Checkbox, checkboxVariants } from "./Checkbox";
 export { Badge, badgeVariants } from "./Badge";
 export { Button, buttonVariants } from "./Button";
+export { Checkbox, checkboxVariants } from "./Checkbox";
 export { Divider } from "./Divider";
 export { Dropdown } from "./Dropdown";
 export { FormField } from "./FormField";
@@ -10,8 +10,8 @@ export { Input, inputVariants } from "./Input";
 export { Modal } from "./Modal";
 export { Pagination } from "./Pagination";
 export { getPasswordStrength, PasswordStrengthMeter } from "./PasswordStrengthMeter";
-export { Select } from "./Select";
 export type { SelectOption } from "./Select";
+export { Select } from "./Select";
 export { Spinner, spinnerVariants } from "./Spinner";
 export {
   TableCell,

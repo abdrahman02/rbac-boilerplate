@@ -9,14 +9,7 @@ interface RefreshButtonProps {
 
 export function RefreshButton({ isLoading, onClick, label = "Refresh" }: RefreshButtonProps) {
   return (
-    <Button
-      variant="outline"
-      size="sm"
-      onClick={onClick}
-      disabled={isLoading}
-      className="gap-1.5"
-      title={label}
-    >
+    <Button variant="outline" size="sm" onClick={onClick} disabled={isLoading} className="gap-1.5" title={label}>
       {isLoading ? <Loader2 size={14} className="animate-spin" /> : <RefreshCw size={14} />}
       {label}
     </Button>

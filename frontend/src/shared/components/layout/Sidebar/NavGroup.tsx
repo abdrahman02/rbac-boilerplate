@@ -4,8 +4,8 @@ import { ChevronDown } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { type ReactNode, useEffect, useState } from "react";
-import { PermissionGate } from "@/shared/components/guard/PermissionGate";
-import { Dropdown } from "@/shared/components/ui/Dropdown";
+import { PermissionGate } from "@/shared/components/guard";
+import { Dropdown } from "@/shared/components/ui";
 import { navGroupChildVariants, navGroupTriggerVariants } from "./NavGroup.variants";
 import type { NavItemDef } from "./Sidebar.types";
 

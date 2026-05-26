@@ -1,7 +1,7 @@
 import { memo } from "react";
 import type { VariantProps } from "tailwind-variants";
+import type { badgeVariants } from "@/shared/components/ui";
 import { Avatar, Badge } from "@/shared/components/ui";
-import type { badgeVariants } from "@/shared/components/ui/Badge/Badge.variants";
 import { formatDateTime, formatRelative } from "@/shared/lib/format-date";
 import type { RecentActivityItem } from "@/shared/types";
 

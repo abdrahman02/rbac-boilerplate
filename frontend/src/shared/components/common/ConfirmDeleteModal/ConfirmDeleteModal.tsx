@@ -26,7 +26,12 @@ export function ConfirmDeleteModal({
   confirmLabel = "Delete",
   isLoading,
 }: ConfirmDeleteModalProps) {
-  const { register, isMatch, handleClose, handleSubmit } = useConfirmDelete({isOpen, onClose, onConfirm, confirmText});
+  const { register, isMatch, handleClose, handleSubmit } = useConfirmDelete({
+    isOpen,
+    onClose,
+    onConfirm,
+    confirmText,
+  });
 
   return (
     <Modal isOpen={isOpen} onClose={handleClose} title={title} maxWidth="sm">
@@ -50,11 +55,7 @@ export function ConfirmDeleteModal({
           }
           htmlFor="confirm-delete-input"
         >
-          <Input
-            id="confirm-delete-input"
-            {...register("confirm")}
-            placeholder={confirmText}
-          />
+          <Input id="confirm-delete-input" {...register("confirm")} placeholder={confirmText} />
         </FormField>
 
         <div className="flex justify-end gap-2 pt-1">

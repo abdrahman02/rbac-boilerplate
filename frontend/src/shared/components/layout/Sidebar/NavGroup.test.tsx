@@ -20,10 +20,10 @@ vi.mock("next/link", () => ({
     </a>
   ),
 }));
-vi.mock("@/shared/components/guard/PermissionGate", () => ({
+vi.mock("@/shared/components/guard", () => ({
   PermissionGate: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
-vi.mock("@/shared/components/ui/Dropdown", () => ({
+vi.mock("@/shared/components/ui", () => ({
   Dropdown: ({ trigger, children }: { trigger: React.ReactNode; children: React.ReactNode }) => (
     <div data-testid="dropdown">
       {trigger}

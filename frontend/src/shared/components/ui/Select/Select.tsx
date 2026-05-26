@@ -33,13 +33,9 @@ export function Select({
   const inputRef = useRef<HTMLInputElement>(null);
 
   const filtered =
-    searchable && query
-      ? options.filter((o) => o.label.toLowerCase().includes(query.toLowerCase()))
-      : options;
+    searchable && query ? options.filter((o) => o.label.toLowerCase().includes(query.toLowerCase())) : options;
 
-  const selectedLabel = value
-    ? (options.find((o) => o.value === value)?.label ?? value)
-    : (placeholder ?? "");
+  const selectedLabel = value ? (options.find((o) => o.value === value)?.label ?? value) : (placeholder ?? "");
 
   const handleOpen = () => {
     setOpen(true);
@@ -61,11 +57,7 @@ export function Select({
 
   return (
     <div className={selectRoot({ className })}>
-      <button
-        type="button"
-        onClick={handleOpen}
-        className={selectTrigger({ hasValue: !!value })}
-      >
+      <button type="button" onClick={handleOpen} className={selectTrigger({ hasValue: !!value })}>
         <span className="flex-1 truncate">{selectedLabel}</span>
         <ChevronDown
           size={13}
@@ -75,11 +67,12 @@ export function Select({
 
       {open && (
         <>
+          {/* biome-ignore lint/a11y/noStaticElementInteractions: backdrop overlay for click-outside dismiss */}
           <div
             className="fixed inset-0 z-40"
             onClick={close}
             onKeyDown={(e) => e.key === "Escape" && close()}
-            role="presentation"
+            aria-hidden="true"
           />
           <div className="absolute top-[calc(100%+4px)] left-0 right-0 bg-popover border border-border rounded-lg shadow-lg z-50 overflow-hidden min-w-[160px]">
             {searchable && (
@@ -100,16 +93,8 @@ export function Select({
 
             <div className="max-h-44 overflow-y-auto py-1">
               {placeholder !== undefined && (
-                <button
-                  type="button"
-                  onClick={() => select("")}
-                  className={selectOptionAll({ selected: !value })}
-                >
-                  {!value ? (
-                    <Check size={12} className="shrink-0" />
-                  ) : (
-                    <span className="w-3 shrink-0" />
-                  )}
+                <button type="button" onClick={() => select("")} className={selectOptionAll({ selected: !value })}>
+                  {!value ? <Check size={12} className="shrink-0" /> : <span className="w-3 shrink-0" />}
                   <span>{placeholder}</span>
                 </button>
               )}
@@ -121,19 +106,13 @@ export function Select({
                   onClick={() => select(o.value)}
                   className={selectOptionItem({ selected: value === o.value })}
                 >
-                  {value === o.value ? (
-                    <Check size={12} className="shrink-0" />
-                  ) : (
-                    <span className="w-3 shrink-0" />
-                  )}
+                  {value === o.value ? <Check size={12} className="shrink-0" /> : <span className="w-3 shrink-0" />}
                   <span>{o.label}</span>
                 </button>
               ))}
 
               {searchable && filtered.length === 0 && (
-                <p className="px-3 py-2 text-[12.5px] text-muted-foreground text-center">
-                  No results found
-                </p>
+                <p className="px-3 py-2 text-[12.5px] text-muted-foreground text-center">No results found</p>
               )}
             </div>
           </div>

@@ -1,1 +1,1 @@
-export { BrandMark } from "./BrandMark"
+export { BrandMark } from "./BrandMark";

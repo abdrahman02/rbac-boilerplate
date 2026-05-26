@@ -12,14 +12,7 @@ interface UserRowMenuProps {
   canDelete: boolean;
 }
 
-export function UserRowMenu({
-  onEdit,
-  onManageRoles,
-  onCopyId,
-  onDelete,
-  canEdit,
-  canDelete,
-}: UserRowMenuProps) {
+export function UserRowMenu({ onEdit, onManageRoles, onCopyId, onDelete, canEdit, canDelete }: UserRowMenuProps) {
   return (
     <RowActionsDropdown>
       {canEdit && (

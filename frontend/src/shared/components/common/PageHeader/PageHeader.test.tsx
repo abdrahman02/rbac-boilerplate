@@ -19,7 +19,11 @@ describe("PageHeader", () => {
   });
 
   it("renders children in the right slot", () => {
-    render(<PageHeader title="Users"><button type="button">Add</button></PageHeader>);
+    render(
+      <PageHeader title="Users">
+        <button type="button">Add</button>
+      </PageHeader>,
+    );
     expect(screen.getByRole("button", { name: "Add" })).toBeInTheDocument();
   });
 });

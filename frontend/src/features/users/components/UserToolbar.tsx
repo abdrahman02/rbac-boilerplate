@@ -53,10 +53,7 @@ export function UserToolbar({
         />
       </div>
 
-      <FilterDropdown
-        activeCount={activeCount}
-        onClearAll={activeCount > 0 ? clearAll : undefined}
-      >
+      <FilterDropdown activeCount={activeCount} onClearAll={activeCount > 0 ? clearAll : undefined}>
         <FilterField label="Role">
           <Select
             searchable
@@ -94,9 +91,7 @@ export function UserToolbar({
 function FilterField({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <span className="text-[11px] font-semibold uppercase tracking-[0.04em] text-muted-foreground">
-        {label}
-      </span>
+      <span className="text-[11px] font-semibold uppercase tracking-[0.04em] text-muted-foreground">{label}</span>
       {children}
     </div>
   );

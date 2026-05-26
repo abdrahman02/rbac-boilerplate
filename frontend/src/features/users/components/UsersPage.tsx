@@ -1,14 +1,14 @@
 "use client";
 
-import { useState } from "react";
 import { useIsFetching, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import { useRoles } from "@/features/roles/hooks/useRoles";
+import { ConfirmDeleteModal, PageHeader } from "@/shared/components/common";
 import { Pagination } from "@/shared/components/ui";
 import { useDebounce, usePermission } from "@/shared/hooks";
 import type { UserWithRoles } from "@/shared/types";
 import { useDeleteUser, useRemoveRole, useUsers } from "../hooks/useUsers";
 import { AssignRoleModal } from "./AssignRoleModal";
-import { ConfirmDeleteModal, PageHeader } from "@/shared/components/common";
 import { UserModal } from "./UserModal";
 import { UserTable } from "./UserTable";
 import { UserToolbar } from "./UserToolbar";
@@ -120,26 +120,14 @@ export function UsersPage() {
       />
 
       {/* Pagination */}
-      {meta && (
-        <Pagination
-          page={page}
-          pageSize={meta.limit}
-          total={meta.total}
-          onPageChange={setPage}
-          label="users"
-        />
-      )}
+      {meta && <Pagination page={page} pageSize={meta.limit} total={meta.total} onPageChange={setPage} label="users" />}
 
       {/* Create / Edit user modal */}
       <UserModal isOpen={isUserModalOpen} onClose={() => setUserModalOpen(false)} user={editingUser} />
 
       {/* Assign roles modal */}
       {assigningUser && (
-        <AssignRoleModal
-          isOpen={!!assigningUser}
-          onClose={() => setAssigningUser(null)}
-          user={assigningUser}
-        />
+        <AssignRoleModal isOpen={!!assigningUser} onClose={() => setAssigningUser(null)} user={assigningUser} />
       )}
 
       {/* Confirm delete modal */}

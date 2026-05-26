@@ -11,7 +11,7 @@ interface PaginationProps {
   label?: string;
 }
 
-type PageItem = number | "...";
+type PageItem = number | "ellipsis-start" | "ellipsis-end";
 
 function buildPageWindow(page: number, totalPages: number, maxButtons = 7): PageItem[] {
   if (totalPages <= maxButtons) {
@@ -20,13 +20,13 @@ function buildPageWindow(page: number, totalPages: number, maxButtons = 7): Page
   const innerWidth = maxButtons - 4; // 1 first + 1 last + 2 ellipsis slots
   const half = Math.floor(innerWidth / 2);
   let start = Math.max(2, page - half);
-  let end = Math.min(totalPages - 1, start + innerWidth - 1);
+  const end = Math.min(totalPages - 1, start + innerWidth - 1);
   if (end - start + 1 < innerWidth) start = Math.max(2, end - innerWidth + 1);
 
   const out: PageItem[] = [1];
-  if (start > 2) out.push("...");
+  if (start > 2) out.push("ellipsis-start");
   for (let p = start; p <= end; p++) out.push(p);
-  if (end < totalPages - 1) out.push("...");
+  if (end < totalPages - 1) out.push("ellipsis-end");
   out.push(totalPages);
   return out;
 }
@@ -41,10 +41,10 @@ export function Pagination({ page, pageSize, total, onPageChange, label = "items
     <div className="flex items-center justify-between flex-wrap gap-3">
       <span className="text-[12.5px] text-muted-foreground">
         Showing{" "}
-        <b className="text-foreground font-semibold">{from}–{to}</b>
-        {" "}of{" "}
-        <b className="text-foreground font-semibold">{total}</b>
-        {" "}{label}
+        <b className="text-foreground font-semibold">
+          {from}–{to}
+        </b>{" "}
+        of <b className="text-foreground font-semibold">{total}</b> {label}
       </span>
 
       <div className="flex items-center gap-1">
@@ -55,12 +55,9 @@ export function Pagination({ page, pageSize, total, onPageChange, label = "items
           <ChevronLeft size={14} />
         </PageBtn>
 
-        {pages.map((p, i) =>
-          p === "..." ? (
-            <span
-              key={`ellipsis-${i}`}
-              className="w-8 h-8 inline-flex items-center justify-center text-[13px] text-muted-foreground"
-            >
+        {pages.map((p) =>
+          p === "ellipsis-start" || p === "ellipsis-end" ? (
+            <span key={p} className="w-8 h-8 inline-flex items-center justify-center text-[13px] text-muted-foreground">
               …
             </span>
           ) : (

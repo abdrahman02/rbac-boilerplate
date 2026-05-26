@@ -85,15 +85,7 @@ interface UserRowProps {
   onRemoveRole: (roleName: string) => void;
 }
 
-function UserRow({
-  user,
-  canEdit,
-  canDelete,
-  onEdit,
-  onManageRoles,
-  onDelete,
-  onRemoveRole,
-}: UserRowProps) {
+function UserRow({ user, canEdit, canDelete, onEdit, onManageRoles, onDelete, onRemoveRole }: UserRowProps) {
   const handleCopyId = () => {
     navigator.clipboard.writeText(String(user.id)).catch(() => {});
   };

@@ -1,17 +1,14 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import {
-  TableCell,
-  TableEmptyRow,
-  TableHeader,
-  TableLoadingRow,
-  TableRow,
-  TableShell,
-} from "./Table";
+import { TableCell, TableEmptyRow, TableHeader, TableLoadingRow, TableRow, TableShell } from "./Table";
 
 describe("TableShell", () => {
   it("renders children inside card wrapper", () => {
-    render(<TableShell><span>content</span></TableShell>);
+    render(
+      <TableShell>
+        <span>content</span>
+      </TableShell>,
+    );
     expect(screen.getByText("content")).toBeInTheDocument();
   });
 });

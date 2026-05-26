@@ -4,7 +4,11 @@ import { FilterDropdown } from "./FilterDropdown";
 
 describe("FilterDropdown", () => {
   it("renders Filters trigger button", () => {
-    render(<FilterDropdown><span>content</span></FilterDropdown>);
+    render(
+      <FilterDropdown>
+        <span>content</span>
+      </FilterDropdown>,
+    );
     expect(screen.getByText("Filters")).toBeInTheDocument();
   });
 
@@ -19,12 +23,20 @@ describe("FilterDropdown", () => {
   });
 
   it("shows active count badge when activeCount > 0", () => {
-    render(<FilterDropdown activeCount={2}><span /></FilterDropdown>);
+    render(
+      <FilterDropdown activeCount={2}>
+        <span />
+      </FilterDropdown>,
+    );
     expect(screen.getByText("2")).toBeInTheDocument();
   });
 
   it("does not show badge when activeCount is 0", () => {
-    render(<FilterDropdown activeCount={0}><span /></FilterDropdown>);
+    render(
+      <FilterDropdown activeCount={0}>
+        <span />
+      </FilterDropdown>,
+    );
     expect(screen.queryByText("0")).not.toBeInTheDocument();
   });
 

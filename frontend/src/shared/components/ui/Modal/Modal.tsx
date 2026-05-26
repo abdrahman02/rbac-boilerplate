@@ -2,7 +2,7 @@
 
 import { type ReactNode, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { Button } from "@/shared/components/ui/Button";
+import { Button } from "@/shared/components/ui";
 
 interface ModalProps {
   isOpen: boolean;

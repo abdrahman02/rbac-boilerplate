@@ -1,1 +1,1 @@
-export { RowActionsDropdown } from "./RowActionsDropdown"
+export { RowActionsDropdown } from "./RowActionsDropdown";

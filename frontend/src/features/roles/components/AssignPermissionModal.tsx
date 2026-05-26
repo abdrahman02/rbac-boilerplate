@@ -52,17 +52,16 @@ export function AssignPermissionModal({ isOpen, onClose, role }: AssignPermissio
         {permissions.map((perm) => {
           const hasPerm = role.permissions.includes(perm.name);
           return (
-            <label key={perm.id} className={permRow({ checked: hasPerm })}>
+            <label key={perm.id} htmlFor={`perm-${perm.id}`} className={permRow({ checked: hasPerm })}>
               <Checkbox
+                id={`perm-${perm.id}`}
                 checked={hasPerm}
                 onCheckedChange={(checked) => handleToggle(perm.id, !checked)}
                 disabled={isPending}
               />
               <div>
                 <p className="font-mono text-sm font-medium">{perm.name}</p>
-                {perm.description && (
-                  <p className="text-xs text-muted-foreground">{perm.description}</p>
-                )}
+                {perm.description && <p className="text-xs text-muted-foreground">{perm.description}</p>}
               </div>
             </label>
           );

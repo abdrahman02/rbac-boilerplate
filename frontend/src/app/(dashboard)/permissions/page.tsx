@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { PermissionModal } from "@/features/permissions/components/PermissionModal";
 import { useDeletePermission, usePermissionList } from "@/features/permissions/hooks/usePermissionsCrud";
-import { PermissionGate } from "@/shared/components/guard/PermissionGate";
+import { PermissionGate } from "@/shared/components/guard";
 import { Button } from "@/shared/components/ui";
 import { getErrorMessage } from "@/shared/lib/api-error";
 import type { Permission } from "@/shared/types";

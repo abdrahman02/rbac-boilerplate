@@ -1,7 +1,7 @@
 "use client";
 
 import { Menu, Moon, Sun } from "lucide-react";
-import { Button } from "@/shared/components/ui/Button";
+import { Button } from "@/shared/components/ui";
 import { AvatarMenu } from "./AvatarMenu";
 import { Breadcrumb } from "./Breadcrumb";
 

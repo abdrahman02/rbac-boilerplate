@@ -2,8 +2,8 @@
 
 import { FileText, Key, LayoutDashboard, Shield, ShieldCheck, Users } from "lucide-react";
 import type { ReactNode } from "react";
-import { BrandMark } from "@/shared/components/common/BrandMark";
-import { PermissionGate } from "@/shared/components/guard/PermissionGate";
+import { BrandMark } from "@/shared/components/common";
+import { PermissionGate } from "@/shared/components/guard";
 import { useAnyPermission } from "@/shared/hooks/useAnyPermission";
 import { NavGroup } from "./NavGroup";
 import { NavItem } from "./NavItem";
