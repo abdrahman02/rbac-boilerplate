@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { Button } from "@/shared/components/ui";
 import { menuItemBase, menuItemIcon } from "./DropdownMenuItem.variants";
 
 interface DropdownMenuItemProps {
@@ -15,13 +16,13 @@ export function DropdownMenuItem({
   children,
 }: DropdownMenuItemProps) {
   return (
-    <button
-      type="button"
+    <Button
+      variant="ghost"
       onClick={onClick}
       className={menuItemBase({ destructive })}
     >
       {icon && <span className={menuItemIcon({ destructive })}>{icon}</span>}
       {children}
-    </button>
+    </Button>
   );
 }

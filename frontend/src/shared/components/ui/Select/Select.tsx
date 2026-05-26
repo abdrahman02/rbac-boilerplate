@@ -2,7 +2,7 @@
 
 import { Check, ChevronDown, Search } from "lucide-react";
 import { useRef, useState } from "react";
-import { selectOptionAll, selectOptionItem, selectTrigger } from "./Select.variants";
+import { selectOptionAll, selectOptionItem, selectRoot, selectTrigger } from "./Select.variants";
 
 export interface SelectOption {
   value: string;
@@ -60,7 +60,7 @@ export function Select({
   };
 
   return (
-    <div className={`relative w-full ${className ?? ""}`}>
+    <div className={selectRoot({ className })}>
       <button
         type="button"
         onClick={handleOpen}

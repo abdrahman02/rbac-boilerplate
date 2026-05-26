@@ -29,7 +29,7 @@ export const useConfirmDelete = ({ isOpen, onClose, onConfirm, confirmText }: Pa
         onClose();
     }, [reset, onClose]);
 
-    const handleSubmit = useCallback((e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = useCallback((e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (isMatch) onConfirm();
     }, [isMatch, onConfirm]);

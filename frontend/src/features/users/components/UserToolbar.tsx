@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus, X } from "lucide-react";
+import { Plus } from "lucide-react";
 import type { ReactNode } from "react";
 import { FilterDropdown, RefreshButton, SearchInput } from "@/shared/components/common";
 import { Button, Select } from "@/shared/components/ui";
@@ -49,6 +49,7 @@ export function UserToolbar({
           placeholder="Search by name or email"
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
+          onClear={search ? () => onSearchChange("") : undefined}
         />
       </div>
 
@@ -75,13 +76,6 @@ export function UserToolbar({
           />
         </FilterField>
       </FilterDropdown>
-
-      {search && (
-        <Button variant="ghost" size="sm" onClick={() => onSearchChange("")} className="gap-1.5">
-          <X size={14} />
-          Clear
-        </Button>
-      )}
 
       <div className="flex-1" />
 

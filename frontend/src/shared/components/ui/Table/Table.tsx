@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
-import { Spinner } from "@/shared/components/ui/Spinner";
+import { Spinner } from "@/shared/components/ui";
+import { tableCell, tableHeader, tableRow, tableShell } from "./Table.variants";
 
 interface TableShellProps {
   children: ReactNode;
@@ -7,13 +8,7 @@ interface TableShellProps {
 }
 
 export function TableShell({ children, className }: TableShellProps) {
-  return (
-    <div
-      className={`rounded-xl border border-border bg-card shadow-sm overflow-hidden ${className ?? ""}`}
-    >
-      {children}
-    </div>
-  );
+  return <div className={tableShell({ className })}>{children}</div>;
 }
 
 interface TableHeaderProps {
@@ -22,13 +17,7 @@ interface TableHeaderProps {
 }
 
 export function TableHeader({ children, className }: TableHeaderProps) {
-  return (
-    <th
-      className={`px-4 py-2.5 text-left text-[11px] font-medium uppercase tracking-[0.02em] border-b border-border whitespace-nowrap ${className ?? ""}`}
-    >
-      {children}
-    </th>
-  );
+  return <th className={tableHeader({ className })}>{children}</th>;
 }
 
 interface TableRowProps {
@@ -37,11 +26,7 @@ interface TableRowProps {
 }
 
 export function TableRow({ children, className }: TableRowProps) {
-  return (
-    <tr className={`border-b border-border hover:bg-muted/50 transition-colors ${className ?? ""}`}>
-      {children}
-    </tr>
-  );
+  return <tr className={tableRow({ className })}>{children}</tr>;
 }
 
 interface TableCellProps {
@@ -52,7 +37,7 @@ interface TableCellProps {
 
 export function TableCell({ children, colSpan, className }: TableCellProps) {
   return (
-    <td colSpan={colSpan} className={`px-4 py-3 ${className ?? ""}`}>
+    <td colSpan={colSpan} className={tableCell({ className })}>
       {children}
     </td>
   );

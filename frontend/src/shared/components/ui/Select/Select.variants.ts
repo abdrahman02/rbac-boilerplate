@@ -1,5 +1,9 @@
 import { tv } from "tailwind-variants";
 
+export const selectRoot = tv({
+  base: "relative w-full",
+});
+
 export const selectTrigger = tv({
   base: "w-full h-9 pl-3 pr-8 relative flex items-center text-left rounded-lg border border-input bg-background text-sm transition-colors hover:bg-muted/50",
   variants: {

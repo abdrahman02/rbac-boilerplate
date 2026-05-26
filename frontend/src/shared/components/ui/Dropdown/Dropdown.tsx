@@ -15,8 +15,8 @@ import {
 import { type ReactNode, useState } from "react";
 
 interface DropdownProps {
-  /** Elemen pemicu yang diklik untuk membuka dropdown */
-  trigger: ReactNode;
+  /** Elemen pemicu — bisa ReactNode atau fungsi (open: boolean) => ReactNode */
+  trigger: ReactNode | ((open: boolean) => ReactNode);
   /** Konten dropdown yang akan ditampilkan */
   children: ReactNode;
   /** Posisi dropdown relatif terhadap trigger */
@@ -48,7 +48,7 @@ export function Dropdown({ trigger, children, placement = "bottom-end", offsetPx
   return (
     <>
       <div ref={refs.setReference} {...getReferenceProps()} className="inline-flex">
-        {trigger}
+        {typeof trigger === "function" ? trigger(open) : trigger}
       </div>
       {open && (
         <FloatingPortal>
