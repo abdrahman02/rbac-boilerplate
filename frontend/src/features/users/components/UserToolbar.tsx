@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, ChevronDown, Filter, Plus, RefreshCw, Search, X } from "lucide-react";
+import { Check, ChevronDown, Filter, Loader2, Plus, RefreshCw, Search, X } from "lucide-react";
 import type { ReactNode } from "react";
 import { useRef, useState } from "react";
 import type { RoleWithPermissions } from "@/shared/types";
@@ -143,7 +143,7 @@ export function UserToolbar({
         className="gap-1.5"
         title="Refresh"
       >
-        <RefreshCw size={14} className={isFetching ? "animate-spin" : ""} />
+        {isFetching ? <Loader2 size={14} className="animate-spin" /> : <RefreshCw size={14} />}
         Refresh
       </Button>
 
