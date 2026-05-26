@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus } from "lucide-react";
+import { Plus, Users, X } from "lucide-react";
 import type { ReactNode } from "react";
 import { Avatar, Spinner } from "@/shared/components/ui";
 import type { UserWithRoles } from "@/shared/types";
@@ -154,9 +154,9 @@ function RemovableBadge({ children, onRemove }: { children: ReactNode; onRemove:
         type="button"
         onClick={onRemove}
         title="Remove role"
-        className="w-4 h-4 flex items-center justify-center rounded-full text-[10px] leading-none text-muted-foreground hover:bg-destructive/15 hover:text-destructive transition-colors"
+        className="w-4 h-4 flex items-center justify-center rounded-full text-muted-foreground hover:bg-destructive/15 hover:text-destructive transition-colors"
       >
-        ✕
+        <X size={10} />
       </button>
     </span>
   );
@@ -183,13 +183,7 @@ function EmptyRow() {
       <td colSpan={5}>
         <div className="flex flex-col items-center gap-3 py-16 px-4 text-center">
           <div className="w-14 h-14 flex items-center justify-center rounded-2xl bg-muted border border-border text-muted-foreground">
-            {/* biome-ignore lint/a11y/noSvgWithoutTitle: decorative icon */}
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-              <circle cx="9" cy="7" r="4" />
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-            </svg>
+            <Users size={24} strokeWidth={1.5} aria-hidden="true" />
           </div>
           <div className="text-[15px] font-semibold">No users match your filters</div>
           <div className="text-[13.5px] text-muted-foreground max-w-sm">

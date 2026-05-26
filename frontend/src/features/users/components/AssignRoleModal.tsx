@@ -2,11 +2,23 @@
 
 import { Shield } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { tv } from "tailwind-variants";
 import { useRoles } from "@/features/roles/hooks/useRoles";
 import { useSyncRoles } from "@/features/users/hooks/useUsers";
-import { Alert, Avatar, Badge, Button, Modal } from "@/shared/components/ui";
+import { Alert, Avatar, Badge, Button, Checkbox, Modal } from "@/shared/components/ui";
 import { getErrorMessage } from "@/shared/lib/api-error";
 import type { RoleWithPermissions, UserWithRoles } from "@/shared/types";
+
+const roleLabel = tv({
+  base: "flex items-center gap-3 p-2.5 rounded-lg border-[1.5px] cursor-pointer transition-colors",
+  variants: {
+    checked: {
+      true: "border-primary bg-primary/[.05]",
+      false: "border-border bg-background hover:border-border/60",
+    },
+  },
+  defaultVariants: { checked: false },
+});
 
 interface AssignRoleModalProps {
   isOpen: boolean;
@@ -142,17 +154,8 @@ interface RoleCheckboxProps {
 
 function RoleCheckbox({ role, checked, adding, removing, onToggle }: RoleCheckboxProps) {
   return (
-    <label
-      className={`flex items-center gap-3 p-2.5 rounded-lg border-[1.5px] cursor-pointer transition-colors ${
-        checked ? "border-primary bg-primary/[.05]" : "border-border bg-background hover:border-border/60"
-      }`}
-    >
-      <input
-        type="checkbox"
-        checked={checked}
-        onChange={onToggle}
-        className="accent-primary shrink-0"
-      />
+    <label className={roleLabel({ checked })}>
+      <Checkbox checked={checked} onChange={onToggle} />
       <span className="w-7 h-7 flex items-center justify-center rounded-lg bg-muted text-muted-foreground shrink-0">
         <Shield size={14} />
       </span>

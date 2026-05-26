@@ -3,8 +3,56 @@
 import { Check, ChevronDown, Filter, Loader2, Plus, RefreshCw, Search, X } from "lucide-react";
 import type { ReactNode } from "react";
 import { useRef, useState } from "react";
+import { tv } from "tailwind-variants";
 import type { RoleWithPermissions } from "@/shared/types";
 import { Button, Input } from "@/shared/components/ui";
+
+const filterButton = tv({
+  base: "h-[38px] px-3.5 flex items-center gap-2 rounded-lg text-sm font-medium border transition-colors",
+  variants: {
+    active: {
+      true: "bg-accent text-accent-foreground border-accent-foreground/25",
+      false: "bg-background text-foreground border-input hover:bg-muted",
+    },
+    open: {
+      true: "ring-2 ring-ring/20 border-ring",
+    },
+  },
+  defaultVariants: { active: false },
+});
+
+const selectTrigger = tv({
+  base: "w-full h-9 pl-3 pr-8 relative flex items-center text-left rounded-lg border border-input bg-background text-sm transition-colors hover:bg-muted/50",
+  variants: {
+    hasValue: {
+      true: "text-foreground",
+      false: "text-muted-foreground",
+    },
+  },
+  defaultVariants: { hasValue: false },
+});
+
+const optionAll = tv({
+  base: "w-full text-left px-3 py-1.5 text-[13px] hover:bg-muted transition-colors flex items-center gap-2",
+  variants: {
+    selected: {
+      true: "text-primary font-medium",
+      false: "text-muted-foreground",
+    },
+  },
+  defaultVariants: { selected: false },
+});
+
+const optionItem = tv({
+  base: "w-full text-left px-3 py-1.5 text-[13px] hover:bg-muted transition-colors flex items-center gap-2",
+  variants: {
+    selected: {
+      true: "text-primary font-medium",
+      false: "text-foreground",
+    },
+  },
+  defaultVariants: { selected: false },
+});
 
 interface FilterState {
   role: string;
@@ -56,11 +104,7 @@ export function UserToolbar({
         <button
           type="button"
           onClick={() => setFilterOpen((o) => !o)}
-          className={`h-[38px] px-3.5 flex items-center gap-2 rounded-lg text-sm font-medium border transition-colors ${
-            activeCount > 0
-              ? "bg-accent text-accent-foreground border-accent-foreground/25"
-              : "bg-background text-foreground border-input hover:bg-muted"
-          } ${filterOpen ? "ring-2 ring-ring/20 border-ring" : ""}`}
+          className={filterButton({ active: activeCount > 0, open: filterOpen })}
         >
           <Filter size={14} />
           <span>Filters</span>
@@ -216,9 +260,7 @@ function SearchableSelect({
       <button
         type="button"
         onClick={handleOpen}
-        className={`w-full h-9 pl-3 pr-8 relative flex items-center text-left rounded-lg border border-input bg-background text-sm transition-colors hover:bg-muted/50 ${
-          value ? "text-foreground" : "text-muted-foreground"
-        }`}
+        className={selectTrigger({ hasValue: !!value })}
       >
         <span className="flex-1 truncate">{selectedLabel}</span>
         <ChevronDown
@@ -258,9 +300,7 @@ function SearchableSelect({
               <button
                 type="button"
                 onClick={() => select("")}
-                className={`w-full text-left px-3 py-1.5 text-[13px] hover:bg-muted transition-colors flex items-center gap-2 ${
-                  !value ? "text-primary font-medium" : "text-muted-foreground"
-                }`}
+                className={optionAll({ selected: !value })}
               >
                 {!value ? <Check size={12} className="shrink-0" /> : <span className="w-3 shrink-0" />}
                 <span>{allLabel}</span>
@@ -271,9 +311,7 @@ function SearchableSelect({
                   key={o.value}
                   type="button"
                   onClick={() => select(o.value)}
-                  className={`w-full text-left px-3 py-1.5 text-[13px] hover:bg-muted transition-colors flex items-center gap-2 ${
-                    value === o.value ? "text-primary font-medium" : "text-foreground"
-                  }`}
+                  className={optionItem({ selected: value === o.value })}
                 >
                   {value === o.value ? <Check size={12} className="shrink-0" /> : <span className="w-3 shrink-0" />}
                   <span>{o.label}</span>
