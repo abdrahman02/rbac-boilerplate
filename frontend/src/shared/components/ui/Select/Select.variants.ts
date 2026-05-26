@@ -5,7 +5,7 @@ export const selectRoot = tv({
 });
 
 export const selectTrigger = tv({
-  base: "w-full h-9 pl-3 pr-8 relative flex items-center text-left rounded-lg border border-input bg-background text-sm transition-colors hover:bg-muted/50",
+  base: "w-full h-9 pl-3 pr-8 relative flex items-center text-left rounded-lg border border-input bg-background text-sm transition-colors cursor-pointer hover:bg-muted/50",
   variants: {
     hasValue: {
       true: "text-foreground",
