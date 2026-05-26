@@ -1,6 +1,6 @@
 import { memo, useMemo } from "react";
 import { useRoles } from "@/features/roles/hooks/useRoles";
-import { useUsers } from "@/features/users/hooks/useUsers";
+import { useUsers } from "@/features/users/hooks";
 
 const MAX_USERS_FOR_DISTRIBUTION = 200;
 

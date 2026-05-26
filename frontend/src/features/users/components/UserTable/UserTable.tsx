@@ -12,8 +12,8 @@ import {
   TableShell,
 } from "@/shared/components/ui";
 import type { UserWithRoles } from "@/shared/types";
-import { StatusBadge } from "./StatusBadge";
-import { UserActionsMenu } from "./UserActionsMenu";
+import { StatusBadge } from "../StatusBadge";
+import { UserActionsMenu } from "../UserActionsMenu";
 
 interface UserTableProps {
   users: UserWithRoles[];

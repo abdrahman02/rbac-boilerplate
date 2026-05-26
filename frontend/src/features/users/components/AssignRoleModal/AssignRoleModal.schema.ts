@@ -4,4 +4,5 @@ export const assignRoleSchema = z.object({
   roleIds: z.array(z.number()),
 });
 
-export type AssignRoleInput = z.infer<typeof assignRoleSchema>;
+export type AssignRoleInput = z.input<typeof assignRoleSchema>;
+export type AssignRoleOutput = z.output<typeof assignRoleSchema>;

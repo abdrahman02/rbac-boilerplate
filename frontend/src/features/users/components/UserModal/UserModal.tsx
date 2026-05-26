@@ -1,30 +1,9 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Lock, Mail, User } from "lucide-react";
-import { useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { useCreateUser, useUpdateUser } from "@/features/users/hooks/useUsers";
 import { Alert, Button, FormField, Input, Modal } from "@/shared/components/ui";
-import { getErrorMessage } from "@/shared/lib/api-error";
 import type { UserWithRoles } from "@/shared/types";
-
-const schema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters"),
-  email: z.email({ message: "Invalid email" }),
-  // Optional at schema level (edit mode sends ""); refines only run when value is non-empty
-  password: z
-    .string()
-    .optional()
-    .refine((val) => !val || val.length >= 8, "At least 8 characters")
-    .refine(
-      (val) => !val || /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(val),
-      "Must contain uppercase, lowercase, and a number",
-    ),
-});
-
-type FormInput = z.infer<typeof schema>;
+import { useUserModal } from "./useUserModal";
 
 interface UserModalProps {
   isOpen: boolean;
@@ -33,40 +12,7 @@ interface UserModalProps {
 }
 
 export function UserModal({ isOpen, onClose, user }: UserModalProps) {
-  const isEditing = !!user;
-  const createUser = useCreateUser();
-  const updateUser = useUpdateUser();
-
-  const {
-    register,
-    handleSubmit,
-    reset,
-    setError,
-    formState: { errors, isSubmitting },
-  } = useForm<FormInput>({ resolver: zodResolver(schema) });
-
-  useEffect(() => {
-    if (isOpen) {
-      reset(isEditing ? { name: user.name, email: user.email, password: "" } : {});
-    }
-  }, [isOpen, isEditing, user, reset]);
-
-  const onSubmit = async (data: FormInput) => {
-    if (!isEditing && !data.password) {
-      setError("password", { message: "Password is required" });
-      return;
-    }
-    try {
-      if (isEditing) {
-        await updateUser.mutateAsync({ id: user.id, payload: { name: data.name, email: data.email } });
-      } else {
-        await createUser.mutateAsync({ name: data.name, email: data.email, password: data.password! });
-      }
-      onClose();
-    } catch (err) {
-      setError("root", { message: getErrorMessage(err) });
-    }
-  };
+  const { isEditing, handleSubmit, onSubmit, errors, register, isSubmitting } = useUserModal({ isOpen, onClose, user });
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={isEditing ? "Edit user" : "Add user"}>

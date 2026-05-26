@@ -1,11 +1,11 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useCallback, useEffect, useMemo } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { useRoles } from "@/features/roles/hooks/useRoles";
 import { getErrorMessage } from "@/shared/lib/api-error";
 import type { UserWithRoles } from "@/shared/types";
-import { useSyncRoles } from "../../hooks/useUsers";
-import { type AssignRoleInput, assignRoleSchema } from "./AssignRoleModal.schema";
+import { useSyncRoles } from "../../hooks";
+import { type AssignRoleInput, type AssignRoleOutput, assignRoleSchema } from "./AssignRoleModal.schema";
 
 interface Params {
   isOpen: boolean;
@@ -18,14 +18,14 @@ export const useAssignRoleModal = ({ isOpen, onClose, user }: Params) => {
   const syncRoles = useSyncRoles();
 
   const {
+    control,
     handleSubmit,
     setValue,
     getValues,
-    watch,
     reset,
     setError,
     formState: { errors, isSubmitting, isDirty },
-  } = useForm<AssignRoleInput>({
+  } = useForm<AssignRoleInput, unknown, AssignRoleOutput>({
     resolver: zodResolver(assignRoleSchema),
     defaultValues: { roleIds: [] },
   });
@@ -41,7 +41,7 @@ export const useAssignRoleModal = ({ isOpen, onClose, user }: Params) => {
     }
   }, [isOpen, originalRoleIds, reset]);
 
-  const roleIdsArr = watch("roleIds");
+  const roleIdsArr = useWatch({ control, name: "roleIds" });
 
   const selectedIds = useMemo(() => new Set(roleIdsArr), [roleIdsArr]);
 

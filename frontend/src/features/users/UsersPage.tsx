@@ -7,11 +7,11 @@ import { ConfirmDeleteModal, PageHeader } from "@/shared/components/common";
 import { Pagination } from "@/shared/components/ui";
 import { useDebounce, usePermission } from "@/shared/hooks";
 import type { UserWithRoles } from "@/shared/types";
-import { useDeleteUser, useRemoveRole, useUsers } from "../hooks/useUsers";
-import { AssignRoleModal } from "./AssignRoleModal";
-import { UserModal } from "./UserModal";
-import { UserTable } from "./UserTable";
-import { UserToolbar } from "./UserToolbar";
+import { AssignRoleModal } from "./components/AssignRoleModal";
+import { UserModal } from "./components/UserModal/UserModal";
+import { UserTable } from "./components/UserTable";
+import { UserToolbar } from "./components/UserToolbar/UserToolbar";
+import { useDeleteUser, useRemoveRole, useUsers } from "./hooks";
 
 interface FilterState {
   role: string;
