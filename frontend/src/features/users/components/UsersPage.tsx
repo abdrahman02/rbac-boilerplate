@@ -8,7 +8,7 @@ import { useDebounce, usePermission } from "@/shared/hooks";
 import type { UserWithRoles } from "@/shared/types";
 import { useDeleteUser, useRemoveRole, useUsers } from "../hooks/useUsers";
 import { AssignRoleModal } from "./AssignRoleModal";
-import { ConfirmDeleteModal } from "./ConfirmDeleteModal";
+import { ConfirmDeleteModal } from "@/shared/components/common";
 import { UserModal } from "./UserModal";
 import { UserTable } from "./UserTable";
 import { UserToolbar } from "./UserToolbar";
