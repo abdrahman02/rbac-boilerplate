@@ -30,7 +30,7 @@ export function UsersPage() {
   const [deletingUser, setDeletingUser] = useState<UserWithRoles | null>(null);
 
   const debouncedSearch = useDebounce(search, 400);
-  const { data } = useUsers(page, 10, debouncedSearch);
+  const { data } = useUsers(page, 10, debouncedSearch, filters.role, filters.status);
   const isFetching = useIsFetching({ queryKey: ["users"] }) > 0;
   const { data: roles = [] } = useRoles();
   const deleteUser = useDeleteUser();
@@ -40,17 +40,9 @@ export function UsersPage() {
   const canEdit = usePermission("users:update");
   const canDelete = usePermission("users:delete");
 
-  const allUsers = data?.data ?? [];
+  const users = data?.data ?? [];
   const meta = data?.meta;
   const totalPages = meta ? Math.ceil(meta.total / meta.limit) : 1;
-
-  // Client-side filter for role and status (server handles name/email search)
-  const filteredUsers = allUsers.filter((user) => {
-    if (filters.role && !user.roles.includes(filters.role)) return false;
-    if (filters.status === "active" && !user.is_active) return false;
-    if (filters.status === "inactive" && user.is_active) return false;
-    return true;
-  });
 
   const handleSearchChange = (v: string) => {
     setSearch(v);
@@ -115,7 +107,7 @@ export function UsersPage() {
 
       {/* Users table */}
       <UserTable
-        users={filteredUsers}
+        users={users}
         isFetching={isFetching}
         canEdit={canEdit}
         canDelete={canDelete}

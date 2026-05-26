@@ -7,6 +7,8 @@ export async function findAllUsers(
   page: number,
   limit: number,
   search?: string,
+  role?: string,
+  status?: boolean,
 ): Promise<{ rows: UserRow[]; total: number }> {
   const offset = (page - 1) * limit
   const where = {
@@ -14,6 +16,8 @@ export async function findAllUsers(
     ...(search
       ? { OR: [{ fullName: { contains: search } }, { email: { contains: search } }] }
       : {}),
+    ...(role ? { roles: { some: { role: { name: role } } } } : {}),
+    ...(status !== undefined ? { isActive: status } : {}),
   }
 
   const [total, rows] = await prisma.$transaction([

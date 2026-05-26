@@ -16,12 +16,14 @@ interface UpdateUserPayload {
   is_active?: boolean;
 }
 
-export function useUsers(page = 1, limit = 10, search = "") {
+export function useUsers(page = 1, limit = 10, search = "", role = "", status = "") {
   return useQuery<PaginatedResponse<UserWithRoles>>({
-    queryKey: ["users", page, limit, search],
+    queryKey: ["users", page, limit, search, role, status],
     queryFn: async () => {
       const params = new URLSearchParams({ page: String(page), limit: String(limit) });
       if (search) params.set("search", search);
+      if (role) params.set("role", role);
+      if (status) params.set("status", status);
       const res = await apiClient.get(`/users?${params}`);
       return res.data;
     },

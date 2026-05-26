@@ -9,8 +9,11 @@ export async function listUsers(req: Request, res: Response): Promise<void> {
     const page = Math.max(1, parseInt(req.query.page as string, 10) || 1)
     const limit = Math.min(100, Math.max(1, parseInt(req.query.limit as string, 10) || 10))
     const search = typeof req.query.search === 'string' ? req.query.search.trim() || undefined : undefined
+    const role = typeof req.query.role === 'string' ? req.query.role.trim() || undefined : undefined
+    const statusStr = typeof req.query.status === 'string' ? req.query.status : undefined
+    const status = statusStr === 'active' ? true : statusStr === 'inactive' ? false : undefined
 
-    const result = await svc.listUsers(page, limit, search)
+    const result = await svc.listUsers(page, limit, search, role, status)
     res.status(200).json(result)
   } catch (error) {
     handleError(res, error)

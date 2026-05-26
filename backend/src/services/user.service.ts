@@ -8,8 +8,10 @@ export async function listUsers(
   page: number,
   limit: number,
   search?: string,
+  role?: string,
+  status?: boolean,
 ): Promise<PaginatedResponse<UserWithRoles>> {
-  const { rows, total } = await repo.findAllUsers(page, limit, search)
+  const { rows, total } = await repo.findAllUsers(page, limit, search, role, status)
 
   const data = await Promise.all(
     rows.map(async (u) => {
