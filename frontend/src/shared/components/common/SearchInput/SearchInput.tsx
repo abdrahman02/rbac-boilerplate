@@ -1,6 +1,6 @@
 import { Search, X } from "lucide-react";
 import type { ComponentProps } from "react";
-import { Input } from "@/shared/components/ui";
+import { Button, Input } from "@/shared/components/ui";
 
 type SearchInputProps = Omit<ComponentProps<typeof Input>, "type" | "iconLeft" | "iconRight"> & {
   onClear?: () => void;
@@ -14,14 +14,15 @@ export function SearchInput({ onClear, value, ...props }: SearchInputProps) {
       iconLeft={<Search size={15} />}
       iconRight={
         showClear ? (
-          <button
-            type="button"
+          <Button
+            variant="ghost"
+            size="iconOnly"
             onClick={onClear}
-            className="flex text-muted-foreground hover:text-foreground transition-colors"
             aria-label="Clear search"
+            className="w-5 h-5 text-muted-foreground hover:text-foreground hover:bg-transparent"
           >
             <X size={14} />
-          </button>
+          </Button>
         ) : undefined
       }
       value={value}
