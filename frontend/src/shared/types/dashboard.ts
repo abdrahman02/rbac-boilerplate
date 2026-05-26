@@ -14,5 +14,7 @@ export interface DashboardStats {
   totalRoles: number;
   totalPermissionsAssigned: number;
   totalPermissions: number;
+  totalEvents: number;
+  eventsToday: number;
   recentActivity: RecentActivityItem[];
 }

@@ -42,6 +42,8 @@ const MOCK_RAW = {
   totalRoles: 8,
   totalPermissionsAssigned: 24,
   totalPermissions: 10,
+  totalEvents: 100,
+  eventsToday: 7,
   recentActivity: [
     {
       id: 1,
@@ -82,6 +84,8 @@ describe('dashboard service — getDashboardStats', () => {
     expect(result.data?.totalRoles).toBe(8)
     expect(result.data?.totalPermissionsAssigned).toBe(24)
     expect(result.data?.totalPermissions).toBe(10)
+    expect(result.data?.totalEvents).toBe(100)
+    expect(result.data?.eventsToday).toBe(7)
     expect(result.message).toBeNull()
   })
 

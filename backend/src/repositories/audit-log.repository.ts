@@ -49,7 +49,8 @@ export async function findAuditLogs(
     }
   }
 
-  const offset = (page - 1) * limit
+  const fetchAll = limit === -1
+  const offset = fetchAll ? 0 : (page - 1) * limit
 
   const [total, rows] = await prisma.$transaction([
     prisma.auditLog.count({ where }),
@@ -57,7 +58,7 @@ export async function findAuditLogs(
       where,
       orderBy: { createdAt: 'desc' },
       skip: offset,
-      take: limit,
+      ...(fetchAll ? {} : { take: limit }),
     }),
   ])
 

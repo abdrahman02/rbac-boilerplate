@@ -7,7 +7,8 @@ import type { ApiResponse, PaginatedResponse } from '../types/index.js'
 export async function list(req: Request, res: Response): Promise<void> {
 	try {
 		const page = Math.max(1, Number(req.query.page) || 1)
-		const limit = Math.min(100, Math.max(1, Number(req.query.limit) || 20))
+		const rawLimit = Number(req.query.limit) || 20
+		const limit = rawLimit === -1 ? -1 : Math.min(100, Math.max(1, rawLimit))
 
 		const rawUserId = req.query.userId
 		const userId = rawUserId !== undefined ? Number(rawUserId) : undefined

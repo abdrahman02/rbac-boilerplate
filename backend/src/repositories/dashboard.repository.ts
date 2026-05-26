@@ -16,12 +16,17 @@ export interface DashboardStatsRaw {
   totalRoles: number
   totalPermissionsAssigned: number
   totalPermissions: number
+  totalEvents: number
+  eventsToday: number
   recentActivity: RecentActivityItem[]
 }
 
-const RECENT_ACTIVITY_LIMIT = 5
+const RECENT_ACTIVITY_LIMIT = 20
 
 export async function getDashboardStats(sinceDate: Date): Promise<DashboardStatsRaw> {
+  const now = new Date()
+  const todayMidnight = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()))
+
   const [
     totalUsers,
     inactiveUsers,
@@ -29,6 +34,8 @@ export async function getDashboardStats(sinceDate: Date): Promise<DashboardStats
     totalRoles,
     totalPermissionsAssigned,
     totalPermissions,
+    totalEvents,
+    eventsToday,
     recentLogs,
   ] = await prisma.$transaction([
     prisma.user.count({ where: { deletedAt: null } }),
@@ -37,6 +44,8 @@ export async function getDashboardStats(sinceDate: Date): Promise<DashboardStats
     prisma.role.count(),
     prisma.rolePermission.count(),
     prisma.permission.count(),
+    prisma.auditLog.count(),
+    prisma.auditLog.count({ where: { createdAt: { gte: todayMidnight } } }),
     prisma.auditLog.findMany({
       take: RECENT_ACTIVITY_LIMIT,
       orderBy: { createdAt: 'desc' },
@@ -51,6 +60,8 @@ export async function getDashboardStats(sinceDate: Date): Promise<DashboardStats
     totalRoles,
     totalPermissionsAssigned,
     totalPermissions,
+    totalEvents,
+    eventsToday,
     recentActivity: recentLogs.map((log) => ({
       id: log.id,
       action: log.action,

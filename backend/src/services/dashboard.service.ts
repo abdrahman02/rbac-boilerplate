@@ -24,6 +24,8 @@ export interface DashboardStatsDto {
   totalRoles: number
   totalPermissionsAssigned: number
   totalPermissions: number
+  totalEvents: number
+  eventsToday: number
   recentActivity: RecentActivityDto[]
 }
 
@@ -124,6 +126,8 @@ export async function getDashboardStats(): Promise<ApiResponse<DashboardStatsDto
       totalRoles: raw.totalRoles,
       totalPermissionsAssigned: raw.totalPermissionsAssigned,
       totalPermissions: raw.totalPermissions,
+      totalEvents: raw.totalEvents,
+      eventsToday: raw.eventsToday,
       recentActivity: raw.recentActivity.map((item) => ({
         id: item.id,
         action: item.action,

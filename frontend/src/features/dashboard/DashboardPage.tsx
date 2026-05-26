@@ -56,8 +56,8 @@ export function DashboardPage() {
       },
       {
         label: "Recent events",
-        value: stats?.recentActivity.length ?? 0,
-        sub: "Last 5 events shown",
+        value: stats?.totalEvents ?? 0,
+        sub: stats ? `${stats.eventsToday} today` : undefined,
         icon: STAT_ICONS.events,
       },
     ],
@@ -93,14 +93,14 @@ export function DashboardPage() {
         ))}
       </div>
 
-      {/* Two-column: recent activity + sidebar */}
+      {/* Two-column: recent activity + sidebar — grid stretches both cells to equal height */}
       <div className="grid grid-cols-1 xl:grid-cols-[1fr_300px] gap-4">
-        {/* Recent activity */}
-        <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
-          <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+        {/* Recent activity — header fixed, feed scrolls to fill remaining height */}
+        <div className="rounded-xl border border-border bg-card shadow-sm flex flex-col overflow-hidden">
+          <div className="flex items-center justify-between px-5 py-4 border-b border-border shrink-0">
             <div>
               <h2 className="text-[15px] font-semibold">Recent activity</h2>
-              <p className="text-xs text-muted-foreground mt-0.5">Last five events across the workspace</p>
+              <p className="text-xs text-muted-foreground mt-0.5">All recent activity across the workspace</p>
             </div>
             <Link
               href="/audit-logs"
@@ -110,21 +110,25 @@ export function DashboardPage() {
               <ChevronRight size={14} />
             </Link>
           </div>
-          <ActivityFeed logs={stats?.recentActivity ?? []} isLoading={isLoading} />
+          <div className="flex-1 min-h-0 overflow-y-auto">
+            <ActivityFeed logs={stats?.recentActivity ?? []} isLoading={isLoading} />
+          </div>
         </div>
 
-        {/* Right column */}
+        {/* Right column — QuickActions fixed, RoleDistribution fills remaining height */}
         <div className="flex flex-col gap-4">
-          {/* Quick actions */}
-          <div className="rounded-xl border border-border bg-card shadow-sm p-5">
+          <div className="rounded-xl border border-border bg-card shadow-sm p-5 shrink-0">
             <h2 className="text-[15px] font-semibold mb-3">Quick actions</h2>
             <QuickActions />
           </div>
 
-          {/* Role distribution */}
-          <div className="rounded-xl border border-border bg-card shadow-sm p-5">
-            <h2 className="text-[15px] font-semibold mb-3">Role distribution</h2>
-            <RoleDistribution />
+          <div className="rounded-xl border border-border bg-card shadow-sm flex flex-col flex-1 overflow-hidden">
+            <div className="px-5 pt-5 pb-3 shrink-0">
+              <h2 className="text-[15px] font-semibold">Role distribution</h2>
+            </div>
+            <div className="flex-1 min-h-0 overflow-y-auto px-5 pb-5">
+              <RoleDistribution />
+            </div>
           </div>
         </div>
       </div>
