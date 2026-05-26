@@ -8,7 +8,7 @@ import { useDebounce, usePermission } from "@/shared/hooks";
 import type { UserWithRoles } from "@/shared/types";
 import { useDeleteUser, useRemoveRole, useUsers } from "../hooks/useUsers";
 import { AssignRoleModal } from "./AssignRoleModal";
-import { ConfirmDeleteModal } from "@/shared/components/common";
+import { ConfirmDeleteModal, PageHeader } from "@/shared/components/common";
 import { UserModal } from "./UserModal";
 import { UserTable } from "./UserTable";
 import { UserToolbar } from "./UserToolbar";
@@ -89,13 +89,10 @@ export function UsersPage() {
 
   return (
     <div className="flex flex-col gap-5">
-      {/* Page header */}
-      <div>
-        <h1 className="text-[22px] font-semibold tracking-tight">Users</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          People who can sign into this workspace, and the roles assigned to them.
-        </p>
-      </div>
+      <PageHeader
+        title="Users"
+        description="People who can sign into this workspace, and the roles assigned to them."
+      />
 
       {/* Toolbar: search + filters + actions */}
       <UserToolbar
