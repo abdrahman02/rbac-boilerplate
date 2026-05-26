@@ -1,5 +1,6 @@
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
 import type { ReactNode } from "react";
+import { pageBtnVariants } from "./Pagination.variants";
 
 interface PaginationProps {
   /** 1-indexed current page */
@@ -96,16 +97,7 @@ function PageBtn({ active, disabled, onClick, title, iconOnly, children }: PageB
       onClick={onClick}
       disabled={disabled}
       title={title}
-      className={[
-        "min-w-8 h-8 inline-flex items-center justify-center rounded-md border text-[13px] transition-colors",
-        iconOnly ? "w-8 px-0" : "px-2 font-medium tabular-nums",
-        active
-          ? "bg-primary text-primary-foreground border-primary font-semibold"
-          : "bg-transparent text-foreground border-border hover:bg-muted",
-        disabled ? "opacity-40 cursor-not-allowed" : "cursor-pointer",
-      ]
-        .filter(Boolean)
-        .join(" ")}
+      className={pageBtnVariants({ active, disabled, iconOnly })}
     >
       {children}
     </button>
