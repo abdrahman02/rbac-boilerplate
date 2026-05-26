@@ -3,7 +3,7 @@
 import type { Placement } from "@floating-ui/react";
 import { Ellipsis } from "lucide-react";
 import type { ReactNode } from "react";
-import { Dropdown } from "@/shared/components/ui/Dropdown";
+import { Dropdown } from "@/shared/components/ui";
 
 interface RowActionsDropdownProps {
   children: ReactNode;

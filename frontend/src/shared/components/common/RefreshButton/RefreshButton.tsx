@@ -1,5 +1,5 @@
 import { Loader2, RefreshCw } from "lucide-react";
-import { Button } from "@/shared/components/ui/Button";
+import { Button } from "@/shared/components/ui";
 
 interface RefreshButtonProps {
   isLoading?: boolean;

@@ -1,4 +1,4 @@
-export { BrandMark } from "./BrandMark/BrandMark";
+export { BrandMark } from "./BrandMark";
 export { ConfirmDeleteModal } from "./ConfirmDeleteModal";
 export { DropdownMenuItem } from "./DropdownMenuItem";
 export { FilterDropdown } from "./FilterDropdown";

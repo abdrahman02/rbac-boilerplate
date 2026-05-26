@@ -4,13 +4,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { TriangleAlert } from "lucide-react";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { Button, FormField, Input, Modal } from "@/shared/components/ui";
-
-const schema = z.object({
-  confirm: z.string().min(1),
-});
-type FormInput = z.infer<typeof schema>;
+import { confirmModalSchema, ConfirmModalInput } from "./ConfirmDeleteModal.schema";
 
 interface ConfirmDeleteModalProps {
   isOpen: boolean;
@@ -34,8 +29,8 @@ export function ConfirmDeleteModal({
   confirmLabel = "Delete",
   isLoading,
 }: ConfirmDeleteModalProps) {
-  const { register, watch, reset } = useForm<FormInput>({
-    resolver: zodResolver(schema),
+  const { register, watch, reset } = useForm<ConfirmModalInput>({
+    resolver: zodResolver(confirmModalSchema),
     defaultValues: { confirm: "" },
     mode: "onChange",
   });
