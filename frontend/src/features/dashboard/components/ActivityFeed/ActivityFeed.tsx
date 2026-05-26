@@ -4,38 +4,14 @@ import type { badgeVariants } from "@/shared/components/ui";
 import { Avatar, Badge } from "@/shared/components/ui";
 import { formatDateTime, formatRelative } from "@/shared/lib/format-date";
 import type { RecentActivityItem } from "@/shared/types";
+import { ACTION_VARIANT_MAP } from "./ActivityFeed.constant";
 
 interface ActivityFeedProps {
   logs: RecentActivityItem[];
   isLoading?: boolean;
 }
 
-type BadgeVariant = NonNullable<VariantProps<typeof badgeVariants>["variant"]>;
-
-// Maps every backend action string to a badge variant.
-// danger=destroy, warning=unlink, info=modify/assign, primary=create, success=auth ok, default=neutral
-const ACTION_VARIANT_MAP: Record<string, BadgeVariant> = {
-  // auth
-  login: "success",
-  logout: "default",
-  register: "primary",
-  // users
-  create_user: "primary",
-  update_user: "info",
-  delete_user: "danger",
-  assign_role: "info",
-  remove_role: "warning",
-  // roles
-  create_role: "primary",
-  update_role: "info",
-  delete_role: "danger",
-  assign_permission: "info",
-  remove_permission: "warning",
-  // permissions
-  create_permission: "primary",
-  update_permission: "info",
-  delete_permission: "danger",
-};
+export type BadgeVariant = NonNullable<VariantProps<typeof badgeVariants>["variant"]>;
 
 function getActionBadgeVariant(action: string): BadgeVariant {
   return ACTION_VARIANT_MAP[action] ?? "default";

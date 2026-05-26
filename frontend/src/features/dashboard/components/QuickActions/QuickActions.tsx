@@ -1,20 +1,14 @@
-import { ChevronRight, Key, ScrollText, Shield, Users } from "lucide-react";
+import { ChevronRight, type LucideIcon } from "lucide-react";
 import Link from "next/link";
 import { memo } from "react";
 import { Button } from "@/shared/components/ui";
+import { QUICK_ACTIONS } from "./QuickActions.constant";
 
-interface QuickAction {
-  icon: typeof Users;
+export interface QuickAction {
+  icon: LucideIcon;
   label: string;
   href: string;
 }
-
-const QUICK_ACTIONS: QuickAction[] = [
-  { icon: Users, label: "Invite a user", href: "/users" },
-  { icon: Shield, label: "Create a role", href: "/roles" },
-  { icon: Key, label: "Add a permission", href: "/permissions" },
-  { icon: ScrollText, label: "Review audit log", href: "/audit-logs" },
-];
 
 export const QuickActions = memo(function QuickActions() {
   return (

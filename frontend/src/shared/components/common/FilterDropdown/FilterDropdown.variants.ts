@@ -1,11 +1,15 @@
 import { tv } from "tailwind-variants";
 
+// Applied as className on <Button variant="outline"> — only overrides that differ from Button defaults.
+// Button base already provides: rounded-lg, transition-colors, font-medium, inline-flex items-center justify-center.
+// We override: sizing (h-[38px] px-3.5), layout (flex gap-2 instead of inline-flex justify-center),
+// and add active/open state variants.
 export const filterTrigger = tv({
-  base: "h-[38px] px-3.5 flex items-center gap-2 rounded-lg text-sm font-medium border transition-colors",
+  base: "h-[38px] px-3.5 flex gap-2 justify-start",
   variants: {
     active: {
       true: "bg-accent text-accent-foreground border-accent-foreground/25",
-      false: "bg-background text-foreground border-input hover:bg-muted",
+      false: "",
     },
     open: {
       true: "ring-2 ring-ring/20 border-ring",
@@ -42,5 +46,5 @@ export const filterPanelBody = tv({
 });
 
 export const filterClearBtn = tv({
-  base: "text-[12.5px] text-primary font-medium hover:underline h-auto px-0 py-0 font-medium",
+  base: "text-[12.5px] text-primary font-medium hover:underline h-auto px-0 py-0",
 });
