@@ -13,7 +13,7 @@ import {
 } from "@/shared/components/ui";
 import type { UserWithRoles } from "@/shared/types";
 import { StatusBadge } from "./StatusBadge";
-import { UserRowMenu } from "./UserRowMenu";
+import { UserActionsMenu } from "./UserActionsMenu";
 
 interface UserTableProps {
   users: UserWithRoles[];
@@ -93,7 +93,7 @@ function UserRow({ user, canEdit, canDelete, onEdit, onManageRoles, onDelete, on
   return (
     <TableRow>
       <TableCell className="w-12">
-        <UserRowMenu
+        <UserActionsMenu
           canEdit={canEdit}
           canDelete={canDelete}
           onEdit={onEdit}

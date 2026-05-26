@@ -5,12 +5,12 @@ import { Ellipsis } from "lucide-react";
 import type { ReactNode } from "react";
 import { Button, Dropdown } from "@/shared/components/ui";
 
-interface RowActionsDropdownProps {
+interface ActionsMenuProps {
   children: ReactNode;
   placement?: Placement;
 }
 
-export function RowActionsDropdown({ children, placement = "bottom-start" }: RowActionsDropdownProps) {
+export function ActionsMenu({ children, placement = "bottom-start" }: ActionsMenuProps) {
   return (
     <Dropdown
       placement={placement}
@@ -18,7 +18,7 @@ export function RowActionsDropdown({ children, placement = "bottom-start" }: Row
         <Button
           variant="ghost"
           size="iconOnly"
-          title="Row actions"
+          title="Actions"
           className="w-7 h-7 rounded-md text-muted-foreground hover:text-foreground"
         >
           <Ellipsis size={15} />

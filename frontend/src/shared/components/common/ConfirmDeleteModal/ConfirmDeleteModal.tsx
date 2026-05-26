@@ -38,7 +38,7 @@ export function ConfirmDeleteModal({
       <form onSubmit={handleSubmit} className="flex flex-col gap-3.5 pt-1">
         <p className="text-sm text-muted-foreground">{description}</p>
 
-        <div className="flex items-start gap-2.5 p-3 rounded-lg bg-destructive/[.08] border border-destructive/[.22] text-destructive text-[13px]">
+        <div className="flex items-start gap-2.5 p-3 rounded-lg bg-destructive/8 border border-destructive/22 text-destructive text-[13px]">
           <TriangleAlert size={15} className="mt-0.5 shrink-0" />
           <span>This action is irreversible and will be recorded in the audit log.</span>
         </div>

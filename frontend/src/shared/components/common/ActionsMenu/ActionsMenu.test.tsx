@@ -1,32 +1,32 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { RowActionsDropdown } from "./RowActionsDropdown";
+import { ActionsMenu } from "./ActionsMenu";
 
-describe("RowActionsDropdown", () => {
+describe("ActionsMenu", () => {
   it("renders an accessible trigger button", () => {
     render(
-      <RowActionsDropdown>
+      <ActionsMenu>
         <button type="button">Item</button>
-      </RowActionsDropdown>,
+      </ActionsMenu>,
     );
-    expect(screen.getByTitle("Row actions")).toBeInTheDocument();
+    expect(screen.getByTitle("Actions")).toBeInTheDocument();
   });
 
   it("shows children after trigger click", () => {
     render(
-      <RowActionsDropdown>
+      <ActionsMenu>
         <button type="button">Edit</button>
-      </RowActionsDropdown>,
+      </ActionsMenu>,
     );
-    fireEvent.click(screen.getByTitle("Row actions"));
+    fireEvent.click(screen.getByTitle("Actions"));
     expect(screen.getByText("Edit")).toBeInTheDocument();
   });
 
   it("hides children before trigger click", () => {
     render(
-      <RowActionsDropdown>
+      <ActionsMenu>
         <button type="button">Edit</button>
-      </RowActionsDropdown>,
+      </ActionsMenu>,
     );
     expect(screen.queryByText("Edit")).not.toBeInTheDocument();
   });
