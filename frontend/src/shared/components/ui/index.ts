@@ -7,5 +7,6 @@ export { Dropdown } from "./Dropdown";
 export { FormField } from "./FormField";
 export { Input, inputVariants } from "./Input";
 export { Modal } from "./Modal";
+export { Pagination } from "./Pagination";
 export { getPasswordStrength, PasswordStrengthMeter } from "./PasswordStrengthMeter";
 export { Spinner, spinnerVariants } from "./Spinner";

@@ -1,10 +1,9 @@
 "use client";
 
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
 import { useIsFetching, useQueryClient } from "@tanstack/react-query";
 import { useRoles } from "@/features/roles/hooks/useRoles";
-import { Button } from "@/shared/components/ui";
+import { Pagination } from "@/shared/components/ui";
 import { useDebounce, usePermission } from "@/shared/hooks";
 import type { UserWithRoles } from "@/shared/types";
 import { useDeleteUser, useRemoveRole, useUsers } from "../hooks/useUsers";
@@ -47,7 +46,6 @@ export function UsersPage() {
 
   const users = data?.data ?? [];
   const meta = data?.meta;
-  const totalPages = meta ? Math.ceil(meta.total / meta.limit) : 1;
 
   const handleSearchChange = (v: string) => {
     setSearch(v);
@@ -125,39 +123,14 @@ export function UsersPage() {
       />
 
       {/* Pagination */}
-      {meta && meta.total > meta.limit && (
-        <div className="flex items-center justify-between flex-wrap gap-3">
-          <span className="text-[12.5px] text-muted-foreground">
-            Showing{" "}
-            <b className="text-foreground">{(page - 1) * meta.limit + 1}–{Math.min(page * meta.limit, meta.total)}</b>{" "}
-            of <b className="text-foreground">{meta.total}</b> users
-          </span>
-          <div className="flex items-center gap-1.5">
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-              disabled={page <= 1}
-              className="gap-1"
-            >
-              <ChevronLeft size={14} />
-              Prev
-            </Button>
-            <span className="px-3 py-1.5 text-sm text-muted-foreground">
-              {page} / {totalPages}
-            </span>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => setPage((p) => p + 1)}
-              disabled={page >= totalPages}
-              className="gap-1"
-            >
-              Next
-              <ChevronRight size={14} />
-            </Button>
-          </div>
-        </div>
+      {meta && (
+        <Pagination
+          page={page}
+          pageSize={meta.limit}
+          total={meta.total}
+          onPageChange={setPage}
+          label="users"
+        />
       )}
 
       {/* Create / Edit user modal */}
