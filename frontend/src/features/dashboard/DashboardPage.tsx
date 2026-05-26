@@ -93,8 +93,8 @@ export function DashboardPage() {
         ))}
       </div>
 
-      {/* Two-column: recent activity + sidebar — grid stretches both cells to equal height */}
-      <div className="grid grid-cols-1 xl:grid-cols-[1fr_300px] gap-4">
+      {/* Two-column: recent activity + sidebar — fixed height so overflow-y-auto fires */}
+      <div className="grid grid-cols-1 xl:grid-cols-[1fr_300px] xl:h-[600px] gap-4">
         {/* Recent activity — header fixed, feed scrolls to fill remaining height */}
         <div className="rounded-xl border border-border bg-card shadow-sm flex flex-col overflow-hidden">
           <div className="flex items-center justify-between px-5 py-4 border-b border-border shrink-0">
