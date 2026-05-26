@@ -1,6 +1,7 @@
 "use client";
 
 import type { ChangeEvent, ComponentPropsWithoutRef } from "react";
+import { checkboxVariants } from "./Checkbox.variants";
 
 type CheckboxProps = Omit<ComponentPropsWithoutRef<"input">, "type"> & {
   onCheckedChange?: (checked: boolean) => void;
@@ -16,9 +17,7 @@ export function Checkbox({ onCheckedChange, onChange, className, ...props }: Che
     <input
       type="checkbox"
       onChange={handleChange}
-      className={["accent-primary w-4 h-4 cursor-pointer shrink-0", className]
-        .filter(Boolean)
-        .join(" ")}
+      className={checkboxVariants({ className })}
       {...props}
     />
   );

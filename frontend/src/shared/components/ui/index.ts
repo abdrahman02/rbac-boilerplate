@@ -1,6 +1,6 @@
 export { Alert, alertVariants } from "./Alert";
 export { Avatar } from "./Avatar";
-export { Checkbox } from "./Checkbox";
+export { Checkbox, checkboxVariants } from "./Checkbox";
 export { Badge, badgeVariants } from "./Badge";
 export { Button, buttonVariants } from "./Button";
 export { Divider } from "./Divider";
