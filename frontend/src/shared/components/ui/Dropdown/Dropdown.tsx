@@ -1,18 +1,8 @@
 "use client";
 
-import {
-  FloatingPortal,
-  flip,
-  offset,
-  type Placement,
-  shift,
-  useClick,
-  useDismiss,
-  useFloating,
-  useInteractions,
-  useRole,
-} from "@floating-ui/react";
-import { type ReactNode, useState } from "react";
+import { FloatingPortal, type Placement } from "@floating-ui/react";
+import type { ReactNode } from "react";
+import { useDropdown } from "./useDropdown";
 
 interface DropdownProps {
   /** Elemen pemicu — bisa ReactNode atau fungsi (open: boolean) => ReactNode */
@@ -30,20 +20,7 @@ interface DropdownProps {
  * Mendukung keyboard navigation, dismissal otomatis, dan portal rendering.
  */
 export function Dropdown({ trigger, children, placement = "bottom-end", offsetPx = 6 }: DropdownProps) {
-  const [open, setOpen] = useState(false);
-
-  const { refs, floatingStyles, context } = useFloating({
-    open,
-    onOpenChange: setOpen,
-    placement,
-    middleware: [offset(offsetPx), flip(), shift({ padding: 8 })],
-  });
-
-  const click = useClick(context);
-  const dismiss = useDismiss(context);
-  const role = useRole(context);
-
-  const { getReferenceProps, getFloatingProps } = useInteractions([click, dismiss, role]);
+  const { open, refs, floatingStyles, getReferenceProps, getFloatingProps } = useDropdown({ placement, offsetPx });
 
   return (
     <>

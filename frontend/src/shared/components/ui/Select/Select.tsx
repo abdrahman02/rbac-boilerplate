@@ -1,8 +1,8 @@
 "use client";
 
 import { Check, ChevronDown, Search } from "lucide-react";
-import { useRef, useState } from "react";
 import { selectOptionAll, selectOptionItem, selectRoot, selectTrigger } from "./Select.variants";
+import { useSelect } from "./useSelect";
 
 export interface SelectOption {
   value: string;
@@ -28,32 +28,13 @@ export function Select({
   searchPlaceholder = "Search…",
   className,
 }: SelectProps) {
-  const [open, setOpen] = useState(false);
-  const [query, setQuery] = useState("");
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  const filtered =
-    searchable && query ? options.filter((o) => o.label.toLowerCase().includes(query.toLowerCase())) : options;
-
-  const selectedLabel = value ? (options.find((o) => o.value === value)?.label ?? value) : (placeholder ?? "");
-
-  const handleOpen = () => {
-    setOpen(true);
-    if (searchable) {
-      setTimeout(() => inputRef.current?.focus(), 0);
-    }
-  };
-
-  const select = (v: string) => {
-    onChange(v);
-    setOpen(false);
-    setQuery("");
-  };
-
-  const close = () => {
-    setOpen(false);
-    setQuery("");
-  };
+  const { open, query, setQuery, inputRef, filtered, selectedLabel, handleOpen, select, close } = useSelect({
+    value,
+    onChange,
+    options,
+    placeholder,
+    searchable,
+  });
 
   return (
     <div className={selectRoot({ className })}>
@@ -67,7 +48,6 @@ export function Select({
 
       {open && (
         <>
-          {/* biome-ignore lint/a11y/noStaticElementInteractions: backdrop overlay for click-outside dismiss */}
           <div
             className="fixed inset-0 z-40"
             onClick={close}
