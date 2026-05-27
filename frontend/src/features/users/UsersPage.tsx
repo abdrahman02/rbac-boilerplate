@@ -1,91 +1,47 @@
 "use client";
 
-import { useIsFetching, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
-import { useRoles } from "@/features/roles/hooks/useRoles";
 import { ConfirmDeleteModal, PageHeader } from "@/shared/components/common";
 import { Pagination } from "@/shared/components/ui";
-import { useDebounce, usePermission } from "@/shared/hooks";
-import type { UserWithRoles } from "@/shared/types";
 import { AssignRoleModal } from "./components/AssignRoleModal";
 import { UserModal } from "./components/UserModal/UserModal";
 import { UserTable } from "./components/UserTable";
 import { UserToolbar } from "./components/UserToolbar/UserToolbar";
-import { useDeleteUser, useRemoveRole, useUsers } from "./hooks";
-
-interface FilterState {
-  role: string;
-  status: string;
-}
+import { useUsersPage } from "./hooks/useUsersPage";
 
 export function UsersPage() {
-  const [page, setPage] = useState(1);
-  const [search, setSearch] = useState("");
-  const [filters, setFilters] = useState<FilterState>({ role: "", status: "" });
-
-  const [editingUser, setEditingUser] = useState<UserWithRoles | null>(null);
-  const [isUserModalOpen, setUserModalOpen] = useState(false);
-  const [assigningUser, setAssigningUser] = useState<UserWithRoles | null>(null);
-  const [deletingUser, setDeletingUser] = useState<UserWithRoles | null>(null);
-
-  const queryClient = useQueryClient();
-  const debouncedSearch = useDebounce(search, 400);
-  const { data } = useUsers(page, 10, debouncedSearch, filters.role, filters.status);
-  const isFetching = useIsFetching({ queryKey: ["users"] }) > 0;
-
-  const handleRefresh = () => {
-    queryClient.invalidateQueries({ queryKey: ["users"] });
-  };
-  const { data: roles = [] } = useRoles();
-  const deleteUser = useDeleteUser();
-  const removeRole = useRemoveRole();
-
-  const canCreate = usePermission("users:create");
-  const canEdit = usePermission("users:update");
-  const canDelete = usePermission("users:delete");
-
-  const users = data?.data ?? [];
-  const meta = data?.meta;
-
-  const handleSearchChange = (v: string) => {
-    setSearch(v);
-    setPage(1);
-  };
-
-  const handleFiltersChange = (f: FilterState) => {
-    setFilters(f);
-    setPage(1);
-  };
-
-  const openCreate = () => {
-    setEditingUser(null);
-    setUserModalOpen(true);
-  };
-
-  const openEdit = (user: UserWithRoles) => {
-    setEditingUser(user);
-    setUserModalOpen(true);
-  };
-
-  const handleRemoveRole = async (user: UserWithRoles, roleName: string) => {
-    const role = roles.find((r) => r.name === roleName);
-    if (!role) return;
-    try {
-      await removeRole.mutateAsync({ userId: user.id, roleId: role.id });
-    } catch {
-      // API error silently ignored; the list will not update if the request failed
-    }
-  };
-
-  const handleConfirmDelete = async () => {
-    if (!deletingUser) return;
-    try {
-      await deleteUser.mutateAsync(deletingUser.id);
-      setDeletingUser(null);
-    } catch {
-      // Error is shown by the isLoading/disabled state; keep modal open for retry
-    }
-  };
+  const {
+    page,
+    setPage,
+    search,
+    filters,
+    editingUser,
+    isUserModalOpen,
+    assigningUser,
+    deletingUser,
+    users,
+    meta,
+    roles,
+    isFetching,
+    canCreate,
+    canEdit,
+    canDelete,
+    activeFilterCount,
+    clearFilters,
+    handleRefresh,
+    handleSearchChange,
+    handleFiltersChange,
+    openCreate,
+    openEdit,
+    closeUserModal,
+    openAssignRoles,
+    closeAssignRoles,
+    openConfirmDelete,
+    closeConfirmDelete,
+    handleCopyUserId,
+    handleRemoveRole,
+    handleConfirmDelete,
+    deleteUser,
+  } = useUsersPage();
 
   return (
     <div className="flex flex-col gap-5">
@@ -94,12 +50,13 @@ export function UsersPage() {
         description="People who can sign into this workspace, and the roles assigned to them."
       />
 
-      {/* Toolbar: search + filters + actions */}
       <UserToolbar
         search={search}
         onSearchChange={handleSearchChange}
         filters={filters}
         onFiltersChange={handleFiltersChange}
+        activeFilterCount={activeFilterCount}
+        onClearFilters={clearFilters}
         roles={roles}
         canCreate={canCreate}
         isFetching={isFetching}
@@ -107,34 +64,38 @@ export function UsersPage() {
         onRefresh={handleRefresh}
       />
 
-      {/* Users table */}
       <UserTable
         users={users}
         isFetching={isFetching}
         canEdit={canEdit}
         canDelete={canDelete}
         onEdit={openEdit}
-        onManageRoles={(user) => setAssigningUser(user)}
-        onDelete={(user) => setDeletingUser(user)}
+        onManageRoles={openAssignRoles}
+        onDelete={openConfirmDelete}
         onRemoveRole={handleRemoveRole}
+        onCopyUserId={handleCopyUserId}
       />
 
-      {/* Pagination */}
-      {meta && <Pagination page={page} pageSize={meta.limit} total={meta.total} onPageChange={setPage} label="users" />}
-
-      {/* Create / Edit user modal */}
-      <UserModal isOpen={isUserModalOpen} onClose={() => setUserModalOpen(false)} user={editingUser} />
-
-      {/* Assign roles modal */}
-      {assigningUser && (
-        <AssignRoleModal isOpen={!!assigningUser} onClose={() => setAssigningUser(null)} user={assigningUser} />
+      {meta && (
+        <Pagination
+          page={page}
+          pageSize={meta.limit}
+          total={meta.total}
+          onPageChange={setPage}
+          label="users"
+        />
       )}
 
-      {/* Confirm delete modal */}
+      <UserModal isOpen={isUserModalOpen} onClose={closeUserModal} user={editingUser} />
+
+      {assigningUser && (
+        <AssignRoleModal isOpen={!!assigningUser} onClose={closeAssignRoles} user={assigningUser} />
+      )}
+
       {deletingUser && (
         <ConfirmDeleteModal
           isOpen={!!deletingUser}
-          onClose={() => setDeletingUser(null)}
+          onClose={closeConfirmDelete}
           onConfirm={handleConfirmDelete}
           title={`Delete ${deletingUser.name}?`}
           description="This will permanently remove their account and revoke all active sessions."

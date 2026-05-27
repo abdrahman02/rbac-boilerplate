@@ -5,17 +5,16 @@ import type { ReactNode } from "react";
 import { FilterDropdown, RefreshButton, SearchInput } from "@/shared/components/common";
 import { Button, Select } from "@/shared/components/ui";
 import type { RoleWithPermissions } from "@/shared/types";
-
-interface FilterState {
-  role: string;
-  status: string;
-}
+import type { FilterState } from "../../types";
+import { STATUS_OPTIONS } from "./UserToolbar.constants";
 
 interface UserToolbarProps {
   search: string;
   onSearchChange: (v: string) => void;
   filters: FilterState;
   onFiltersChange: (f: FilterState) => void;
+  activeFilterCount: number;
+  onClearFilters?: () => void;
   roles: RoleWithPermissions[];
   canCreate: boolean;
   isFetching: boolean;
@@ -23,25 +22,19 @@ interface UserToolbarProps {
   onRefresh: () => void;
 }
 
-const statusOptions = [
-  { value: "active", label: "Active" },
-  { value: "inactive", label: "Inactive" },
-];
-
 export function UserToolbar({
   search,
   onSearchChange,
   filters,
   onFiltersChange,
+  activeFilterCount,
+  onClearFilters,
   roles,
   canCreate,
   isFetching,
   onAddUser,
   onRefresh,
 }: UserToolbarProps) {
-  const activeCount = (filters.role ? 1 : 0) + (filters.status ? 1 : 0);
-  const clearAll = () => onFiltersChange({ role: "", status: "" });
-
   return (
     <div className="flex gap-2.5 flex-wrap items-center p-3.5 rounded-xl border border-border bg-card shadow-sm">
       <div className="flex-1 min-w-[200px]">
@@ -53,7 +46,7 @@ export function UserToolbar({
         />
       </div>
 
-      <FilterDropdown activeCount={activeCount} onClearAll={activeCount > 0 ? clearAll : undefined}>
+      <FilterDropdown activeCount={activeFilterCount} onClearAll={onClearFilters}>
         <FilterField label="Role">
           <Select
             searchable
@@ -68,7 +61,7 @@ export function UserToolbar({
           <Select
             value={filters.status}
             onChange={(v) => onFiltersChange({ ...filters, status: v })}
-            options={statusOptions}
+            options={STATUS_OPTIONS}
             placeholder="All statuses"
           />
         </FilterField>

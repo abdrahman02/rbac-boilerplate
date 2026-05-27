@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import { Plus, Users, X } from "lucide-react";
 import type { ReactNode } from "react";
 import {
@@ -24,6 +25,7 @@ interface UserTableProps {
   onManageRoles: (user: UserWithRoles) => void;
   onDelete: (user: UserWithRoles) => void;
   onRemoveRole: (user: UserWithRoles, roleName: string) => void;
+  onCopyUserId: (userId: number) => void;
 }
 
 export function UserTable({
@@ -35,6 +37,7 @@ export function UserTable({
   onManageRoles,
   onDelete,
   onRemoveRole,
+  onCopyUserId,
 }: UserTableProps) {
   return (
     <TableShell>
@@ -63,10 +66,11 @@ export function UserTable({
               user={user}
               canEdit={canEdit}
               canDelete={canDelete}
-              onEdit={() => onEdit(user)}
-              onManageRoles={() => onManageRoles(user)}
-              onDelete={() => onDelete(user)}
-              onRemoveRole={(roleName) => onRemoveRole(user, roleName)}
+              onEdit={onEdit}
+              onManageRoles={onManageRoles}
+              onDelete={onDelete}
+              onRemoveRole={onRemoveRole}
+              onCopyUserId={onCopyUserId}
             />
           ))}
         </tbody>
@@ -79,27 +83,33 @@ interface UserRowProps {
   user: UserWithRoles;
   canEdit: boolean;
   canDelete: boolean;
-  onEdit: () => void;
-  onManageRoles: () => void;
-  onDelete: () => void;
-  onRemoveRole: (roleName: string) => void;
+  onEdit: (user: UserWithRoles) => void;
+  onManageRoles: (user: UserWithRoles) => void;
+  onDelete: (user: UserWithRoles) => void;
+  onRemoveRole: (user: UserWithRoles, roleName: string) => void;
+  onCopyUserId: (userId: number) => void;
 }
 
-function UserRow({ user, canEdit, canDelete, onEdit, onManageRoles, onDelete, onRemoveRole }: UserRowProps) {
-  const handleCopyId = () => {
-    navigator.clipboard.writeText(String(user.id)).catch(() => {});
-  };
-
+const UserRow = memo(function UserRow({
+  user,
+  canEdit,
+  canDelete,
+  onEdit,
+  onManageRoles,
+  onDelete,
+  onRemoveRole,
+  onCopyUserId,
+}: UserRowProps) {
   return (
     <TableRow>
       <TableCell className="w-12">
         <UserActionsMenu
           canEdit={canEdit}
           canDelete={canDelete}
-          onEdit={onEdit}
-          onManageRoles={onManageRoles}
-          onCopyId={handleCopyId}
-          onDelete={onDelete}
+          onEdit={() => onEdit(user)}
+          onManageRoles={() => onManageRoles(user)}
+          onCopyId={() => onCopyUserId(user.id)}
+          onDelete={() => onDelete(user)}
         />
       </TableCell>
 
@@ -119,14 +129,14 @@ function UserRow({ user, canEdit, canDelete, onEdit, onManageRoles, onDelete, on
             <span className="text-[12px] text-muted-foreground">No role</span>
           ) : (
             user.roles.map((role) => (
-              <RemovableBadge key={role} onRemove={() => onRemoveRole(role)}>
+              <RemovableBadge key={role} onRemove={() => onRemoveRole(user, role)}>
                 {role}
               </RemovableBadge>
             ))
           )}
           <button
             type="button"
-            onClick={onManageRoles}
+            onClick={() => onManageRoles(user)}
             title="Manage roles"
             className="h-[22px] px-2 inline-flex items-center gap-1 rounded-full border border-dashed border-border text-[11.5px] text-muted-foreground hover:text-foreground hover:border-foreground/40 transition-colors"
           >
@@ -145,7 +155,7 @@ function UserRow({ user, canEdit, canDelete, onEdit, onManageRoles, onDelete, on
       </TableCell>
     </TableRow>
   );
-}
+});
 
 function RemovableBadge({ children, onRemove }: { children: ReactNode; onRemove: () => void }) {
   return (
