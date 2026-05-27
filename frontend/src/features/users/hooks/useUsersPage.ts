@@ -125,6 +125,7 @@ export function useUsersPage() {
     // derived
     activeFilterCount,
     clearFilters: activeFilterCount > 0 ? handleClearFilters : undefined,
+    isDeletePending: deleteUser.isPending,
     // handlers
     handleRefresh,
     handleSearchChange,
@@ -139,6 +140,5 @@ export function useUsersPage() {
     handleCopyUserId,
     handleRemoveRole,
     handleConfirmDelete,
-    deleteUser,
   };
 }

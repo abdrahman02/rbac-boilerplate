@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import { Plus } from "lucide-react";
 import type { ReactNode } from "react";
 import { FilterDropdown, RefreshButton, SearchInput } from "@/shared/components/common";
@@ -22,7 +23,7 @@ interface UserToolbarProps {
   onRefresh: () => void;
 }
 
-export function UserToolbar({
+export const UserToolbar = memo(function UserToolbar({
   search,
   onSearchChange,
   filters,
@@ -79,7 +80,7 @@ export function UserToolbar({
       )}
     </div>
   );
-}
+});
 
 function FilterField({ label, children }: { label: string; children: ReactNode }) {
   return (

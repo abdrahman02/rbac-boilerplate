@@ -28,7 +28,7 @@ interface UserTableProps {
   onCopyUserId: (userId: number) => void;
 }
 
-export function UserTable({
+export const UserTable = memo(function UserTable({
   users,
   isFetching,
   canEdit,
@@ -77,7 +77,7 @@ export function UserTable({
       </table>
     </TableShell>
   );
-}
+});
 
 interface UserRowProps {
   user: UserWithRoles;

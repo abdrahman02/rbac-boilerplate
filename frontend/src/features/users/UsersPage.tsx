@@ -40,7 +40,7 @@ export function UsersPage() {
     handleCopyUserId,
     handleRemoveRole,
     handleConfirmDelete,
-    deleteUser,
+    isDeletePending,
   } = useUsersPage();
 
   return (
@@ -101,7 +101,7 @@ export function UsersPage() {
           description="This will permanently remove their account and revoke all active sessions."
           confirmText={deletingUser.email}
           confirmLabel="Delete user"
-          isLoading={deleteUser.isPending}
+          isLoading={isDeletePending}
         />
       )}
     </div>
