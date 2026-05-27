@@ -1,15 +1,9 @@
 import { useMemo } from "react";
 import { useRoles } from "@/features/roles/hooks/useRoles";
 import { useUsers } from "@/features/users/hooks";
+import type { RoleBar } from "../../types";
 
 const MAX_USERS_FOR_DISTRIBUTION = 200;
-
-interface RoleBar {
-  id: number;
-  name: string;
-  count: number;
-  pct: number;
-}
 
 export const useRoleDistribution = () => {
   const rolesQuery = useRoles();

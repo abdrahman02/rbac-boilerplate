@@ -1,6 +1,7 @@
 "use client";
 
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { useCallback } from "react";
 import { apiClient } from "@/shared/lib/api-client";
 import type { DashboardStats } from "@/shared/types";
 
@@ -29,5 +30,6 @@ export function useExportDashboard() {
       URL.revokeObjectURL(url);
     },
   });
-  return { exportDashboard: () => mutate(), isExporting: isPending };
+  const exportDashboard = useCallback(() => mutate(), [mutate]);
+  return { exportDashboard, isExporting: isPending };
 }

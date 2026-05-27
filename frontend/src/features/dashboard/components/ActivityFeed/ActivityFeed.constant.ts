@@ -1,4 +1,7 @@
-import type { BadgeVariant } from "./ActivityFeed";
+import type { VariantProps } from "tailwind-variants";
+import type { badgeVariants } from "@/shared/components/ui";
+
+export type BadgeVariant = NonNullable<VariantProps<typeof badgeVariants>["variant"]>;
 
 // Maps every backend action string to a badge variant.
 // danger=destroy, warning=unlink, info=modify/assign, primary=create, success=auth ok, default=neutral

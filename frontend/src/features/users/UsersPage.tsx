@@ -76,21 +76,11 @@ export function UsersPage() {
         onCopyUserId={handleCopyUserId}
       />
 
-      {meta && (
-        <Pagination
-          page={page}
-          pageSize={meta.limit}
-          total={meta.total}
-          onPageChange={setPage}
-          label="users"
-        />
-      )}
+      {meta && <Pagination page={page} pageSize={meta.limit} total={meta.total} onPageChange={setPage} label="users" />}
 
       <UserModal isOpen={isUserModalOpen} onClose={closeUserModal} user={editingUser} />
 
-      {assigningUser && (
-        <AssignRoleModal isOpen={!!assigningUser} onClose={closeAssignRoles} user={assigningUser} />
-      )}
+      {assigningUser && <AssignRoleModal isOpen={!!assigningUser} onClose={closeAssignRoles} user={assigningUser} />}
 
       {deletingUser && (
         <ConfirmDeleteModal

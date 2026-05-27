@@ -1,8 +1,8 @@
 "use client";
 
-import { memo } from "react";
 import { Plus, Users, X } from "lucide-react";
 import type { ReactNode } from "react";
+import { memo } from "react";
 import {
   Avatar,
   TableCell,

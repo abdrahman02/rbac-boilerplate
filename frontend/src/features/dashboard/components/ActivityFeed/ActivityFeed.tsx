@@ -1,17 +1,13 @@
 import { memo } from "react";
-import type { VariantProps } from "tailwind-variants";
-import type { badgeVariants } from "@/shared/components/ui";
 import { Avatar, Badge } from "@/shared/components/ui";
 import { formatDateTime, formatRelative } from "@/shared/lib/format-date";
 import type { RecentActivityItem } from "@/shared/types";
-import { ACTION_VARIANT_MAP } from "./ActivityFeed.constant";
+import { ACTION_VARIANT_MAP, type BadgeVariant } from "./ActivityFeed.constant";
 
 interface ActivityFeedProps {
   logs: RecentActivityItem[];
   isLoading?: boolean;
 }
-
-export type BadgeVariant = NonNullable<VariantProps<typeof badgeVariants>["variant"]>;
 
 function getActionBadgeVariant(action: string): BadgeVariant {
   return ACTION_VARIANT_MAP[action] ?? "default";
