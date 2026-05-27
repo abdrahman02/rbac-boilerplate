@@ -1,4 +1,4 @@
-import { type AuthenticatedUser, authenticatedUserSchema } from "@/features/auth/types";
+import { type AuthenticatedUser, authenticatedUserSchema } from "@/shared/types";
 import { apiClient } from "@/shared/lib/api-client";
 import type { LoginInput } from "./login.schema";
 

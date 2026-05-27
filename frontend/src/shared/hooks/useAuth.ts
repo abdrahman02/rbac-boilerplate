@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
-import { useAuthStore } from "@/features/auth/stores/authStore";
-import { type AuthenticatedUser, authenticatedUserSchema } from "@/features/auth/types";
+import { useAuthStore } from "@/shared/stores/authStore";
+import { type AuthenticatedUser, authenticatedUserSchema } from "@/shared/types";
 import { apiClient } from "@/shared/lib/api-client";
 
 export function useAuth() {

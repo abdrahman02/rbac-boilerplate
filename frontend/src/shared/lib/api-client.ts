@@ -1,5 +1,5 @@
 import axios, { type AxiosError, type AxiosInstance, type InternalAxiosRequestConfig } from "axios";
-import { useAuthStore } from "@/features/auth/stores/authStore";
+import { useAuthStore } from "@/shared/stores/authStore";
 
 interface PendingRequest {
   config: InternalAxiosRequestConfig;

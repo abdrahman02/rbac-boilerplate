@@ -1,4 +1,4 @@
-import { useAuthStore } from "@/features/auth/stores/authStore";
+import { useAuthStore } from "@/shared/stores/authStore";
 
 export function usePermission(permission: string): boolean {
   const { user } = useAuthStore();

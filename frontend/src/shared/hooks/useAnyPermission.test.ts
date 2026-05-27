@@ -1,6 +1,6 @@
 import { renderHook } from "@testing-library/react";
 import { beforeEach, describe, expect, it } from "vitest";
-import { useAuthStore } from "@/features/auth/stores/authStore";
+import { useAuthStore } from "@/shared/stores/authStore";
 import { useAnyPermission } from "./useAnyPermission";
 
 describe("useAnyPermission", () => {
