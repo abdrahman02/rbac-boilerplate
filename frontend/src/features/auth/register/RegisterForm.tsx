@@ -5,7 +5,6 @@ import Link from "next/link";
 import { memo } from "react";
 import { AuthShell } from "@/features/auth/components/AuthShell";
 import { Alert, Button, FormField, Input, PasswordStrengthMeter } from "@/shared/components/ui";
-import { getErrorMessage } from "@/shared/lib/api-error";
 import { useRegisterForm } from "./useRegisterForm";
 
 // Memoised at module level — avoids re-creating the wrapped component on every render
@@ -21,7 +20,7 @@ const footer = (
 );
 
 export function RegisterForm() {
-  const { form, isPending, error, password, onSubmit } = useRegisterForm();
+  const { form, isPending, password, onSubmit } = useRegisterForm();
 
   const {
     register,
@@ -35,7 +34,7 @@ export function RegisterForm() {
         You&apos;ll be the workspace owner with full admin permissions.
       </p>
 
-      {error && <Alert message={getErrorMessage(error)} className="mb-4" />}
+      {errors.root?.message && <Alert message={errors.root.message} className="mb-4" />}
 
       <form onSubmit={onSubmit} className="flex flex-col gap-3.5">
         <FormField label="Full name" required error={errors.name?.message}>

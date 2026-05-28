@@ -4,7 +4,6 @@ import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 import Link from "next/link";
 import { AuthShell } from "@/features/auth/components/AuthShell";
 import { Alert, Button, Divider, FormField, Input } from "@/shared/components/ui";
-import { getErrorMessage } from "@/shared/lib/api-error";
 import { useLoginForm } from "./useLoginForm";
 
 const footer = (
@@ -17,7 +16,7 @@ const footer = (
 );
 
 export function LoginForm() {
-  const { form, isPending, error, showPassword, toggleShowPassword, onSubmit } = useLoginForm();
+  const { form, isPending, showPassword, toggleShowPassword, onSubmit } = useLoginForm();
 
   const {
     register,
@@ -29,7 +28,7 @@ export function LoginForm() {
       <h1 className="text-[26px] font-semibold tracking-tight m-0">Welcome back</h1>
       <p className="mt-1.5 mb-7 text-sm text-muted-foreground">Sign in to your RBAC workspace.</p>
 
-      {error && <Alert message={getErrorMessage(error)} className="mb-4" />}
+      {errors.root?.message && <Alert message={errors.root.message} className="mb-4" />}
 
       <form onSubmit={onSubmit} className="flex flex-col gap-3.5">
         <FormField label="Email" required error={errors.email?.message}>

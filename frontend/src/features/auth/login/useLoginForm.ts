@@ -7,13 +7,13 @@ import type { BaseSyntheticEvent } from "react";
 import { useCallback, useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { useForm } from "react-hook-form";
+import { getErrorMessage } from "@/shared/lib/api-error";
 import { loginApi } from "./LoginForm.api";
 import { type LoginInput, loginSchema } from "./LoginForm.schema";
 
 interface UseLoginFormReturn {
   form: UseFormReturn<LoginInput>;
   isPending: boolean;
-  error: Error | null;
   showPassword: boolean;
   toggleShowPassword: () => void;
   onSubmit: (e?: BaseSyntheticEvent) => Promise<void>;
@@ -28,12 +28,15 @@ export function useLoginForm(): UseLoginFormReturn {
     resolver: zodResolver(loginSchema),
   });
 
-  const { mutate, isPending, error } = useMutation({
+  const { setError } = form;
+
+  const { mutate, isPending } = useMutation({
     mutationFn: loginApi,
     onSuccess: (user) => {
       queryClient.setQueryData(["auth", "me"], user);
       router.push("/dashboard");
     },
+    onError: (err) => setError("root", { message: getErrorMessage(err) }),
   });
 
   // toggleShowPassword is passed to child components, so it needs useCallback
@@ -42,5 +45,5 @@ export function useLoginForm(): UseLoginFormReturn {
   // form.handleSubmit is already stable from RHF, no useCallback wrapper needed
   const onSubmit = form.handleSubmit((data) => mutate(data));
 
-  return { form, isPending, error, showPassword, toggleShowPassword, onSubmit };
+  return { form, isPending, showPassword, toggleShowPassword, onSubmit };
 }
