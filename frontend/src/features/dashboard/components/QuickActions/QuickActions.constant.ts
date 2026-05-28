@@ -1,4 +1,4 @@
-import { type LucideIcon, Key, ScrollText, Shield, Users } from "lucide-react";
+import { Key, type LucideIcon, ScrollText, Shield, Users } from "lucide-react";
 
 export interface QuickAction {
   icon: LucideIcon;
