@@ -6,7 +6,7 @@ import type { BaseSyntheticEvent } from "react";
 import { useCallback, useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { useForm, useWatch } from "react-hook-form";
-import { type ResetPasswordInput, resetPasswordSchema } from "./resetPassword.schema";
+import { type ResetPasswordInput, resetPasswordSchema } from "./ResetPasswordForm.schema";
 
 interface UseResetPasswordFormReturn {
   form: UseFormReturn<ResetPasswordInput>;

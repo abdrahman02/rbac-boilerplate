@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { resetPasswordSchema } from "./resetPassword.schema";
+import { resetPasswordSchema } from "./ResetPasswordForm.schema";
 
 const validData = { password: "newpassword123", confirmPassword: "newpassword123" };
 

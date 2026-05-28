@@ -6,8 +6,8 @@ import { useRouter } from "next/navigation";
 import type { BaseSyntheticEvent } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { useForm, useWatch } from "react-hook-form";
-import { registerApi } from "./register.api";
-import { type RegisterInput, registerSchema } from "./register.schema";
+import { registerApi } from "./RegisterForm.api";
+import { type RegisterInput, registerSchema } from "./RegisterForm.schema";
 
 interface UseRegisterFormReturn {
   form: UseFormReturn<RegisterInput>;

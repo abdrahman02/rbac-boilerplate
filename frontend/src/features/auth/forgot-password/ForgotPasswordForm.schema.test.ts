@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { forgotPasswordSchema } from "./forgotPassword.schema";
+import { forgotPasswordSchema } from "./ForgotPasswordForm.schema";
 
 describe("forgotPasswordSchema", () => {
   it("accepts valid email", () => {

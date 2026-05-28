@@ -7,10 +7,15 @@ import { Alert, Button, Divider, FormField, Input } from "@/shared/components/ui
 import { getErrorMessage } from "@/shared/lib/api-error";
 import { useLoginForm } from "./useLoginForm";
 
-/**
- * Pure JSX login form component.
- * All state, routing, and mutation logic are encapsulated in useLoginForm.
- */
+const footer = (
+  <>
+    Don&apos;t have an account?{" "}
+    <Link href="/register" className="text-primary font-medium no-underline">
+      Create one
+    </Link>
+  </>
+);
+
 export function LoginForm() {
   const { form, isPending, error, showPassword, toggleShowPassword, onSubmit } = useLoginForm();
 
@@ -18,15 +23,6 @@ export function LoginForm() {
     register,
     formState: { errors },
   } = form;
-
-  const footer = (
-    <>
-      Don&apos;t have an account?{" "}
-      <Link href="/register" className="text-primary font-medium no-underline">
-        Create one
-      </Link>
-    </>
-  );
 
   return (
     <AuthShell footer={footer}>

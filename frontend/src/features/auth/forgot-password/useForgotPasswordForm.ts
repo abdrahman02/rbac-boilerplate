@@ -5,7 +5,7 @@ import type { BaseSyntheticEvent } from "react";
 import { useCallback, useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { useForm } from "react-hook-form";
-import { type ForgotPasswordInput, forgotPasswordSchema } from "./forgotPassword.schema";
+import { type ForgotPasswordInput, forgotPasswordSchema } from "./ForgotPasswordForm.schema";
 
 interface UseForgotPasswordFormReturn {
   form: UseFormReturn<ForgotPasswordInput>;

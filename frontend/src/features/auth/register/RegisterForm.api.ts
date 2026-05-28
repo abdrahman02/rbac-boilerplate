@@ -1,6 +1,6 @@
-import { type AuthenticatedUser, authenticatedUserSchema } from "@/shared/types";
 import { apiClient } from "@/shared/lib/api-client";
-import type { RegisterInput } from "./register.schema";
+import { type AuthenticatedUser, authenticatedUserSchema } from "@/shared/types";
+import type { RegisterInput } from "./RegisterForm.schema";
 
 /** Only these three fields are sent to the backend — confirmPassword is omitted. */
 type RegisterApiInput = Pick<RegisterInput, "name" | "email" | "password">;

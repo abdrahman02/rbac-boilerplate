@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { apiClient } from "@/shared/lib/api-client";
-import { registerApi } from "./register.api";
+import { registerApi } from "./RegisterForm.api";
 
 vi.mock("@/shared/lib/api-client", () => ({
   apiClient: { post: vi.fn() },

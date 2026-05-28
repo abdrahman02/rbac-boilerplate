@@ -8,17 +8,18 @@ import { Alert, Button, FormField, Input, PasswordStrengthMeter } from "@/shared
 import { getErrorMessage } from "@/shared/lib/api-error";
 import { useRegisterForm } from "./useRegisterForm";
 
-/**
- * Memoised wrapper to avoid re-rendering the meter on every keystroke
- * unless the password value itself changes.
- */
+// Memoised at module level — avoids re-creating the wrapped component on every render
 const PasswordStrengthMeterMemo = memo(PasswordStrengthMeter);
 
-/**
- * Pure JSX registration form.
- * Contains zero useState, zero useRouter, and zero async logic.
- * All behaviour is delegated to useRegisterForm.
- */
+const footer = (
+  <>
+    Already have an account?{" "}
+    <Link href="/login" className="text-primary font-medium no-underline">
+      Sign in
+    </Link>
+  </>
+);
+
 export function RegisterForm() {
   const { form, isPending, error, password, onSubmit } = useRegisterForm();
 
@@ -26,15 +27,6 @@ export function RegisterForm() {
     register,
     formState: { errors },
   } = form;
-
-  const footer = (
-    <>
-      Already have an account?{" "}
-      <Link href="/login" className="text-primary font-medium no-underline">
-        Sign in
-      </Link>
-    </>
-  );
 
   return (
     <AuthShell footer={footer}>

@@ -7,8 +7,8 @@ import type { BaseSyntheticEvent } from "react";
 import { useCallback, useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { useForm } from "react-hook-form";
-import { loginApi } from "./login.api";
-import { type LoginInput, loginSchema } from "./login.schema";
+import { loginApi } from "./LoginForm.api";
+import { type LoginInput, loginSchema } from "./LoginForm.schema";
 
 interface UseLoginFormReturn {
   form: UseFormReturn<LoginInput>;
