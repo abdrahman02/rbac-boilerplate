@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import type { ReactNode } from "react";
+import { memo, type ReactNode } from "react";
 import { navBadgeVariants, navItemVariants } from "./NavItem.variants";
 
 interface NavItemProps {
@@ -14,7 +14,7 @@ interface NavItemProps {
   onClick?: () => void;
 }
 
-export function NavItem({ href, label, icon, badge, collapsed = false, onClick }: NavItemProps) {
+export const NavItem = memo(function NavItem({ href, label, icon, badge, collapsed = false, onClick }: NavItemProps) {
   const pathname = usePathname();
   const active = href === "/dashboard" ? pathname === href : pathname.startsWith(href);
 
@@ -34,4 +34,4 @@ export function NavItem({ href, label, icon, badge, collapsed = false, onClick }
       )}
     </Link>
   );
-}
+});

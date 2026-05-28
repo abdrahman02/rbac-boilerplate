@@ -1,6 +1,7 @@
 "use client";
 
 import { Menu, Moon, Sun } from "lucide-react";
+import { memo } from "react";
 import { Button } from "@/shared/components/ui";
 import { AvatarMenu } from "./AvatarMenu";
 import { Breadcrumb } from "./Breadcrumb";
@@ -11,7 +12,7 @@ interface HeaderProps {
   onOpenMobileNav: () => void;
 }
 
-export function Header({ onToggleSidebar, onOpenMobileNav }: HeaderProps) {
+export const Header = memo(function Header({ onToggleSidebar, onOpenMobileNav }: HeaderProps) {
   const { isDark, toggle: onToggleDark } = useDarkMode();
 
   return (
@@ -55,4 +56,4 @@ export function Header({ onToggleSidebar, onOpenMobileNav }: HeaderProps) {
       </div>
     </header>
   );
-}
+});

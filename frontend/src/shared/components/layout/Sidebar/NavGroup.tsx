@@ -3,11 +3,12 @@
 import { ChevronDown } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { type ReactNode, useEffect, useState } from "react";
+import { memo, type ReactNode, useMemo } from "react";
 import { PermissionGate } from "@/shared/components/guard";
 import { Dropdown } from "@/shared/components/ui";
 import { navGroupChildVariants, navGroupTriggerVariants } from "./NavGroup.variants";
 import type { NavItemDef } from "./Sidebar.types";
+import { useNavGroup } from "./useNavGroup";
 
 interface NavGroupProps {
   label: string;
@@ -17,37 +18,36 @@ interface NavGroupProps {
   onChildClick?: () => void;
 }
 
-export function NavGroup({ label, icon, items, collapsed = false, onChildClick }: NavGroupProps) {
+export const NavGroup = memo(function NavGroup({ label, icon, items, collapsed = false, onChildClick }: NavGroupProps) {
   const pathname = usePathname();
-  const isActiveParent = items.some((item) => pathname.startsWith(item.href));
-  const [isOpen, setIsOpen] = useState(false);
+  const { isOpen, isActiveParent, toggle } = useNavGroup(items);
 
-  useEffect(() => {
-    if (items.some((item) => pathname.startsWith(item.href))) setIsOpen(true);
-  }, [pathname, items]);
+  const childList = useMemo(
+    () =>
+      items.map((item) => {
+        const active = pathname.startsWith(item.href);
+        const className = navGroupChildVariants({ active });
 
-  const childList = items.map((item) => {
-    const active = pathname.startsWith(item.href);
-    const className = navGroupChildVariants({ active });
+        if (item.permission !== null) {
+          return (
+            <PermissionGate key={item.href} permission={item.permission}>
+              <Link href={item.href} className={className} onClick={onChildClick}>
+                <span className="flex shrink-0">{item.icon}</span>
+                <span>{item.label}</span>
+              </Link>
+            </PermissionGate>
+          );
+        }
 
-    if (item.permission !== null) {
-      return (
-        <PermissionGate key={item.href} permission={item.permission}>
-          <Link href={item.href} className={className} onClick={onChildClick}>
+        return (
+          <Link key={item.href} href={item.href} className={className} onClick={onChildClick}>
             <span className="flex shrink-0">{item.icon}</span>
             <span>{item.label}</span>
           </Link>
-        </PermissionGate>
-      );
-    }
-
-    return (
-      <Link key={item.href} href={item.href} className={className} onClick={onChildClick}>
-        <span className="flex shrink-0">{item.icon}</span>
-        <span>{item.label}</span>
-      </Link>
-    );
-  });
+        );
+      }),
+    [items, pathname, onChildClick],
+  );
 
   if (collapsed) {
     const trigger = (
@@ -76,7 +76,7 @@ export function NavGroup({ label, icon, items, collapsed = false, onChildClick }
       <button
         type="button"
         aria-expanded={isOpen}
-        onClick={() => setIsOpen((prev) => !prev)}
+        onClick={toggle}
         className={navGroupTriggerVariants({ activeParent: isActiveParent, collapsed: false })}
       >
         <span className="flex shrink-0">{icon}</span>
@@ -86,4 +86,4 @@ export function NavGroup({ label, icon, items, collapsed = false, onChildClick }
       {isOpen && <div className="pl-4 pt-0.5 flex flex-col gap-0.5">{childList}</div>}
     </div>
   );
-}
+});

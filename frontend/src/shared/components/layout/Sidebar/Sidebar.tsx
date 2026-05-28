@@ -1,57 +1,21 @@
 "use client";
 
-import { FileText, Key, LayoutDashboard, Shield, ShieldCheck, Users } from "lucide-react";
 import type { ReactNode } from "react";
+import { memo } from "react";
 import { BrandMark } from "@/shared/components/common";
 import { PermissionGate } from "@/shared/components/guard";
-import { useAnyPermission } from "@/shared/hooks/useAnyPermission";
-import { NavGroup } from "./NavGroup";
+import { NavGroupWrapper } from "./NavGroupWrapper";
 import { NavItem } from "./NavItem";
-import type { NavEntry, NavGroupDef } from "./Sidebar.types";
+import { NAV_CONFIG } from "./Sidebar.constants";
 import { isNavGroup } from "./Sidebar.types";
 import { sidebarVariants } from "./Sidebar.variants";
-
-const NAV_CONFIG: NavEntry[] = [
-  { href: "/dashboard", label: "Dashboard", icon: <LayoutDashboard size={18} />, permission: null },
-  { href: "/users", label: "Users", icon: <Users size={18} />, permission: "users:read" },
-  {
-    label: "Access Control",
-    icon: <Shield size={18} />,
-    permissions: ["roles:read", "permissions:read"],
-    children: [
-      { href: "/roles", label: "Roles", icon: <ShieldCheck size={18} />, permission: "roles:read" },
-      { href: "/permissions", label: "Permissions", icon: <Key size={18} />, permission: "permissions:read" },
-    ],
-  },
-  { href: "/audit-logs", label: "Audit Logs", icon: <FileText size={18} />, permission: "audit_logs:read" },
-];
 
 interface SidebarProps {
   collapsed?: boolean;
   onMobileClose?: () => void;
 }
 
-interface NavGroupWrapperProps {
-  entry: NavGroupDef;
-  collapsed: boolean;
-  onMobileClose?: () => void;
-}
-
-function NavGroupWrapper({ entry, collapsed, onMobileClose }: NavGroupWrapperProps) {
-  const visible = useAnyPermission(entry.permissions);
-  if (!visible) return null;
-  return (
-    <NavGroup
-      label={entry.label}
-      icon={entry.icon as ReactNode}
-      items={entry.children}
-      collapsed={collapsed}
-      onChildClick={onMobileClose}
-    />
-  );
-}
-
-export function Sidebar({ collapsed = false, onMobileClose }: SidebarProps) {
+export const Sidebar = memo(function Sidebar({ collapsed = false, onMobileClose }: SidebarProps) {
   return (
     <aside className={sidebarVariants({ collapsed })}>
       {/* Brand */}
@@ -100,4 +64,4 @@ export function Sidebar({ collapsed = false, onMobileClose }: SidebarProps) {
       </nav>
     </aside>
   );
-}
+});
