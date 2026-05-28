@@ -6,9 +6,12 @@ import { useRouter } from "next/navigation";
 import type { BaseSyntheticEvent } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { useForm, useWatch } from "react-hook-form";
+import { apiClient } from "@/shared/lib/api-client";
 import { getErrorMessage } from "@/shared/lib/api-error";
-import { registerApi } from "./RegisterForm.api";
+import { type AuthenticatedUser, authenticatedUserSchema } from "@/shared/types";
 import { type RegisterInput, registerSchema } from "./RegisterForm.schema";
+
+type RegisterApiInput = Pick<RegisterInput, "name" | "email" | "password">;
 
 interface UseRegisterFormReturn {
   form: UseFormReturn<RegisterInput>;
@@ -25,8 +28,11 @@ export function useRegisterForm(): UseRegisterFormReturn {
   const form = useForm<RegisterInput>({ resolver: zodResolver(registerSchema) });
   const { setError } = form;
 
-  const { mutate, isPending } = useMutation({
-    mutationFn: registerApi,
+  const { mutate, isPending } = useMutation<AuthenticatedUser, Error, RegisterApiInput>({
+    mutationFn: async (data) => {
+      const response = await apiClient.post("/auth/register", data);
+      return authenticatedUserSchema.parse(response.data.data);
+    },
     onSuccess: (user) => {
       queryClient.setQueryData(["auth", "me"], user);
       router.push("/dashboard");

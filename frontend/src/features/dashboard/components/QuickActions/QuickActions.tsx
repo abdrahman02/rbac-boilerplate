@@ -1,14 +1,8 @@
-import { ChevronRight, type LucideIcon } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { memo } from "react";
 import { Button } from "@/shared/components/ui";
 import { QUICK_ACTIONS } from "./QuickActions.constant";
-
-export interface QuickAction {
-  icon: LucideIcon;
-  label: string;
-  href: string;
-}
 
 export const QuickActions = memo(function QuickActions() {
   return (

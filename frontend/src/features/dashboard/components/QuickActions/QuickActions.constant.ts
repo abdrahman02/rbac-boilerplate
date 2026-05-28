@@ -1,5 +1,10 @@
-import { Key, ScrollText, Shield, Users } from "lucide-react";
-import type { QuickAction } from "./QuickActions";
+import { type LucideIcon, Key, ScrollText, Shield, Users } from "lucide-react";
+
+export interface QuickAction {
+  icon: LucideIcon;
+  label: string;
+  href: string;
+}
 
 export const QUICK_ACTIONS: QuickAction[] = [
   { icon: Users, label: "Invite a user", href: "/users" },

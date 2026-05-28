@@ -30,6 +30,7 @@ export function useExportDashboard() {
       URL.revokeObjectURL(url);
     },
   });
+
   const exportDashboard = useCallback(() => mutate(), [mutate]);
   return { exportDashboard, isExporting: isPending };
 }

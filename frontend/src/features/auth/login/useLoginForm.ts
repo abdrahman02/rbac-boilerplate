@@ -7,8 +7,9 @@ import type { BaseSyntheticEvent } from "react";
 import { useCallback, useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { useForm } from "react-hook-form";
+import { apiClient } from "@/shared/lib/api-client";
 import { getErrorMessage } from "@/shared/lib/api-error";
-import { loginApi } from "./LoginForm.api";
+import { type AuthenticatedUser, authenticatedUserSchema } from "@/shared/types";
 import { type LoginInput, loginSchema } from "./LoginForm.schema";
 
 interface UseLoginFormReturn {
@@ -30,8 +31,11 @@ export function useLoginForm(): UseLoginFormReturn {
 
   const { setError } = form;
 
-  const { mutate, isPending } = useMutation({
-    mutationFn: loginApi,
+  const { mutate, isPending } = useMutation<AuthenticatedUser, Error, LoginInput>({
+    mutationFn: async (data) => {
+      const response = await apiClient.post("/auth/login", data);
+      return authenticatedUserSchema.parse(response.data.data);
+    },
     onSuccess: (user) => {
       queryClient.setQueryData(["auth", "me"], user);
       router.push("/dashboard");
