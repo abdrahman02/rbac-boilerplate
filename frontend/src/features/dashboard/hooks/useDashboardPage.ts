@@ -2,15 +2,14 @@
 
 import { useMemo } from "react";
 import { useAuth } from "@/shared/hooks";
-import { getErrorMessage } from "@/shared/lib/api-error";
 import { STAT_ICONS } from "../DashboardPage.constants";
 import type { StatCardConfig } from "../types";
 import { useDashboardStats, useExportDashboard } from "./useDashboard";
 
 export function useDashboardPage() {
   const { user } = useAuth();
-  const { data: stats, isLoading, error: statsQueryError } = useDashboardStats();
-  const { exportDashboard, isExporting, exportError } = useExportDashboard();
+  const { data: stats, isLoading, isError: isStatsError } = useDashboardStats();
+  const { exportDashboard, isExporting } = useExportDashboard();
 
   const firstName = user?.name?.split(" ")[0] ?? "there";
 
@@ -50,9 +49,8 @@ export function useDashboardPage() {
     statCards,
     recentActivity: stats?.recentActivity ?? [],
     isLoading,
-    statsError: statsQueryError ? getErrorMessage(statsQueryError) : null,
+    isStatsError,
     isExporting,
-    exportError,
     exportDashboard,
   };
 }

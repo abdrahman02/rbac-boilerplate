@@ -8,9 +8,10 @@ interface StatCardProps {
   sub?: string;
   icon: ReactNode;
   isLoading?: boolean;
+  isError?: boolean;
 }
 
-export const StatCard = memo(function StatCard({ label, value, delta, sub, icon, isLoading }: StatCardProps) {
+export const StatCard = memo(function StatCard({ label, value, delta, sub, icon, isLoading, isError }: StatCardProps) {
   return (
     <div className="rounded-xl border border-border bg-card text-card-foreground shadow-sm p-[18px] flex flex-col gap-3">
       <div className="flex items-center justify-between">
@@ -22,6 +23,8 @@ export const StatCard = memo(function StatCard({ label, value, delta, sub, icon,
 
       {isLoading ? (
         <Spinner size="sm" />
+      ) : isError ? (
+        <span className="text-[26px] font-semibold leading-none tracking-tight text-muted-foreground">—</span>
       ) : (
         <div className="text-[30px] font-semibold leading-none tracking-tight">{value.toLocaleString()}</div>
       )}

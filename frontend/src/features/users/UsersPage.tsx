@@ -22,6 +22,7 @@ export function UsersPage() {
     meta,
     roles,
     isFetching,
+    isUsersError,
     canCreate,
     canEdit,
     canDelete,
@@ -67,6 +68,7 @@ export function UsersPage() {
       <UserTable
         users={users}
         isFetching={isFetching}
+        isError={isUsersError}
         canEdit={canEdit}
         canDelete={canDelete}
         onEdit={openEdit}

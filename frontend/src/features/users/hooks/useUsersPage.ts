@@ -4,6 +4,8 @@ import { useIsFetching, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useMemo, useState } from "react";
 import { useRoles } from "@/features/roles/hooks/useRoles";
 import { useDebounce, usePermission } from "@/shared/hooks";
+import { getErrorMessage } from "@/shared/lib/api-error";
+import { toast } from "@/shared/lib/toast";
 import type { UserWithRoles } from "@/shared/types";
 import type { FilterState } from "../types";
 import { useDeleteUser, useRemoveRole, useUsers } from "./useUsers";
@@ -22,7 +24,7 @@ export function useUsersPage() {
 
   const queryClient = useQueryClient();
   const debouncedSearch = useDebounce(search, 400);
-  const { data } = useUsers(page, 10, debouncedSearch, filters.role, filters.status);
+  const { data, isError: isUsersError } = useUsers(page, 10, debouncedSearch, filters.role, filters.status);
   const isFetching = useIsFetching({ queryKey: ["users"] }) > 0;
 
   const { data: roles = [] } = useRoles();
@@ -80,26 +82,23 @@ export function useUsersPage() {
   }, []);
 
   const handleRemoveRole = useCallback(
-    async (user: UserWithRoles, roleName: string) => {
+    (user: UserWithRoles, roleName: string) => {
       const role = roles.find((r) => r.name === roleName);
       if (!role) return;
-      try {
-        await removeRole.mutateAsync({ userId: user.id, roleId: role.id });
-      } catch {
-        // API error silently ignored; list won't update if request failed
-      }
+      removeRole.mutate(
+        { userId: user.id, roleId: role.id },
+        { onError: (err) => toast.error("Failed to remove role", { description: getErrorMessage(err) }) },
+      );
     },
     [roles, removeRole],
   );
 
-  const handleConfirmDelete = useCallback(async () => {
+  const handleConfirmDelete = useCallback(() => {
     if (!deletingUser) return;
-    try {
-      await deleteUser.mutateAsync(deletingUser.id);
-      setDeletingUser(null);
-    } catch {
-      // Error shown via isLoading/disabled state; keep modal open for retry
-    }
+    deleteUser.mutate(deletingUser.id, {
+      onSuccess: () => setDeletingUser(null),
+      onError: (err) => toast.error("Failed to delete user", { description: getErrorMessage(err) }),
+    });
   }, [deletingUser, deleteUser]);
 
   return {
@@ -118,6 +117,7 @@ export function useUsersPage() {
     meta,
     roles,
     isFetching,
+    isUsersError,
     // permissions
     canCreate,
     canEdit,

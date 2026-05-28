@@ -19,6 +19,7 @@ import { UserActionsMenu } from "../UserActionsMenu";
 interface UserTableProps {
   users: UserWithRoles[];
   isFetching: boolean;
+  isError?: boolean;
   canEdit: boolean;
   canDelete: boolean;
   onEdit: (user: UserWithRoles) => void;
@@ -31,6 +32,7 @@ interface UserTableProps {
 export const UserTable = memo(function UserTable({
   users,
   isFetching,
+  isError,
   canEdit,
   canDelete,
   onEdit,
@@ -53,8 +55,15 @@ export const UserTable = memo(function UserTable({
         </thead>
         <tbody>
           <TableLoadingRow isLoading={isFetching} colSpan={5} />
+          {isError && !isFetching && (
+            <tr>
+              <td colSpan={5} className="py-12 text-center text-sm text-muted-foreground">
+                Failed to load users. Try refreshing.
+              </td>
+            </tr>
+          )}
           <TableEmptyRow
-            isEmpty={!isFetching && users.length === 0}
+            isEmpty={!isFetching && !isError && users.length === 0}
             colSpan={5}
             icon={<Users size={24} strokeWidth={1.5} aria-hidden />}
             title="No users match your filters"

@@ -4,6 +4,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { useCallback } from "react";
 import { apiClient } from "@/shared/lib/api-client";
 import { getErrorMessage } from "@/shared/lib/api-error";
+import { toast } from "@/shared/lib/toast";
 import type { DashboardStats } from "@/shared/types";
 
 export function useDashboardStats() {
@@ -17,7 +18,7 @@ export function useDashboardStats() {
 }
 
 export function useExportDashboard() {
-  const { mutate, isPending, error } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: async () => {
       const res = await apiClient.get<Blob>("/dashboard/export", { responseType: "blob" });
       const url = URL.createObjectURL(res.data);
@@ -30,12 +31,9 @@ export function useExportDashboard() {
       anchor.click();
       URL.revokeObjectURL(url);
     },
+    onError: (err) => toast.error("Export failed", { description: getErrorMessage(err) }),
   });
 
   const exportDashboard = useCallback(() => mutate(), [mutate]);
-  return {
-    exportDashboard,
-    isExporting: isPending,
-    exportError: error ? getErrorMessage(error) : null,
-  };
+  return { exportDashboard, isExporting: isPending };
 }

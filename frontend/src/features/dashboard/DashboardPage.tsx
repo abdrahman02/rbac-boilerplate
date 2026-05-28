@@ -3,7 +3,7 @@
 import { ChevronRight, Download, Loader2, UserPlus } from "lucide-react";
 import Link from "next/link";
 import { PageHeader } from "@/shared/components/common";
-import { Alert, Button, buttonVariants } from "@/shared/components/ui";
+import { Button, buttonVariants } from "@/shared/components/ui";
 import { ActivityFeed } from "./components/ActivityFeed";
 import { QuickActions } from "./components/QuickActions";
 import { RoleDistribution } from "./components/RoleDistribution";
@@ -11,7 +11,7 @@ import { StatCard } from "./components/StatCard";
 import { useDashboardPage } from "./hooks";
 
 export function DashboardPage() {
-  const { firstName, statCards, recentActivity, isLoading, statsError, isExporting, exportError, exportDashboard } =
+  const { firstName, statCards, recentActivity, isLoading, isStatsError, isExporting, exportDashboard } =
     useDashboardPage();
 
   return (
@@ -32,12 +32,9 @@ export function DashboardPage() {
         </div>
       </PageHeader>
 
-      {statsError && <Alert message={statsError} />}
-      {exportError && <Alert message={exportError} />}
-
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {statCards.map((card) => (
-          <StatCard key={card.label} {...card} isLoading={isLoading} />
+          <StatCard key={card.label} {...card} isLoading={isLoading} isError={isStatsError} />
         ))}
       </div>
 
@@ -59,7 +56,7 @@ export function DashboardPage() {
             </Link>
           </div>
           <div className="flex-1 min-h-0 overflow-y-auto">
-            <ActivityFeed logs={recentActivity} isLoading={isLoading} />
+            <ActivityFeed logs={recentActivity} isLoading={isLoading} isError={isStatsError} />
           </div>
         </div>
 

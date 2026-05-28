@@ -7,6 +7,7 @@ import { ACTION_VARIANT_MAP, type BadgeVariant } from "./ActivityFeed.constant";
 interface ActivityFeedProps {
   logs: RecentActivityItem[];
   isLoading?: boolean;
+  isError?: boolean;
 }
 
 function getActionBadgeVariant(action: string): BadgeVariant {
@@ -40,7 +41,7 @@ const ActivityRow = memo(function ActivityRow({ log }: { log: RecentActivityItem
   );
 });
 
-export const ActivityFeed = memo(function ActivityFeed({ logs, isLoading }: ActivityFeedProps) {
+export const ActivityFeed = memo(function ActivityFeed({ logs, isLoading, isError }: ActivityFeedProps) {
   if (isLoading) {
     return (
       <div className="flex flex-col">
@@ -56,6 +57,14 @@ export const ActivityFeed = memo(function ActivityFeed({ logs, isLoading }: Acti
             <div className="h-3 w-10 bg-muted rounded animate-pulse" />
           </div>
         ))}
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="flex items-center justify-center py-12 text-sm text-muted-foreground">
+        Failed to load activity
       </div>
     );
   }
