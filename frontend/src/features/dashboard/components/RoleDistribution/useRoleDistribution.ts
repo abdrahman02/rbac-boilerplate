@@ -3,7 +3,7 @@ import { useRoles } from "@/features/roles/hooks/useRoles";
 import { useUsers } from "@/features/users/hooks";
 import type { RoleBar } from "../../types";
 
-const MAX_USERS_FOR_DISTRIBUTION = 200;
+const MAX_USERS_FOR_DISTRIBUTION = -1;
 
 export const useRoleDistribution = () => {
   const rolesQuery = useRoles();
