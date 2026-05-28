@@ -3,7 +3,7 @@
 import { ChevronRight, Download, Loader2, UserPlus } from "lucide-react";
 import Link from "next/link";
 import { PageHeader } from "@/shared/components/common";
-import { Button, buttonVariants } from "@/shared/components/ui";
+import { Alert, Button, buttonVariants } from "@/shared/components/ui";
 import { ActivityFeed } from "./components/ActivityFeed";
 import { QuickActions } from "./components/QuickActions";
 import { RoleDistribution } from "./components/RoleDistribution";
@@ -11,7 +11,8 @@ import { StatCard } from "./components/StatCard";
 import { useDashboardPage } from "./hooks";
 
 export function DashboardPage() {
-  const { firstName, statCards, recentActivity, isLoading, isExporting, exportDashboard } = useDashboardPage();
+  const { firstName, statCards, recentActivity, isLoading, statsError, isExporting, exportError, exportDashboard } =
+    useDashboardPage();
 
   return (
     <div className="flex flex-col gap-6">
@@ -30,6 +31,9 @@ export function DashboardPage() {
           </Link>
         </div>
       </PageHeader>
+
+      {statsError && <Alert message={statsError} />}
+      {exportError && <Alert message={exportError} />}
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {statCards.map((card) => (
