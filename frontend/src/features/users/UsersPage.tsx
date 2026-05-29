@@ -39,6 +39,7 @@ export function UsersPage() {
     openConfirmDelete,
     closeConfirmDelete,
     handleCopyUserId,
+    handleToggleStatus,
     handleRemoveRole,
     handleConfirmDelete,
     isDeletePending,
@@ -73,6 +74,7 @@ export function UsersPage() {
         canDelete={canDelete}
         onEdit={openEdit}
         onManageRoles={openAssignRoles}
+        onToggleStatus={handleToggleStatus}
         onDelete={openConfirmDelete}
         onRemoveRole={handleRemoveRole}
         onCopyUserId={handleCopyUserId}

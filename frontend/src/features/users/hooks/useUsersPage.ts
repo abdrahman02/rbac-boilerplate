@@ -8,7 +8,7 @@ import { getErrorMessage } from "@/shared/lib/api-error";
 import { toast } from "@/shared/lib/toast";
 import type { UserWithRoles } from "@/shared/types";
 import type { FilterState } from "../types";
-import { useDeleteUser, useRemoveRole, useUsers } from "./useUsers";
+import { useDeleteUser, useRemoveRole, useUpdateUser, useUsers } from "./useUsers";
 
 const EMPTY_FILTER: FilterState = { role: "", status: "" };
 
@@ -28,6 +28,7 @@ export function useUsersPage() {
   const isFetching = useIsFetching({ queryKey: ["users"] }) > 0;
 
   const { data: roles = [] } = useRoles();
+  const updateUser = useUpdateUser();
   const deleteUser = useDeleteUser();
   const removeRole = useRemoveRole();
 
@@ -81,6 +82,22 @@ export function useUsersPage() {
     navigator.clipboard.writeText(String(userId)).catch(() => {});
   }, []);
 
+  const handleToggleStatus = useCallback(
+    (user: UserWithRoles) => {
+      const next = !user.is_active;
+      updateUser.mutate(
+        { id: user.id, payload: { is_active: next } },
+        {
+          onSuccess: () =>
+            toast.success(next ? "User activated" : "User deactivated", { description: user.name }),
+          onError: (err) =>
+            toast.error("Failed to update status", { description: getErrorMessage(err) }),
+        },
+      );
+    },
+    [updateUser],
+  );
+
   const handleRemoveRole = useCallback(
     (user: UserWithRoles, roleName: string) => {
       const role = roles.find((r) => r.name === roleName);
@@ -130,6 +147,7 @@ export function useUsersPage() {
     handleRefresh,
     handleSearchChange,
     handleFiltersChange,
+    handleToggleStatus,
     openCreate,
     openEdit,
     closeUserModal,

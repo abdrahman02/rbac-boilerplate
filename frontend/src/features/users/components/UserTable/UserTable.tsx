@@ -24,6 +24,7 @@ interface UserTableProps {
   canDelete: boolean;
   onEdit: (user: UserWithRoles) => void;
   onManageRoles: (user: UserWithRoles) => void;
+  onToggleStatus: (user: UserWithRoles) => void;
   onDelete: (user: UserWithRoles) => void;
   onRemoveRole: (user: UserWithRoles, roleName: string) => void;
   onCopyUserId: (userId: number) => void;
@@ -37,6 +38,7 @@ export const UserTable = memo(function UserTable({
   canDelete,
   onEdit,
   onManageRoles,
+  onToggleStatus,
   onDelete,
   onRemoveRole,
   onCopyUserId,
@@ -77,6 +79,7 @@ export const UserTable = memo(function UserTable({
               canDelete={canDelete}
               onEdit={onEdit}
               onManageRoles={onManageRoles}
+              onToggleStatus={onToggleStatus}
               onDelete={onDelete}
               onRemoveRole={onRemoveRole}
               onCopyUserId={onCopyUserId}
@@ -94,6 +97,7 @@ interface UserRowProps {
   canDelete: boolean;
   onEdit: (user: UserWithRoles) => void;
   onManageRoles: (user: UserWithRoles) => void;
+  onToggleStatus: (user: UserWithRoles) => void;
   onDelete: (user: UserWithRoles) => void;
   onRemoveRole: (user: UserWithRoles, roleName: string) => void;
   onCopyUserId: (userId: number) => void;
@@ -105,6 +109,7 @@ const UserRow = memo(function UserRow({
   canDelete,
   onEdit,
   onManageRoles,
+  onToggleStatus,
   onDelete,
   onRemoveRole,
   onCopyUserId,
@@ -113,11 +118,13 @@ const UserRow = memo(function UserRow({
     <TableRow>
       <TableCell className="w-12">
         <UserActionsMenu
+          isActive={user.is_active}
           canEdit={canEdit}
           canDelete={canDelete}
           onEdit={() => onEdit(user)}
           onManageRoles={() => onManageRoles(user)}
           onCopyId={() => onCopyUserId(user.id)}
+          onToggleStatus={() => onToggleStatus(user)}
           onDelete={() => onDelete(user)}
         />
       </TableCell>
