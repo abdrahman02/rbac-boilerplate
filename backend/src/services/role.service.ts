@@ -70,3 +70,10 @@ export async function assignPermission(roleId: number, permissionId: number): Pr
 export async function removePermission(roleId: number, permissionId: number): Promise<boolean> {
   return repo.removePermissionFromRole(roleId, permissionId)
 }
+
+export async function syncPermissions(roleId: number, permissionIds: number[]): Promise<void> {
+  const role = await repo.findRoleById(roleId)
+  if (!role) throw new Error('ROLE_NOT_FOUND')
+
+  await repo.syncRolePermissions(roleId, permissionIds)
+}

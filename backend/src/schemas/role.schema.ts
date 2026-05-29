@@ -25,6 +25,11 @@ export const assignPermissionSchema = z.object({
   permission_id: z.number().int().positive(),
 })
 
+export const syncPermissionsSchema = z.object({
+  permission_ids: z.array(z.number().int().positive()),
+})
+
 export type CreateRoleInput = z.infer<typeof createRoleSchema>
 export type UpdateRoleInput = z.infer<typeof updateRoleSchema>
 export type AssignPermissionInput = z.infer<typeof assignPermissionSchema>
+export type SyncPermissionsInput = z.infer<typeof syncPermissionsSchema>

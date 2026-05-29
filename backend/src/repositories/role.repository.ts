@@ -106,6 +106,16 @@ export async function removePermissionFromRole(
   return result.count > 0
 }
 
+export async function syncRolePermissions(roleId: number, permissionIds: number[]): Promise<void> {
+  await prisma.$transaction([
+    prisma.rolePermission.deleteMany({ where: { roleId } }),
+    prisma.rolePermission.createMany({
+      data: permissionIds.map((permissionId) => ({ roleId, permissionId })),
+      skipDuplicates: true,
+    }),
+  ])
+}
+
 export interface RoleExportRow {
   id: number
   name: string

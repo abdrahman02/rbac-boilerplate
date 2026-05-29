@@ -6,8 +6,8 @@ import type { RoleBar } from "../../types";
 const MAX_USERS_FOR_DISTRIBUTION = -1;
 
 export const useRoleDistribution = () => {
-  const rolesQuery = useRoles();
-  const usersQuery = useUsers(1, MAX_USERS_FOR_DISTRIBUTION);
+  const rolesQuery = useRoles({ limit: -1 });
+  const usersQuery = useUsers({ page: 1, limit: MAX_USERS_FOR_DISTRIBUTION });
 
   const roles = rolesQuery.data ?? [];
   const users = usersQuery.data?.data ?? [];

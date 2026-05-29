@@ -2,7 +2,7 @@ import type { Request, Response } from 'express'
 import * as svc from '../services/role.service.js'
 import { handleError } from '../lib/handle-error.js'
 import type { ApiResponse, RoleWithPermissions, PaginatedResponse } from '../types/index.js'
-import type { CreateRoleInput, UpdateRoleInput, AssignPermissionInput } from '../schemas/role.schema.js'
+import type { CreateRoleInput, UpdateRoleInput, AssignPermissionInput, SyncPermissionsInput } from '../schemas/role.schema.js'
 
 export async function listRoles(req: Request, res: Response): Promise<void> {
   try {
@@ -208,6 +208,33 @@ export async function assignPermission(req: Request, res: Response): Promise<voi
       data: role,
       message: null,
     }
+    res.status(200).json(body)
+  } catch (error) {
+    handleError(res, error)
+  }
+}
+
+export async function syncPermissions(req: Request, res: Response): Promise<void> {
+  try {
+    const id = typeof req.params.id === 'string' ? req.params.id : undefined
+    if (!id) {
+      const body: ApiResponse<null> = { success: false, data: null, message: 'Invalid role ID' }
+      res.status(400).json(body)
+      return
+    }
+
+    const roleId = parseInt(id, 10)
+    if (Number.isNaN(roleId)) {
+      const body: ApiResponse<null> = { success: false, data: null, message: 'Invalid role ID' }
+      res.status(400).json(body)
+      return
+    }
+
+    const input = req.body as SyncPermissionsInput
+    await svc.syncPermissions(roleId, input.permission_ids)
+
+    const role = await svc.getRole(roleId)
+    const body: ApiResponse<RoleWithPermissions> = { success: true, data: role, message: null }
     res.status(200).json(body)
   } catch (error) {
     handleError(res, error)

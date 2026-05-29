@@ -16,7 +16,15 @@ interface UpdateUserPayload {
   is_active?: boolean;
 }
 
-export function useUsers(page = 1, limit = 10, search = "", role = "", status = "") {
+interface UseUsersParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+  role?: string;
+  status?: string;
+}
+
+export function useUsers({ page = 1, limit = 10, search = "", role = "", status = "" }: UseUsersParams = {}) {
   return useQuery<PaginatedResponse<UserWithRoles>>({
     queryKey: ["users", page, limit, search, role, status],
     queryFn: async () => {

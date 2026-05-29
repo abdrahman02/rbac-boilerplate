@@ -1,52 +1,43 @@
 "use client";
 
-import { Copy, Pencil, Shield, Trash2, UserCheck, UserX } from "lucide-react";
+import { Copy, Key, Pencil, Trash2 } from "lucide-react";
 import { ActionsMenu, MenuItem } from "@/shared/components/common";
 
-interface UserActionsMenuProps {
-  isActive: boolean;
+interface RoleActionsMenuProps {
   onEdit: () => void;
-  onManageRoles: () => void;
+  onManagePermissions: () => void;
   onCopyId: () => void;
-  onToggleStatus: () => void;
   onDelete: () => void;
   canEdit: boolean;
   canDelete: boolean;
 }
 
-export function UserActionsMenu({
-  isActive,
+export function RoleActionsMenu({
   onEdit,
-  onManageRoles,
+  onManagePermissions,
   onCopyId,
-  onToggleStatus,
   onDelete,
   canEdit,
   canDelete,
-}: UserActionsMenuProps) {
+}: RoleActionsMenuProps) {
   return (
     <ActionsMenu>
       {canEdit && (
         <MenuItem icon={<Pencil size={14} />} onClick={onEdit}>
-          Edit user
+          Edit role
         </MenuItem>
       )}
-      <MenuItem icon={<Shield size={14} />} onClick={onManageRoles}>
-        Manage roles
+      <MenuItem icon={<Key size={14} />} onClick={onManagePermissions}>
+        Manage permissions
       </MenuItem>
       <MenuItem icon={<Copy size={14} />} onClick={onCopyId}>
-        Copy user ID
+        Copy role ID
       </MenuItem>
-      {canEdit && (
-        <MenuItem icon={isActive ? <UserX size={14} /> : <UserCheck size={14} />} onClick={onToggleStatus}>
-          {isActive ? "Deactivate" : "Activate"}
-        </MenuItem>
-      )}
       {canDelete && (
         <>
           <div className="my-1 h-px bg-border" />
           <MenuItem icon={<Trash2 size={14} />} onClick={onDelete} destructive>
-            Delete user
+            Delete role
           </MenuItem>
         </>
       )}

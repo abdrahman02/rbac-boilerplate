@@ -17,21 +17,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
       <body className="min-h-screen antialiased">
         <QueryProvider>{children}</QueryProvider>
-        <Toaster
-          position="top-right"
-          theme="system"
-          richColors
-          gap={8}
-          offset={16}
-          toastOptions={{
-            style: {
-              background: "var(--color-card)",
-              border: "1px solid var(--color-border)",
-              borderRadius: "var(--radius-xl)",
-              boxShadow: "var(--shadow-lg)",
-            },
-          }}
-        />
+        <Toaster position="top-right" theme="system" gap={8} offset={16} />
       </body>
     </html>
   );

@@ -21,7 +21,7 @@ interface RoleListParams {
 }
 
 export function useRoles(params?: RoleListParams) {
-  const { page = 1, limit = -1, search } = params ?? {};
+  const { page = 1, limit = 10, search } = params ?? {};
   return useQuery<RoleWithPermissions[]>({
     queryKey: ["roles", { page, limit, search }],
     queryFn: async () => {
@@ -78,6 +78,17 @@ export function useRemovePermissionFromRole() {
   return useMutation({
     mutationFn: async ({ roleId, permissionId }: { roleId: number; permissionId: number }) => {
       await apiClient.delete(`/roles/${roleId}/permissions/${permissionId}`);
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["roles"] }),
+  });
+}
+
+export function useSyncRolePermissions() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ roleId, permissionIds }: { roleId: number; permissionIds: number[] }) => {
+      const res = await apiClient.put(`/roles/${roleId}/permissions`, { permission_ids: permissionIds });
+      return res.data;
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["roles"] }),
   });

@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { useRoles } from "@/features/roles/hooks/useRoles";
 import { getErrorMessage } from "@/shared/lib/api-error";
+import { toast } from "@/shared/lib/toast";
 import type { UserWithRoles } from "@/shared/types";
 import { useSyncRoles } from "../../hooks";
 import { type AssignRoleInput, type AssignRoleOutput, assignRoleSchema } from "./AssignRoleModal.schema";
@@ -14,7 +15,7 @@ interface Params {
 }
 
 export const useAssignRoleModal = ({ isOpen, onClose, user }: Params) => {
-  const { data: roles = [] } = useRoles();
+  const { data: roles = [] } = useRoles({ limit: -1 });
   const syncRoles = useSyncRoles();
 
   const {
@@ -24,7 +25,7 @@ export const useAssignRoleModal = ({ isOpen, onClose, user }: Params) => {
     getValues,
     reset,
     setError,
-    formState: { errors, isSubmitting, isDirty },
+    formState: { errors, isDirty },
   } = useForm<AssignRoleInput, unknown, AssignRoleOutput>({
     resolver: zodResolver(assignRoleSchema),
     defaultValues: { roleIds: [] },
@@ -62,13 +63,17 @@ export const useAssignRoleModal = ({ isOpen, onClose, user }: Params) => {
     [originalRoleIds, selectedIds],
   );
 
-  const onSubmit = async (data: AssignRoleInput) => {
-    try {
-      await syncRoles.mutateAsync({ userId: user.id, roleIds: data.roleIds });
-      onClose();
-    } catch (err) {
-      setError("root", { message: getErrorMessage(err) });
-    }
+  const onSubmit = (data: AssignRoleInput) => {
+    syncRoles.mutate(
+      { userId: user.id, roleIds: data.roleIds },
+      {
+        onSuccess: () => {
+          toast.success("Roles updated", { description: user.name });
+          onClose();
+        },
+        onError: (err) => setError("root", { message: getErrorMessage(err) }),
+      },
+    );
   };
 
   const handleClose = useCallback(() => {
@@ -88,6 +93,6 @@ export const useAssignRoleModal = ({ isOpen, onClose, user }: Params) => {
     isDirty,
     added,
     removed,
-    isSubmitting,
+    isSubmitting: syncRoles.isPending,
   };
 };

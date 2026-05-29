@@ -2,6 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { getErrorMessage } from "@/shared/lib/api-error";
+import { toast } from "@/shared/lib/toast";
 import type { UserWithRoles } from "@/shared/types";
 import { useCreateUser, useUpdateUser } from "../../hooks";
 import { type UserModalInput, type UserModalOutput, userModalSchema } from "./UserModal.schema";
@@ -22,7 +23,7 @@ export const useUserModal = ({ isOpen, onClose, user }: Params) => {
     handleSubmit,
     reset,
     setError,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<UserModalInput, unknown, UserModalOutput>({ resolver: zodResolver(userModalSchema) });
 
   useEffect(() => {
@@ -31,20 +32,36 @@ export const useUserModal = ({ isOpen, onClose, user }: Params) => {
     }
   }, [isOpen, isEditing, user, reset]);
 
-  const onSubmit = async (data: UserModalInput) => {
+  const onSubmit = (data: UserModalInput) => {
     if (!isEditing && !data.password) {
       setError("password", { message: "Password is required" });
       return;
     }
-    try {
-      if (isEditing) {
-        await updateUser.mutateAsync({ id: user.id, payload: { name: data.name, email: data.email } });
-      } else {
-        await createUser.mutateAsync({ name: data.name, email: data.email, password: data.password! });
-      }
-      onClose();
-    } catch (err) {
-      setError("root", { message: getErrorMessage(err) });
+
+    if (isEditing) {
+      updateUser.mutate(
+        { id: user.id, payload: { name: data.name, email: data.email } },
+        {
+          onSuccess: () => {
+            toast.success("User updated", { description: data.name });
+            onClose();
+            reset();
+          },
+          onError: (err) => setError("root", { message: getErrorMessage(err) }),
+        },
+      );
+    } else {
+      createUser.mutate(
+        { name: data.name, email: data.email, password: data.password! },
+        {
+          onSuccess: () => {
+            toast.success("User created", { description: data.name });
+            onClose();
+            reset();
+          },
+          onError: (err) => setError("root", { message: getErrorMessage(err) }),
+        },
+      );
     }
   };
 
@@ -54,6 +71,6 @@ export const useUserModal = ({ isOpen, onClose, user }: Params) => {
     onSubmit,
     errors,
     register,
-    isSubmitting,
+    isSubmitting: isEditing ? updateUser.isPending : createUser.isPending,
   };
 };

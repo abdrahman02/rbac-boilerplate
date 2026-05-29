@@ -24,7 +24,13 @@ export function useUsersPage() {
 
   const queryClient = useQueryClient();
   const debouncedSearch = useDebounce(search, 400);
-  const { data, isError: isUsersError } = useUsers(page, 10, debouncedSearch, filters.role, filters.status);
+  const { data, isError: isUsersError } = useUsers({
+    page,
+    limit: 10,
+    search: debouncedSearch,
+    role: filters.role,
+    status: filters.status,
+  });
   const isFetching = useIsFetching({ queryKey: ["users"] }) > 0;
 
   const { data: roles = [] } = useRoles();
@@ -88,10 +94,8 @@ export function useUsersPage() {
       updateUser.mutate(
         { id: user.id, payload: { is_active: next } },
         {
-          onSuccess: () =>
-            toast.success(next ? "User activated" : "User deactivated", { description: user.name }),
-          onError: (err) =>
-            toast.error("Failed to update status", { description: getErrorMessage(err) }),
+          onSuccess: () => toast.success(next ? "User activated" : "User deactivated", { description: user.name }),
+          onError: (err) => toast.error("Failed to update status", { description: getErrorMessage(err) }),
         },
       );
     },
@@ -113,7 +117,10 @@ export function useUsersPage() {
   const handleConfirmDelete = useCallback(() => {
     if (!deletingUser) return;
     deleteUser.mutate(deletingUser.id, {
-      onSuccess: () => setDeletingUser(null),
+      onSuccess: () => {
+        setDeletingUser(null);
+        toast.success("Success to delete user");
+      },
       onError: (err) => toast.error("Failed to delete user", { description: getErrorMessage(err) }),
     });
   }, [deletingUser, deleteUser]);
