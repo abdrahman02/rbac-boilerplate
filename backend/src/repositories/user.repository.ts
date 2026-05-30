@@ -170,3 +170,41 @@ export async function findAllUsersForExport(): Promise<UserExportRow[]> {
     createdAt: u.createdAt,
   }))
 }
+
+export interface UserFilteredExportParams {
+  search?: string
+  role?: string
+  status?: boolean
+}
+
+export async function findUsersForExport(filters: UserFilteredExportParams = {}): Promise<UserExportRow[]> {
+  const { search, role, status } = filters
+  const where = {
+    deletedAt: null,
+    ...(search ? { OR: [{ fullName: { contains: search } }, { email: { contains: search } }] } : {}),
+    ...(role ? { roles: { some: { role: { name: role } } } } : {}),
+    ...(status !== undefined ? { isActive: status } : {}),
+  }
+
+  const users = await prisma.user.findMany({
+    where,
+    select: {
+      id: true,
+      fullName: true,
+      email: true,
+      isActive: true,
+      createdAt: true,
+      roles: { select: { role: { select: { name: true } } } },
+    },
+    orderBy: { createdAt: 'desc' },
+  })
+
+  return users.map((u) => ({
+    id: u.id,
+    fullName: u.fullName,
+    email: u.email,
+    isActive: u.isActive,
+    roles: u.roles.map((r) => r.role.name),
+    createdAt: u.createdAt,
+  }))
+}
