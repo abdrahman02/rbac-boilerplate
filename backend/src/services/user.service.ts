@@ -3,6 +3,9 @@ import * as repo from '../repositories/user.repository.js'
 import { hashPassword } from '../utils/hash.js'
 import type { UserWithRoles, PaginatedResponse } from '../types/index.js'
 import type { CreateUserInput, UpdateUserInput } from '../schemas/user.schema.js'
+import ExcelJS from 'exceljs'
+import { freezeHeaderRow, autoFitColumns } from '../lib/excel-styles.js'
+import type { UserFilteredExportParams } from '../repositories/user.repository.js'
 
 export async function listUsers(
   page: number,
@@ -107,4 +110,48 @@ export async function syncRoles(userId: number, roleIds: number[]): Promise<void
   const user = await repo.findUserById(userId)
   if (!user) throw new Error('USER_NOT_FOUND')
   await repo.syncUserRoles(userId, roleIds)
+}
+
+export async function buildUsersExportWorkbook(
+  search?: string,
+  role?: string,
+  status?: string,
+): Promise<Buffer> {
+  const statusBool: boolean | undefined =
+    status === 'active' ? true : status === 'inactive' ? false : undefined
+
+  const filters: UserFilteredExportParams = {
+    ...(search !== undefined && { search }),
+    ...(role !== undefined && { role }),
+    ...(statusBool !== undefined && { status: statusBool }),
+  }
+  const users = await repo.findUsersForExport(filters)
+
+  const wb = new ExcelJS.Workbook()
+  const sheet = wb.addWorksheet('Users')
+  freezeHeaderRow(sheet)
+  sheet.addTable({
+    name: 'Users',
+    ref: 'A1',
+    headerRow: true,
+    totalsRow: false,
+    style: { theme: 'TableStyleMedium2', showRowStripes: false },
+    columns: [
+      { name: 'Name' },
+      { name: 'Email' },
+      { name: 'Status' },
+      { name: 'Roles' },
+      { name: 'Created At' },
+    ],
+    rows: users.map((u) => [
+      u.fullName,
+      u.email,
+      u.isActive ? 'Active' : 'Inactive',
+      u.roles.join(', '),
+      u.createdAt.toISOString().slice(0, 10),
+    ]),
+  })
+  autoFitColumns(sheet)
+
+  return Buffer.from(await wb.xlsx.writeBuffer())
 }
