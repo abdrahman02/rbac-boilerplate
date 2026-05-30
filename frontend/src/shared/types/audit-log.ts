@@ -1,6 +1,8 @@
 export interface AuditLog {
   id: number;
   userId: number | null;
+  userName: string | null;
+  userEmail: string | null;
   action: string;
   resourceType: string;
   resourceId: number | null;

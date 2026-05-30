@@ -1,8 +1,8 @@
-import type { AuditLog } from '../generated/prisma/index.js'
 import type { Request, Response } from 'express'
 import * as auditLogService from '../services/audit-log.service.js'
 import { handleError } from '../lib/handle-error.js'
-import type { ApiResponse, PaginatedResponse } from '../types/index.js'
+import type { AuditLogRow } from '../repositories/audit-log.repository.js'
+import type { PaginatedResponse } from '../types/index.js'
 
 export async function list(req: Request, res: Response): Promise<void> {
 	try {
@@ -15,6 +15,7 @@ export async function list(req: Request, res: Response): Promise<void> {
 
 		const filters = {
 			userId: userId !== undefined && !Number.isNaN(userId) ? userId : undefined,
+			search: typeof req.query.search === 'string' ? req.query.search : undefined,
 			action: typeof req.query.action === 'string' ? req.query.action : undefined,
 			resourceType: typeof req.query.resourceType === 'string' ? req.query.resourceType : undefined,
 			dateFrom: typeof req.query.dateFrom === 'string' ? new Date(req.query.dateFrom) : undefined,
@@ -22,7 +23,7 @@ export async function list(req: Request, res: Response): Promise<void> {
 		}
 
 		const result = await auditLogService.listAuditLogs(filters, page, limit)
-		res.json(result satisfies PaginatedResponse<AuditLog>)
+		res.json(result satisfies PaginatedResponse<AuditLogRow>)
 	} catch (err) {
 		handleError(res, err)
 	}

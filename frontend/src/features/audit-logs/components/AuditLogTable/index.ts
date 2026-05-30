@@ -1,0 +1,1 @@
+export { AuditLogTable } from "./AuditLogTable";
