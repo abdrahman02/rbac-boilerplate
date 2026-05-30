@@ -255,3 +255,20 @@ export async function removeRole(req: Request, res: Response): Promise<void> {
     handleError(res, error)
   }
 }
+
+export async function exportUsers(req: Request, res: Response): Promise<void> {
+  try {
+    const search = typeof req.query.search === 'string' ? req.query.search.trim() || undefined : undefined
+    const role = typeof req.query.role === 'string' ? req.query.role.trim() || undefined : undefined
+    const status = typeof req.query.status === 'string' ? req.query.status : undefined
+
+    const buffer = await svc.buildUsersExportWorkbook(search, role, status)
+    const dateStr = new Date().toISOString().slice(0, 10)
+
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    res.setHeader('Content-Disposition', `attachment; filename="users-${dateStr}.xlsx"`)
+    res.send(buffer)
+  } catch (error) {
+    handleError(res, error)
+  }
+}

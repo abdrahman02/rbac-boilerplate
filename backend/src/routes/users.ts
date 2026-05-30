@@ -31,6 +31,30 @@ router.get('/', authMiddleware, requirePermission('users:read'), ctrl.listUsers)
 
 /**
  * @swagger
+ * /api/users/export:
+ *   get:
+ *     summary: Export all users to Excel
+ *     tags: [Users]
+ *     security:
+ *       - cookieAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: search
+ *         schema: { type: string }
+ *       - in: query
+ *         name: role
+ *         schema: { type: string }
+ *       - in: query
+ *         name: status
+ *         schema: { type: string }
+ *     responses:
+ *       200:
+ *         description: Excel file with users data
+ */
+router.get('/export', authMiddleware, requirePermission('users:read'), ctrl.exportUsers)
+
+/**
+ * @swagger
  * /api/users/{id}:
  *   get:
  *     summary: Get user by ID
