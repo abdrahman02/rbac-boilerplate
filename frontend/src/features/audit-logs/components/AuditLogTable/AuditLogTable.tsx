@@ -2,19 +2,12 @@
 
 import { ScrollText } from "lucide-react";
 import { memo } from "react";
+import type { VariantProps } from "tailwind-variants";
+import { TableCell, TableEmptyRow, TableHeader, TableLoadingRow, TableRow, TableShell } from "@/shared/components/ui";
 import { Avatar } from "@/shared/components/ui/Avatar";
 import { Badge } from "@/shared/components/ui/Badge";
-import type { VariantProps } from "tailwind-variants";
-import {
-  TableCell,
-  TableEmptyRow,
-  TableHeader,
-  TableLoadingRow,
-  TableRow,
-  TableShell,
-} from "@/shared/components/ui";
+import type { badgeVariants } from "@/shared/components/ui/Badge/Badge.variants";
 import { formatDateTime, formatRelative } from "@/shared/lib/format-date";
-import { badgeVariants } from "@/shared/components/ui/Badge/Badge.variants";
 import type { AuditLog } from "@/shared/types";
 
 type BadgeVariant = NonNullable<VariantProps<typeof badgeVariants>["variant"]>;
@@ -22,12 +15,7 @@ type BadgeVariant = NonNullable<VariantProps<typeof badgeVariants>["variant"]>;
 function getActionTone(action: string): BadgeVariant {
   if (action.startsWith("delete_") || action.startsWith("remove_")) return "danger";
   if (action.startsWith("create_") || action === "register") return "success";
-  if (
-    action.startsWith("update_") ||
-    action.startsWith("sync_") ||
-    action.startsWith("assign_")
-  )
-    return "warning";
+  if (action.startsWith("update_") || action.startsWith("sync_") || action.startsWith("assign_")) return "warning";
   if (action === "login" || action === "logout") return "info";
   return "default";
 }
@@ -38,11 +26,7 @@ interface AuditLogTableProps {
   isError?: boolean;
 }
 
-export const AuditLogTable = memo(function AuditLogTable({
-  logs,
-  isFetching,
-  isError,
-}: AuditLogTableProps) {
+export const AuditLogTable = memo(function AuditLogTable({ logs, isFetching, isError }: AuditLogTableProps) {
   return (
     <TableShell>
       <table className="w-full border-collapse text-[13.5px]">
@@ -93,9 +77,7 @@ const AuditLogRow = memo(function AuditLogRow({ log }: AuditLogRowProps) {
             <Avatar name={log.userName} size={28} />
             <div className="flex flex-col">
               <span className="text-[13px] font-semibold leading-tight">{log.userName}</span>
-              <span className="text-[12px] text-muted-foreground leading-tight">
-                {log.userEmail}
-              </span>
+              <span className="text-[12px] text-muted-foreground leading-tight">{log.userEmail}</span>
             </div>
           </div>
         ) : (
@@ -113,17 +95,13 @@ const AuditLogRow = memo(function AuditLogRow({ log }: AuditLogRowProps) {
         <div className="flex flex-col gap-0.5">
           <span className="text-[13px] font-medium">{log.resourceType}</span>
           {log.resourceId !== null && (
-            <span className="font-mono text-[11.5px] text-muted-foreground">
-              #{log.resourceId}
-            </span>
+            <span className="font-mono text-[11.5px] text-muted-foreground">#{log.resourceId}</span>
           )}
         </div>
       </TableCell>
 
       <TableCell>
-        <span className="font-mono text-[12.5px] text-muted-foreground">
-          {log.ipAddress ?? "—"}
-        </span>
+        <span className="font-mono text-[12.5px] text-muted-foreground">{log.ipAddress ?? "—"}</span>
       </TableCell>
 
       <TableCell className="text-right">

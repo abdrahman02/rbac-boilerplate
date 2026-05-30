@@ -70,9 +70,7 @@ export const AuditLogToolbar = memo(function AuditLogToolbar({
 function FilterField({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <span className="text-[11px] font-semibold uppercase tracking-[0.04em] text-muted-foreground">
-        {label}
-      </span>
+      <span className="text-[11px] font-semibold uppercase tracking-[0.04em] text-muted-foreground">{label}</span>
       {children}
     </div>
   );
