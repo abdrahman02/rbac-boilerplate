@@ -20,7 +20,7 @@ const router = Router()
  *       200:
  *         description: Roles list
  */
-router.get('/', authMiddleware, requirePermission('roles:read'), ctrl.listRoles)
+router.get('/', authMiddleware, requirePermission(['roles:read', 'users:read', 'users:update']), ctrl.listRoles)
 
 /**
  * @swagger

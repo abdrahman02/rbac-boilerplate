@@ -16,7 +16,8 @@ interface Params {
 }
 
 export function useAssignPermissionModal({ isOpen, onClose, role, search }: Params) {
-  const { data: permissions = [] } = usePermissionList();
+  const { data: permissionsData } = usePermissionList();
+  const permissions = useMemo(() => permissionsData ?? [], [permissionsData]);
   const syncPermissions = useSyncRolePermissions();
 
   const {

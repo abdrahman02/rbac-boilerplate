@@ -48,16 +48,18 @@ export const UserToolbar = memo(function UserToolbar({
       </div>
 
       <FilterDropdown activeCount={activeFilterCount} onClearAll={onClearFilters}>
-        <FilterField label="Role">
-          <Select
-            searchable
-            value={filters.role}
-            onChange={(v) => onFiltersChange({ ...filters, role: v })}
-            options={roles.map((r) => ({ value: r.name, label: r.name }))}
-            placeholder="All roles"
-            searchPlaceholder="Search roles…"
-          />
-        </FilterField>
+        {roles.length > 0 && (
+          <FilterField label="Role">
+            <Select
+              searchable
+              value={filters.role}
+              onChange={(v) => onFiltersChange({ ...filters, role: v })}
+              options={roles.map((r) => ({ value: r.name, label: r.name }))}
+              placeholder="All roles"
+              searchPlaceholder="Search roles…"
+            />
+          </FilterField>
+        )}
         <FilterField label="Status">
           <Select
             value={filters.status}

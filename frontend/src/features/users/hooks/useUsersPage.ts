@@ -33,7 +33,8 @@ export function useUsersPage() {
   });
   const isFetching = useIsFetching({ queryKey: ["users"] }) > 0;
 
-  const { data: roles = [] } = useRoles();
+  const { data: rolesData } = useRoles({ limit: -1 });
+  const roles = useMemo(() => rolesData ?? [], [rolesData]);
   const updateUser = useUpdateUser();
   const deleteUser = useDeleteUser();
   const removeRole = useRemoveRole();

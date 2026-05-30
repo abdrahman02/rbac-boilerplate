@@ -21,7 +21,7 @@ export function RolesPage() {
     roles,
     total,
     pageSize,
-    permissions,
+    filterPermissions,
     roleUserMap,
     isFetching,
     isError,
@@ -56,7 +56,7 @@ export function RolesPage() {
         onFiltersChange={handleFiltersChange}
         activeFilterCount={activeFilterCount}
         onClearFilters={clearFilters}
-        permissions={permissions}
+        filterPermissions={filterPermissions}
         canCreate={canCreate}
         isFetching={isFetching}
         onAddRole={openCreate}

@@ -1,7 +1,7 @@
 import type { Request, Response, NextFunction } from 'express'
 import type { ApiResponse } from '../types/index.js'
 
-export function requirePermission(permission: string) {
+export function requirePermission(permission: string | string[]) {
   return (req: Request, res: Response, next: NextFunction): void => {
     if (!req.user) {
       const body: ApiResponse<null> = {
@@ -13,11 +13,15 @@ export function requirePermission(permission: string) {
       return
     }
 
-    if (!req.user.permissions.includes(permission)) {
+    const required = Array.isArray(permission) ? permission : [permission]
+    const hasPermission = required.some((p) => req.user!.permissions.includes(p))
+
+    if (!hasPermission) {
+      const label = required.join("' or '")
       const body: ApiResponse<null> = {
         success: false,
         data: null,
-        message: `Forbidden: requires '${permission}'`,
+        message: `Forbidden: requires '${label}'`,
       }
       res.status(403).json(body)
       return

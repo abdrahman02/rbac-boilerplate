@@ -5,7 +5,6 @@ import type { ReactNode } from "react";
 import { memo } from "react";
 import { FilterDropdown, RefreshButton, SearchInput } from "@/shared/components/common";
 import { Button, Select } from "@/shared/components/ui";
-import type { Permission } from "@/shared/types";
 import type { RolesFilterState } from "../../types";
 
 interface RoleToolbarProps {
@@ -15,7 +14,7 @@ interface RoleToolbarProps {
   onFiltersChange: (f: RolesFilterState) => void;
   activeFilterCount: number;
   onClearFilters?: () => void;
-  permissions: Permission[];
+  filterPermissions: string[];
   canCreate: boolean;
   isFetching: boolean;
   onAddRole: () => void;
@@ -29,7 +28,7 @@ export const RoleToolbar = memo(function RoleToolbar({
   onFiltersChange,
   activeFilterCount,
   onClearFilters,
-  permissions,
+  filterPermissions,
   canCreate,
   isFetching,
   onAddRole,
@@ -46,18 +45,20 @@ export const RoleToolbar = memo(function RoleToolbar({
         />
       </div>
 
-      <FilterDropdown activeCount={activeFilterCount} onClearAll={onClearFilters}>
-        <FilterField label="Permission">
-          <Select
-            searchable
-            value={filters.permission}
-            onChange={(v) => onFiltersChange({ ...filters, permission: v })}
-            options={permissions.map((p) => ({ value: p.name, label: p.name }))}
-            placeholder="Any permission"
-            searchPlaceholder="Search permissions…"
-          />
-        </FilterField>
-      </FilterDropdown>
+      {filterPermissions.length > 0 && (
+        <FilterDropdown activeCount={activeFilterCount} onClearAll={onClearFilters}>
+          <FilterField label="Permission">
+            <Select
+              searchable
+              value={filters.permission}
+              onChange={(v) => onFiltersChange({ ...filters, permission: v })}
+              options={filterPermissions.map((p) => ({ value: p, label: p }))}
+              placeholder="Any permission"
+              searchPlaceholder="Search permissions…"
+            />
+          </FilterField>
+        </FilterDropdown>
+      )}
 
       <div className="flex-1" />
 

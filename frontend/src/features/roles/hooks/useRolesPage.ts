@@ -29,7 +29,9 @@ export function useRolesPage() {
   const isFetching = useIsFetching({ queryKey: ["roles"] }) > 0;
   const deleteRole = useDeleteRole();
 
-  const { data: permissions = [] } = usePermissionList();
+  const { data: permissionsData } = usePermissionList();
+  const filterPermissions = useMemo(() => (permissionsData ?? []).map((p) => p.name).sort(), [permissionsData]);
+
   const { data: allUsersData } = useUsers({ page: 1, limit: -1 });
   const allUsers = useMemo<UserWithRoles[]>(() => allUsersData?.data ?? [], [allUsersData]);
 
@@ -125,7 +127,7 @@ export function useRolesPage() {
     roles: pagedRoles,
     total: filteredRoles.length,
     pageSize: PAGE_SIZE,
-    permissions,
+    filterPermissions,
     roleUserMap,
     isLoading,
     isError,
