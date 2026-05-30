@@ -6,12 +6,23 @@ import { apiClient } from "@/shared/lib/api-client";
 import { getErrorMessage } from "@/shared/lib/api-error";
 import { toast } from "@/shared/lib/toast";
 import type { DashboardStats } from "@/shared/types";
+import type { RoleBar } from "../types";
 
 export function useDashboardStats() {
   return useQuery<DashboardStats>({
     queryKey: ["dashboard-stats"],
     queryFn: async () => {
       const res = await apiClient.get("/dashboard/stats");
+      return res.data.data;
+    },
+  });
+}
+
+export function useDashboardRoleDistribution() {
+  return useQuery<RoleBar[]>({
+    queryKey: ["dashboard-role-distribution"],
+    queryFn: async () => {
+      const res = await apiClient.get("/dashboard/role-distribution");
       return res.data.data;
     },
   });

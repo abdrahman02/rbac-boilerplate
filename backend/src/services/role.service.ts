@@ -6,8 +6,9 @@ export async function listRoles(
   page: number,
   limit: number,
   search?: string,
+  permission?: string,
 ): Promise<PaginatedResponse<RoleWithPermissions>> {
-  const { rows, total } = await repo.findAllRoles(page, limit, search)
+  const { rows, total } = await repo.findAllRoles(page, limit, search, permission)
 
   return {
     success: true,
@@ -16,6 +17,7 @@ export async function listRoles(
       name: r.name,
       description: r.description,
       permissions: r.permissions,
+      users: r.users,
       created_at: r.createdAt,
     })),
     meta: { total, page, limit },

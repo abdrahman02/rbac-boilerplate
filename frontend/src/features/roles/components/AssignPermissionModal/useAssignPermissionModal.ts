@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useCallback, useEffect, useMemo } from "react";
 import { useForm, useWatch } from "react-hook-form";
-import { usePermissionList } from "@/features/permissions/hooks/usePermissionsCrud";
+import { usePermissionList } from "@/features/permissions/hooks/usePermissions";
 import { getErrorMessage } from "@/shared/lib/api-error";
 import { toast } from "@/shared/lib/toast";
 import type { RoleWithPermissions } from "@/shared/types";
@@ -16,8 +16,8 @@ interface Params {
 }
 
 export function useAssignPermissionModal({ isOpen, onClose, role, search }: Params) {
-  const { data: permissionsData } = usePermissionList();
-  const permissions = useMemo(() => permissionsData ?? [], [permissionsData]);
+  const { data: permissionsData } = usePermissionList({ limit: -1 });
+  const permissions = useMemo(() => permissionsData?.data ?? [], [permissionsData]);
   const syncPermissions = useSyncRolePermissions();
 
   const {

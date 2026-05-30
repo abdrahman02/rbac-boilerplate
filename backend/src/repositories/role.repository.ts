@@ -8,16 +8,21 @@ export interface RoleRow {
   description: string | null
   createdAt: Date
   permissions: string[]
+  users: { id: number; name: string }[]
 }
 
 export async function findAllRoles(
   page: number,
   limit: number,
   search?: string,
+  permission?: string,
 ): Promise<{ rows: RoleRow[]; total: number }> {
   const fetchAll = limit === -1
   const offset = fetchAll ? 0 : (page - 1) * limit
-  const where: Prisma.RoleWhereInput = search ? { name: { contains: search } } : {}
+
+  const where: Prisma.RoleWhereInput = {}
+  if (search) where.name = { contains: search }
+  if (permission) where.permissions = { some: { permission: { name: permission } } }
 
   const [total, roles] = await prisma.$transaction([
     prisma.role.count({ where }),
@@ -25,6 +30,7 @@ export async function findAllRoles(
       where,
       include: {
         permissions: { include: { permission: { select: { name: true } } } },
+        users: { select: { user: { select: { id: true, fullName: true } } } },
       },
       orderBy: { name: 'asc' },
       skip: offset,
@@ -39,6 +45,7 @@ export async function findAllRoles(
       description: r.description,
       createdAt: r.createdAt,
       permissions: r.permissions.map((rp) => rp.permission.name),
+      users: r.users.map((ur) => ({ id: ur.user.id, name: ur.user.fullName })),
     })),
     total,
   }

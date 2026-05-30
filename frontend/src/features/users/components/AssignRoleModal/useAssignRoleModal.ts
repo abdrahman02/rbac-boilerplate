@@ -16,7 +16,7 @@ interface Params {
 
 export const useAssignRoleModal = ({ isOpen, onClose, user }: Params) => {
   const { data: rolesData } = useRoles({ limit: -1 });
-  const roles = useMemo(() => rolesData ?? [], [rolesData]);
+  const roles = useMemo(() => rolesData?.data ?? [], [rolesData]);
   const syncRoles = useSyncRoles();
 
   const {

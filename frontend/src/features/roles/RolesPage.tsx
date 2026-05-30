@@ -22,7 +22,6 @@ export function RolesPage() {
     total,
     pageSize,
     filterPermissions,
-    roleUserMap,
     isFetching,
     isError,
     canCreate,
@@ -69,7 +68,6 @@ export function RolesPage() {
         isError={isError}
         canEdit={canEdit}
         canDelete={canDelete}
-        roleUserMap={roleUserMap}
         onEdit={openEdit}
         onManagePermissions={openAssignPermissions}
         onDelete={openConfirmDelete}

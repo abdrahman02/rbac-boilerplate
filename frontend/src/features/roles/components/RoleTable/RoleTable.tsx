@@ -12,7 +12,7 @@ import {
   TableRow,
   TableShell,
 } from "@/shared/components/ui";
-import type { RoleWithPermissions, UserWithRoles } from "@/shared/types";
+import type { RoleWithPermissions } from "@/shared/types";
 import { RoleActionsMenu } from "../RoleActionsMenu";
 
 interface RoleTableProps {
@@ -21,7 +21,6 @@ interface RoleTableProps {
   isError?: boolean;
   canEdit: boolean;
   canDelete: boolean;
-  roleUserMap: Record<string, UserWithRoles[]>;
   onEdit: (role: RoleWithPermissions) => void;
   onManagePermissions: (role: RoleWithPermissions) => void;
   onDelete: (role: RoleWithPermissions) => void;
@@ -34,7 +33,6 @@ export const RoleTable = memo(function RoleTable({
   isError,
   canEdit,
   canDelete,
-  roleUserMap,
   onEdit,
   onManagePermissions,
   onDelete,
@@ -74,7 +72,6 @@ export const RoleTable = memo(function RoleTable({
               role={role}
               canEdit={canEdit}
               canDelete={canDelete}
-              users={roleUserMap[role.name] ?? []}
               onEdit={onEdit}
               onManagePermissions={onManagePermissions}
               onDelete={onDelete}
@@ -91,7 +88,6 @@ interface RoleRowProps {
   role: RoleWithPermissions;
   canEdit: boolean;
   canDelete: boolean;
-  users: UserWithRoles[];
   onEdit: (role: RoleWithPermissions) => void;
   onManagePermissions: (role: RoleWithPermissions) => void;
   onDelete: (role: RoleWithPermissions) => void;
@@ -102,7 +98,6 @@ const RoleRow = memo(function RoleRow({
   role,
   canEdit,
   canDelete,
-  users,
   onEdit,
   onManagePermissions,
   onDelete,
@@ -152,8 +147,8 @@ const RoleRow = memo(function RoleRow({
 
       <TableCell>
         <div className="flex items-center gap-2">
-          <AvatarStack users={users} max={3} />
-          <span className="text-[13px] text-muted-foreground tabular-nums">{users.length}</span>
+          <AvatarStack users={role.users} max={3} />
+          <span className="text-[13px] text-muted-foreground tabular-nums">{role.users.length}</span>
         </div>
       </TableCell>
 
@@ -164,7 +159,7 @@ const RoleRow = memo(function RoleRow({
   );
 });
 
-function AvatarStack({ users, max = 3 }: { users: UserWithRoles[]; max?: number }) {
+function AvatarStack({ users, max = 3 }: { users: { id: number; name: string }[]; max?: number }) {
   const visible = users.slice(0, max);
   const overflow = Math.max(0, users.length - max);
 

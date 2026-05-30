@@ -10,8 +10,9 @@ export async function listRoles(req: Request, res: Response): Promise<void> {
     const rawLimit = parseInt(req.query.limit as string, 10) || 10
     const limit = rawLimit === -1 ? -1 : Math.min(100, Math.max(1, rawLimit))
     const search = typeof req.query.search === 'string' ? req.query.search.trim() || undefined : undefined
+    const permission = typeof req.query.permission === 'string' ? req.query.permission.trim() || undefined : undefined
 
-    const result: PaginatedResponse<RoleWithPermissions> = await svc.listRoles(page, limit, search)
+    const result: PaginatedResponse<RoleWithPermissions> = await svc.listRoles(page, limit, search, permission)
     res.status(200).json(result)
   } catch (error) {
     handleError(res, error)

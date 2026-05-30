@@ -2,12 +2,11 @@
 
 import { useIsFetching, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useMemo, useState } from "react";
-import { usePermissionList } from "@/features/permissions/hooks/usePermissionsCrud";
-import { useUsers } from "@/features/users/hooks";
-import { usePermission } from "@/shared/hooks";
+import { usePermissionList } from "@/features/permissions/hooks/usePermissions";
+import { useDebounce, usePermission } from "@/shared/hooks";
 import { getErrorMessage } from "@/shared/lib/api-error";
 import { toast } from "@/shared/lib/toast";
-import type { RoleWithPermissions, UserWithRoles } from "@/shared/types";
+import type { RoleWithPermissions } from "@/shared/types";
 import type { RolesFilterState } from "../types";
 import { useDeleteRole, useRoles } from "./useRoles";
 
@@ -25,43 +24,28 @@ export function useRolesPage() {
   const [deletingRole, setDeletingRole] = useState<RoleWithPermissions | null>(null);
 
   const queryClient = useQueryClient();
-  const { data: allRoles = [], isLoading, isError } = useRoles({ limit: -1 });
+  const debouncedSearch = useDebounce(search, 400);
+
+  // Main paginated data — server handles filtering and pagination
+  const { data, isLoading, isError } = useRoles({
+    page,
+    limit: PAGE_SIZE,
+    search: debouncedSearch,
+    permission: filters.permission || undefined,
+  });
+  const roles = useMemo(() => data?.data ?? [], [data]);
+  const total = data?.meta.total ?? 0;
+
   const isFetching = useIsFetching({ queryKey: ["roles"] }) > 0;
   const deleteRole = useDeleteRole();
 
-  const { data: permissionsData } = usePermissionList();
-  const filterPermissions = useMemo(() => (permissionsData ?? []).map((p) => p.name).sort(), [permissionsData]);
-
-  const { data: allUsersData } = useUsers({ page: 1, limit: -1 });
-  const allUsers = useMemo<UserWithRoles[]>(() => allUsersData?.data ?? [], [allUsersData]);
-
-  const roleUserMap = useMemo<Record<string, UserWithRoles[]>>(() => {
-    const map: Record<string, UserWithRoles[]> = {};
-    for (const user of allUsers) {
-      for (const roleName of user.roles) {
-        if (!map[roleName]) map[roleName] = [];
-        map[roleName].push(user);
-      }
-    }
-    return map;
-  }, [allUsers]);
+  // Filter options — all permissions without pagination
+  const { data: permissionsData } = usePermissionList({ limit: -1 });
+  const filterPermissions = useMemo(() => (permissionsData?.data ?? []).map((p) => p.name).sort(), [permissionsData]);
 
   const canCreate = usePermission("roles:create");
   const canEdit = usePermission("roles:update");
   const canDelete = usePermission("roles:delete");
-
-  const filteredRoles = useMemo(() => {
-    return allRoles.filter((r) => {
-      if (search && !r.name.toLowerCase().includes(search.toLowerCase())) return false;
-      if (filters.permission && !r.permissions.includes(filters.permission)) return false;
-      return true;
-    });
-  }, [allRoles, search, filters]);
-
-  const pagedRoles = useMemo(
-    () => filteredRoles.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE),
-    [filteredRoles, page],
-  );
 
   const handleRefresh = useCallback(() => {
     queryClient.invalidateQueries({ queryKey: ["roles"] });
@@ -124,11 +108,10 @@ export function useRolesPage() {
     isRoleModalOpen,
     assigningRole,
     deletingRole,
-    roles: pagedRoles,
-    total: filteredRoles.length,
+    roles,
+    total,
     pageSize: PAGE_SIZE,
     filterPermissions,
-    roleUserMap,
     isLoading,
     isError,
     isFetching,

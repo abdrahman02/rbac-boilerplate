@@ -22,6 +22,36 @@ export interface DashboardStatsRaw {
 }
 
 const RECENT_ACTIVITY_LIMIT = 20
+const ROLE_DISTRIBUTION_LIMIT = 6
+
+export interface RoleDistributionItem {
+  id: number
+  name: string
+  count: number
+  pct: number
+}
+
+export async function getRoleDistribution(): Promise<RoleDistributionItem[]> {
+  const [totalUsers, roles] = await prisma.$transaction([
+    prisma.user.count({ where: { deletedAt: null } }),
+    prisma.role.findMany({
+      take: ROLE_DISTRIBUTION_LIMIT,
+      orderBy: { name: 'asc' },
+      select: {
+        id: true,
+        name: true,
+        _count: { select: { users: true } },
+      },
+    }),
+  ])
+
+  return roles.map((r) => ({
+    id: r.id,
+    name: r.name,
+    count: r._count.users,
+    pct: totalUsers > 0 ? Math.round((r._count.users / totalUsers) * 100) : 0,
+  }))
+}
 
 export async function getDashboardStats(sinceDate: Date): Promise<DashboardStatsRaw> {
   const now = new Date()

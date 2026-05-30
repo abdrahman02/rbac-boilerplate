@@ -2,7 +2,7 @@ import type { Permission } from '../generated/prisma/index.js'
 import type { Request, Response } from 'express'
 import * as svc from '../services/permission.service.js'
 import { handleError } from '../lib/handle-error.js'
-import type { ApiResponse, PaginatedResponse } from '../types/index.js'
+import type { ApiResponse } from '../types/index.js'
 import type { CreatePermissionInput, UpdatePermissionInput } from '../schemas/permission.schema.js'
 
 export async function listPermissions(req: Request, res: Response): Promise<void> {
@@ -11,8 +11,9 @@ export async function listPermissions(req: Request, res: Response): Promise<void
     const rawLimit = parseInt(req.query.limit as string, 10) || 10
     const limit = rawLimit === -1 ? -1 : Math.min(100, Math.max(1, rawLimit))
     const search = typeof req.query.search === 'string' ? req.query.search.trim() || undefined : undefined
+    const usage = typeof req.query.usage === 'string' ? req.query.usage.trim() || undefined : undefined
 
-    const result: PaginatedResponse<Permission> = await svc.listPermissions(page, limit, search)
+    const result = await svc.listPermissions(page, limit, search, usage)
     res.status(200).json(result)
   } catch (error) {
     handleError(res, error)

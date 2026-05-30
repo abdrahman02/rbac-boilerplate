@@ -2,7 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/shared/lib/api-client";
-import type { RoleWithPermissions } from "@/shared/types";
+import type { PaginatedResponse, RoleWithPermissions } from "@/shared/types";
 
 interface CreateRolePayload {
   name: string;
@@ -18,15 +18,16 @@ interface RoleListParams {
   page?: number;
   limit?: number;
   search?: string;
+  permission?: string;
 }
 
 export function useRoles(params?: RoleListParams) {
-  const { page = 1, limit = 10, search } = params ?? {};
-  return useQuery<RoleWithPermissions[]>({
-    queryKey: ["roles", { page, limit, search }],
+  const { page = 1, limit = 10, search, permission } = params ?? {};
+  return useQuery<PaginatedResponse<RoleWithPermissions>>({
+    queryKey: ["roles", { page, limit, search, permission }],
     queryFn: async () => {
-      const res = await apiClient.get("/roles", { params: { page, limit, search } });
-      return res.data.data;
+      const res = await apiClient.get("/roles", { params: { page, limit, search, permission } });
+      return res.data;
     },
   });
 }

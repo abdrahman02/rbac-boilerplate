@@ -3,7 +3,7 @@ import * as repo from '../repositories/dashboard.repository.js'
 import * as userRepo from '../repositories/user.repository.js'
 import * as roleRepo from '../repositories/role.repository.js'
 import { freezeHeaderRow, autoFitColumns } from '../lib/excel-styles.js'
-import type { DashboardStatsRaw } from '../repositories/dashboard.repository.js'
+import type { DashboardStatsRaw, RoleDistributionItem } from '../repositories/dashboard.repository.js'
 import type { UserExportRow } from '../repositories/user.repository.js'
 import type { RoleExportRow } from '../repositories/role.repository.js'
 import type { ApiResponse } from '../types/index.js'
@@ -112,6 +112,11 @@ export async function buildExportWorkbook(permissions: string[]): Promise<Buffer
  * Fetches dashboard statistics for the last 7 days and maps raw DB data to DTO.
  * Converts Date objects to ISO 8601 strings for serialization.
  */
+export async function getRoleDistribution(): Promise<ApiResponse<RoleDistributionItem[]>> {
+  const data = await repo.getRoleDistribution()
+  return { success: true, data, message: null }
+}
+
 export async function getDashboardStats(): Promise<ApiResponse<DashboardStatsDto>> {
   const sinceDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
 

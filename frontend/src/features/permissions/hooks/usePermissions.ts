@@ -2,7 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/shared/lib/api-client";
-import type { Permission } from "@/shared/types";
+import type { PaginatedResponse, Permission } from "@/shared/types";
 
 interface CreatePermissionPayload {
   name: string;
@@ -18,15 +18,16 @@ interface PermissionListParams {
   page?: number;
   limit?: number;
   search?: string;
+  usage?: string;
 }
 
 export function usePermissionList(params?: PermissionListParams) {
-  const { page = 1, limit = -1, search } = params ?? {};
-  return useQuery<Permission[]>({
-    queryKey: ["permissions", { page, limit, search }],
+  const { page = 1, limit = 10, search, usage } = params ?? {};
+  return useQuery<PaginatedResponse<Permission>>({
+    queryKey: ["permissions", { page, limit, search, usage }],
     queryFn: async () => {
-      const res = await apiClient.get("/permissions", { params: { page, limit, search } });
-      return res.data.data;
+      const res = await apiClient.get("/permissions", { params: { page, limit, search, usage } });
+      return res.data;
     },
   });
 }

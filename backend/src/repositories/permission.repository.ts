@@ -2,26 +2,49 @@ import type { Permission } from '../generated/prisma/index.js'
 import { Prisma } from '../generated/prisma/index.js'
 import { prisma } from '../lib/prisma.js'
 
+export interface PermissionRow {
+  id: number
+  name: string
+  description: string | null
+  createdAt: Date
+  roles: string[]
+}
+
 export async function findAllPermissions(
   page: number,
   limit: number,
   search?: string,
-): Promise<{ rows: Permission[]; total: number }> {
+  usage?: string,
+): Promise<{ rows: PermissionRow[]; total: number }> {
   const fetchAll = limit === -1
   const offset = fetchAll ? 0 : (page - 1) * limit
-  const where: Prisma.PermissionWhereInput = search ? { name: { contains: search } } : {}
 
-  const [total, rows] = await prisma.$transaction([
+  const where: Prisma.PermissionWhereInput = {}
+  if (search) where.name = { contains: search }
+  if (usage === 'used') where.roles = { some: {} }
+  else if (usage === 'unused') where.roles = { none: {} }
+
+  const [total, permissions] = await prisma.$transaction([
     prisma.permission.count({ where }),
     prisma.permission.findMany({
       where,
+      include: { roles: { select: { role: { select: { name: true } } } } },
       orderBy: { name: 'asc' },
       skip: offset,
       ...(fetchAll ? {} : { take: limit }),
     }),
   ])
 
-  return { rows, total }
+  return {
+    rows: permissions.map((p) => ({
+      id: p.id,
+      name: p.name,
+      description: p.description,
+      createdAt: p.createdAt,
+      roles: p.roles.map((rp) => rp.role.name),
+    })),
+    total,
+  }
 }
 
 export async function findPermissionById(id: number): Promise<Permission | null> {
