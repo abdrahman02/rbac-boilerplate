@@ -1,7 +1,10 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useCallback } from "react";
 import { apiClient } from "@/shared/lib/api-client";
+import { getErrorMessage } from "@/shared/lib/api-error";
+import { toast } from "@/shared/lib/toast";
 import type { PaginatedResponse, RoleWithPermissions } from "@/shared/types";
 
 interface CreateRolePayload {
@@ -93,4 +96,31 @@ export function useSyncRolePermissions() {
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["roles"] }),
   });
+}
+
+interface ExportRolesParams {
+  search: string;
+  permission: string;
+}
+
+export function useExportRoles() {
+  const { mutate, isPending } = useMutation({
+    mutationFn: async (params: ExportRolesParams) => {
+      const res = await apiClient.get<Blob>("/roles/export", {
+        responseType: "blob",
+        params,
+      });
+      const url = URL.createObjectURL(res.data);
+      const dateStr = new Date().toISOString().slice(0, 10);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = `roles-${dateStr}.xlsx`;
+      anchor.click();
+      URL.revokeObjectURL(url);
+    },
+    onError: (err) => toast.error("Export failed", { description: getErrorMessage(err) }),
+  });
+
+  const exportRoles = useCallback((params: ExportRolesParams) => mutate(params), [mutate]);
+  return { exportRoles, isExporting: isPending };
 }
