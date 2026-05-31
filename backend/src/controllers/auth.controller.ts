@@ -96,3 +96,31 @@ export async function me(req: Request, res: Response): Promise<void> {
     handleError(res, err)
   }
 }
+
+export async function updateMe(req: Request, res: Response): Promise<void> {
+  try {
+    const user = await authService.updateMe(req.user!.id, req.body)
+    const body: ApiResponse<AuthenticatedUser> = {
+      success: true,
+      data: user,
+      message: null,
+    }
+    res.json(body)
+  } catch (err) {
+    handleError(res, err)
+  }
+}
+
+export async function changePassword(req: Request, res: Response): Promise<void> {
+  try {
+    await authService.changePassword(req.user!.id, req.body)
+    const body: ApiResponse<null> = {
+      success: true,
+      data: null,
+      message: 'Password updated successfully.',
+    }
+    res.json(body)
+  } catch (err) {
+    handleError(res, err)
+  }
+}

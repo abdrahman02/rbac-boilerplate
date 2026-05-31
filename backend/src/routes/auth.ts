@@ -2,7 +2,7 @@ import { Router } from 'express'
 import { authRateLimit } from '../middleware/rate-limit.middleware.js'
 import { authMiddleware } from '../middleware/auth.middleware.js'
 import { validate } from '../middleware/validate.middleware.js'
-import { registerSchema, loginSchema } from '../schemas/auth.schema.js'
+import { registerSchema, loginSchema, updateMeSchema, changePasswordSchema } from '../schemas/auth.schema.js'
 import { auditLog } from '../middleware/audit-log.middleware.js'
 import * as authController from '../controllers/auth.controller.js'
 
@@ -131,5 +131,8 @@ router.post('/refresh', authRateLimit, authController.refresh)
  *         description: Unauthorized
  */
 router.get('/me', authMiddleware, authController.me)
+
+router.patch('/me', authMiddleware, validate(updateMeSchema), authController.updateMe)
+router.post('/change-password', authMiddleware, validate(changePasswordSchema), authController.changePassword)
 
 export default router
