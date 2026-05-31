@@ -37,6 +37,8 @@ export function PermissionsPage() {
     closeConfirmDelete,
     handleCopyPermissionId,
     handleConfirmDelete,
+    handleExport,
+    isExporting,
   } = usePermissionsPage();
 
   return (
@@ -54,6 +56,8 @@ export function PermissionsPage() {
         isFetching={isFetching}
         onAddPermission={openCreate}
         onRefresh={handleRefresh}
+        onExport={handleExport}
+        isExporting={isExporting}
       />
 
       <PermissionTable
