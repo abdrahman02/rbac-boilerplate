@@ -1,10 +1,10 @@
 "use client";
 
-import { Plus } from "lucide-react";
+import { Download, Plus } from "lucide-react";
 import type { ReactNode } from "react";
 import { memo } from "react";
 import { FilterDropdown, RefreshButton, SearchInput } from "@/shared/components/common";
-import { Button, Select } from "@/shared/components/ui";
+import { Button, Select, Spinner } from "@/shared/components/ui";
 import type { RoleWithPermissions } from "@/shared/types";
 import type { FilterState } from "../../types";
 import { STATUS_OPTIONS } from "./UserToolbar.constants";
@@ -21,6 +21,8 @@ interface UserToolbarProps {
   isFetching: boolean;
   onAddUser: () => void;
   onRefresh: () => void;
+  isExporting: boolean;
+  onExport: () => void;
 }
 
 export const UserToolbar = memo(function UserToolbar({
@@ -35,6 +37,8 @@ export const UserToolbar = memo(function UserToolbar({
   isFetching,
   onAddUser,
   onRefresh,
+  isExporting,
+  onExport,
 }: UserToolbarProps) {
   return (
     <div className="flex gap-2.5 flex-wrap items-center p-3.5 rounded-xl border border-border bg-card shadow-sm">
@@ -73,6 +77,17 @@ export const UserToolbar = memo(function UserToolbar({
       <div className="flex-1" />
 
       <RefreshButton isLoading={isFetching} onClick={onRefresh} />
+
+      <Button
+        variant="outline"
+        size="sm"
+        className="gap-1.5"
+        onClick={onExport}
+        disabled={isExporting}
+      >
+        {isExporting ? <Spinner size="sm" /> : <Download size={14} />}
+        Export
+      </Button>
 
       {canCreate && (
         <Button size="sm" className="gap-1.5" onClick={onAddUser}>

@@ -43,6 +43,8 @@ export function UsersPage() {
     handleRemoveRole,
     handleConfirmDelete,
     isDeletePending,
+    isExporting,
+    handleExport,
   } = useUsersPage();
 
   return (
@@ -64,6 +66,8 @@ export function UsersPage() {
         isFetching={isFetching}
         onAddUser={openCreate}
         onRefresh={handleRefresh}
+        isExporting={isExporting}
+        onExport={handleExport}
       />
 
       <UserTable

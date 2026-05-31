@@ -37,10 +37,10 @@ describe('buildUsersExportWorkbook', () => {
     expect(Buffer.isBuffer(result)).toBe(true)
   })
 
-  it('calls findUsersForExport with no filters when params are undefined', async () => {
+  it('calls findUsersForExport with empty filters when params are undefined', async () => {
     vi.mocked(repo.findUsersForExport).mockResolvedValueOnce(MOCK_USERS)
     await buildUsersExportWorkbook()
-    expect(repo.findUsersForExport).toHaveBeenCalledWith({ search: undefined, role: undefined, status: undefined })
+    expect(repo.findUsersForExport).toHaveBeenCalledWith({})
   })
 
   it('passes search and role filters through to the repository', async () => {
