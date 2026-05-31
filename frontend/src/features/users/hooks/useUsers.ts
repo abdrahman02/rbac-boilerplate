@@ -1,7 +1,10 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useCallback } from "react";
 import { apiClient } from "@/shared/lib/api-client";
+import { getErrorMessage } from "@/shared/lib/api-error";
+import { toast } from "@/shared/lib/toast";
 import type { PaginatedResponse, UserWithRoles } from "@/shared/types";
 
 interface CreateUserPayload {
@@ -89,4 +92,32 @@ export function useRemoveRole() {
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["users"] }),
   });
+}
+
+interface ExportUsersParams {
+  search: string;
+  role: string;
+  status: string;
+}
+
+export function useExportUsers() {
+  const { mutate, isPending } = useMutation({
+    mutationFn: async (params: ExportUsersParams) => {
+      const res = await apiClient.get<Blob>("/users/export", {
+        responseType: "blob",
+        params,
+      });
+      const url = URL.createObjectURL(res.data);
+      const dateStr = new Date().toISOString().slice(0, 10);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = `users-${dateStr}.xlsx`;
+      anchor.click();
+      URL.revokeObjectURL(url);
+    },
+    onError: (err) => toast.error("Export failed", { description: getErrorMessage(err) }),
+  });
+
+  const exportUsers = useCallback((params: ExportUsersParams) => mutate(params), [mutate]);
+  return { exportUsers, isExporting: isPending };
 }

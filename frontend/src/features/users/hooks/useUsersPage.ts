@@ -8,7 +8,7 @@ import { getErrorMessage } from "@/shared/lib/api-error";
 import { toast } from "@/shared/lib/toast";
 import type { UserWithRoles } from "@/shared/types";
 import type { FilterState } from "../types";
-import { useDeleteUser, useRemoveRole, useUpdateUser, useUsers } from "./useUsers";
+import { useDeleteUser, useExportUsers, useRemoveRole, useUpdateUser, useUsers } from "./useUsers";
 
 const EMPTY_FILTER: FilterState = { role: "", status: "" };
 
@@ -38,6 +38,7 @@ export function useUsersPage() {
   const updateUser = useUpdateUser();
   const deleteUser = useDeleteUser();
   const removeRole = useRemoveRole();
+  const { exportUsers, isExporting } = useExportUsers();
 
   const canCreate = usePermission("users:create");
   const canEdit = usePermission("users:update");
@@ -126,6 +127,10 @@ export function useUsersPage() {
     });
   }, [deletingUser, deleteUser]);
 
+  const handleExport = useCallback(() => {
+    exportUsers({ search: debouncedSearch, role: filters.role, status: filters.status });
+  }, [exportUsers, debouncedSearch, filters]);
+
   return {
     // list state
     page,
@@ -166,5 +171,7 @@ export function useUsersPage() {
     handleCopyUserId,
     handleRemoveRole,
     handleConfirmDelete,
+    handleExport,
+    isExporting,
   };
 }
