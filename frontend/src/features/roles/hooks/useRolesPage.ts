@@ -8,7 +8,7 @@ import { getErrorMessage } from "@/shared/lib/api-error";
 import { toast } from "@/shared/lib/toast";
 import type { RoleWithPermissions } from "@/shared/types";
 import type { RolesFilterState } from "../types";
-import { useDeleteRole, useRoles } from "./useRoles";
+import { useDeleteRole, useExportRoles, useRoles } from "./useRoles";
 
 const PAGE_SIZE = 10;
 const EMPTY_FILTER: RolesFilterState = { permission: "" };
@@ -38,6 +38,11 @@ export function useRolesPage() {
 
   const isFetching = useIsFetching({ queryKey: ["roles"] }) > 0;
   const deleteRole = useDeleteRole();
+  const { exportRoles, isExporting } = useExportRoles();
+
+  const handleExport = useCallback(() => {
+    exportRoles({ search: debouncedSearch, permission: filters.permission });
+  }, [exportRoles, debouncedSearch, filters.permission]);
 
   // Filter options — all permissions without pagination
   const { data: permissionsData } = usePermissionList({ limit: -1 });
@@ -133,5 +138,7 @@ export function useRolesPage() {
     closeConfirmDelete,
     handleCopyRoleId,
     handleConfirmDelete,
+    handleExport,
+    isExporting,
   };
 }
