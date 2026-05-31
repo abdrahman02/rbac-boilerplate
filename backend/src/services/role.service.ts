@@ -1,6 +1,8 @@
 import * as repo from '../repositories/role.repository.js'
 import type { RoleWithPermissions, PaginatedResponse } from '../types/index.js'
 import type { CreateRoleInput, UpdateRoleInput } from '../schemas/role.schema.js'
+import ExcelJS from 'exceljs'
+import { freezeHeaderRow, autoFitColumns } from '../lib/excel-styles.js'
 
 export async function listRoles(
   page: number,
@@ -78,4 +80,39 @@ export async function syncPermissions(roleId: number, permissionIds: number[]): 
   if (!role) throw new Error('ROLE_NOT_FOUND')
 
   await repo.syncRolePermissions(roleId, permissionIds)
+}
+
+export async function buildRolesExportWorkbook(
+  search?: string,
+  permission?: string,
+): Promise<Buffer> {
+  const { rows } = await repo.findAllRoles(1, -1, search, permission)
+
+  const wb = new ExcelJS.Workbook()
+  const sheet = wb.addWorksheet('Roles')
+  freezeHeaderRow(sheet)
+  sheet.addTable({
+    name: 'Roles',
+    ref: 'A1',
+    headerRow: true,
+    totalsRow: false,
+    style: { theme: 'TableStyleMedium2', showRowStripes: false },
+    columns: [
+      { name: 'Name' },
+      { name: 'Description' },
+      { name: 'Permissions' },
+      { name: 'User Count' },
+      { name: 'Created At' },
+    ],
+    rows: rows.map((r) => [
+      r.name,
+      r.description ?? '',
+      r.permissions.join(', '),
+      r.users.length,
+      r.createdAt.toISOString().slice(0, 10),
+    ]),
+  })
+  autoFitColumns(sheet)
+
+  return Buffer.from(await wb.xlsx.writeBuffer())
 }
