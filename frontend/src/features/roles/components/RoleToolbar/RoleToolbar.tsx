@@ -1,10 +1,10 @@
 "use client";
 
-import { Plus } from "lucide-react";
+import { Download, Plus } from "lucide-react";
 import type { ReactNode } from "react";
 import { memo } from "react";
 import { FilterDropdown, RefreshButton, SearchInput } from "@/shared/components/common";
-import { Button, Select } from "@/shared/components/ui";
+import { Button, Select, Spinner } from "@/shared/components/ui";
 import type { RolesFilterState } from "../../types";
 
 interface RoleToolbarProps {
@@ -19,6 +19,8 @@ interface RoleToolbarProps {
   isFetching: boolean;
   onAddRole: () => void;
   onRefresh: () => void;
+  isExporting: boolean;
+  onExport: () => void;
 }
 
 export const RoleToolbar = memo(function RoleToolbar({
@@ -33,6 +35,8 @@ export const RoleToolbar = memo(function RoleToolbar({
   isFetching,
   onAddRole,
   onRefresh,
+  isExporting,
+  onExport,
 }: RoleToolbarProps) {
   return (
     <div className="flex gap-2.5 flex-wrap items-center p-3.5 rounded-xl border border-border bg-card shadow-sm">
@@ -63,6 +67,11 @@ export const RoleToolbar = memo(function RoleToolbar({
       <div className="flex-1" />
 
       <RefreshButton isLoading={isFetching} onClick={onRefresh} />
+
+      <Button variant="outline" size="sm" className="gap-1.5" onClick={onExport} disabled={isExporting}>
+        {isExporting ? <Spinner size="sm" /> : <Download size={14} />}
+        Export
+      </Button>
 
       {canCreate && (
         <Button size="sm" className="gap-1.5" onClick={onAddRole}>
