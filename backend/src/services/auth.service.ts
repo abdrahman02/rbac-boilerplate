@@ -2,7 +2,7 @@ import * as repo from '../repositories/auth.repository.js'
 import * as tokenSvc from './token.service.js'
 import { hashPassword, comparePassword } from '../utils/hash.js'
 import type { AuthenticatedUser } from '../types/index.js'
-import type { RegisterInput, LoginInput } from '../schemas/auth.schema.js'
+import type { RegisterInput, LoginInput, UpdateMeInput, ChangePasswordInput } from '../schemas/auth.schema.js'
 
 export interface AuthResult {
   user: AuthenticatedUser
@@ -72,6 +72,33 @@ export async function getMe(userId: number): Promise<AuthenticatedUser> {
     roles,
     permissions,
   }
+}
+
+export async function updateMe(
+  userId: number,
+  input: UpdateMeInput,
+): Promise<AuthenticatedUser> {
+  if (input.email) {
+    const conflict = await repo.findUserByEmailExcluding(input.email, userId)
+    if (conflict) throw new Error('EMAIL_TAKEN')
+  }
+
+  await repo.updateUserProfile(userId, { name: input.name, email: input.email })
+  return getMe(userId)
+}
+
+export async function changePassword(
+  userId: number,
+  input: ChangePasswordInput,
+): Promise<void> {
+  const user = await repo.findUserById(userId)
+  if (!user) throw new Error('USER_NOT_FOUND')
+
+  const valid = await comparePassword(input.current_password, user.passwordHash)
+  if (!valid) throw new Error('WRONG_PASSWORD')
+
+  const newHash = await hashPassword(input.new_password)
+  await repo.updateUserPassword(userId, newHash)
 }
 
 async function buildAuthResult(userId: number): Promise<AuthResult> {

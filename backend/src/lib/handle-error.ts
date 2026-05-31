@@ -8,6 +8,7 @@ const ERROR_MAP: Record<string, { status: number; message: string }> = {
   REFRESH_TOKEN_EXPIRED:  { status: 401, message: 'Your session has expired. Please log in again.' },
   EMAIL_TAKEN:            { status: 409, message: 'Email address is already in use.' },
   USER_NOT_FOUND:         { status: 404, message: 'User not found.' },
+  WRONG_PASSWORD:         { status: 400, message: 'Current password is incorrect.' },
   ROLE_NOT_FOUND:         { status: 404, message: 'Role not found.' },
   ROLE_NAME_TAKEN:        { status: 409, message: 'A role with this name already exists.' },
   PERMISSION_NAME_TAKEN:  { status: 409, message: 'A permission with this name already exists.' },
