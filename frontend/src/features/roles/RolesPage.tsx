@@ -42,6 +42,8 @@ export function RolesPage() {
     closeConfirmDelete,
     handleCopyRoleId,
     handleConfirmDelete,
+    handleExport,
+    isExporting,
   } = useRolesPage();
 
   return (
@@ -60,6 +62,8 @@ export function RolesPage() {
         isFetching={isFetching}
         onAddRole={openCreate}
         onRefresh={handleRefresh}
+        onExport={handleExport}
+        isExporting={isExporting}
       />
 
       <RoleTable
