@@ -27,7 +27,7 @@ export function usePermissionsPage() {
   const { exportPermissions, isExporting } = useExportPermissions();
 
   const handleExport = useCallback(() => {
-    exportPermissions({ search: debouncedSearch, usage: filters.usage || "" });
+    exportPermissions({ search: debouncedSearch, usage: filters.usage });
   }, [exportPermissions, debouncedSearch, filters.usage]);
 
   // Main paginated data — server handles filtering and pagination
