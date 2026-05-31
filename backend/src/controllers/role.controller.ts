@@ -292,3 +292,19 @@ export async function removePermission(req: Request, res: Response): Promise<voi
     handleError(res, error)
   }
 }
+
+export async function exportRoles(req: Request, res: Response): Promise<void> {
+  try {
+    const search = typeof req.query.search === 'string' ? req.query.search.trim() || undefined : undefined
+    const permission = typeof req.query.permission === 'string' ? req.query.permission.trim() || undefined : undefined
+
+    const buffer = await svc.buildRolesExportWorkbook(search, permission)
+    const dateStr = new Date().toISOString().slice(0, 10)
+
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    res.setHeader('Content-Disposition', `attachment; filename="roles-${dateStr}.xlsx"`)
+    res.send(buffer)
+  } catch (error) {
+    handleError(res, error)
+  }
+}

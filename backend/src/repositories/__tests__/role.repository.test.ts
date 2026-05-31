@@ -17,6 +17,7 @@ const MOCK_ROLE_WITH_PERMISSIONS = [
     description: 'Administrator',
     createdAt: new Date('2024-01-15T10:00:00.000Z'),
     permissions: [{ permission: { name: 'users:read' } }, { permission: { name: 'users:write' } }],
+    users: [],
   },
 ]
 
@@ -36,6 +37,7 @@ describe('findAllRoles', () => {
       description: 'Administrator',
       createdAt: new Date('2024-01-15T10:00:00.000Z'),
       permissions: ['users:read', 'users:write'],
+      users: [],
     })
   })
 

@@ -24,6 +24,27 @@ router.get('/', authMiddleware, requirePermission(['roles:read', 'users:read', '
 
 /**
  * @swagger
+ * /api/roles/export:
+ *   get:
+ *     summary: Export all roles to Excel
+ *     tags: [Roles]
+ *     security:
+ *       - cookieAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: search
+ *         schema: { type: string }
+ *       - in: query
+ *         name: permission
+ *         schema: { type: string }
+ *     responses:
+ *       200:
+ *         description: Excel file with roles data
+ */
+router.get('/export', authMiddleware, requirePermission('roles:read'), ctrl.exportRoles)
+
+/**
+ * @swagger
  * /api/roles/{id}:
  *   get:
  *     summary: Get role by ID
