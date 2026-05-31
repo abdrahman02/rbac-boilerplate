@@ -3,6 +3,8 @@ import * as repo from '../repositories/permission.repository.js'
 import type { PermissionRow } from '../repositories/permission.repository.js'
 import type { PaginatedResponse } from '../types/index.js'
 import type { CreatePermissionInput, UpdatePermissionInput } from '../schemas/permission.schema.js'
+import ExcelJS from 'exceljs'
+import { freezeHeaderRow, autoFitColumns } from '../lib/excel-styles.js'
 
 export async function listPermissions(
   page: number,
@@ -43,4 +45,37 @@ export async function updatePermission(
 
 export async function deletePermission(permissionId: number): Promise<boolean> {
   return repo.deletePermission(permissionId)
+}
+
+export async function buildPermissionsExportWorkbook(
+  search?: string,
+  usage?: string,
+): Promise<Buffer> {
+  const { rows } = await repo.findAllPermissions(1, -1, search, usage)
+
+  const wb = new ExcelJS.Workbook()
+  const sheet = wb.addWorksheet('Permissions')
+  freezeHeaderRow(sheet)
+  sheet.addTable({
+    name: 'Permissions',
+    ref: 'A1',
+    headerRow: true,
+    totalsRow: false,
+    style: { theme: 'TableStyleMedium2', showRowStripes: false },
+    columns: [
+      { name: 'Name' },
+      { name: 'Description' },
+      { name: 'Roles' },
+      { name: 'Created At' },
+    ],
+    rows: rows.map((r) => [
+      r.name,
+      r.description ?? '',
+      r.roles.join(', '),
+      r.createdAt.toISOString().slice(0, 10),
+    ]),
+  })
+  autoFitColumns(sheet)
+
+  return Buffer.from(await wb.xlsx.writeBuffer())
 }
