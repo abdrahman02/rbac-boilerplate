@@ -7,7 +7,7 @@ import { getErrorMessage } from "@/shared/lib/api-error";
 import { toast } from "@/shared/lib/toast";
 import type { Permission } from "@/shared/types";
 import type { PermissionsFilterState } from "../types";
-import { useDeletePermission, usePermissionList } from "./usePermissions";
+import { useDeletePermission, useExportPermissions, usePermissionList } from "./usePermissions";
 
 const PAGE_SIZE = 10;
 const EMPTY_FILTER: PermissionsFilterState = { usage: "" };
@@ -24,6 +24,11 @@ export function usePermissionsPage() {
   const queryClient = useQueryClient();
   const debouncedSearch = useDebounce(search, 400);
   const deletePermission = useDeletePermission();
+  const { exportPermissions, isExporting } = useExportPermissions();
+
+  const handleExport = useCallback(() => {
+    exportPermissions({ search: debouncedSearch, usage: filters.usage || "" });
+  }, [exportPermissions, debouncedSearch, filters.usage]);
 
   // Main paginated data — server handles filtering and pagination
   const { data, isLoading, isError } = usePermissionList({
@@ -122,5 +127,7 @@ export function usePermissionsPage() {
     closeConfirmDelete,
     handleCopyPermissionId,
     handleConfirmDelete,
+    handleExport,
+    isExporting,
   };
 }
