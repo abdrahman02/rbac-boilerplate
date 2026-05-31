@@ -82,3 +82,32 @@ export async function revokeRefreshToken(tokenHash: string): Promise<void> {
     data: { revokedAt: new Date() },
   })
 }
+
+export async function findUserByEmailExcluding(
+  email: string,
+  excludeId: number,
+): Promise<User | null> {
+  return prisma.user.findFirst({
+    where: { email, deletedAt: null, id: { not: excludeId } },
+  })
+}
+
+export async function updateUserProfile(
+  id: number,
+  data: { name?: string; email?: string },
+): Promise<void> {
+  await prisma.user.update({
+    where: { id },
+    data: {
+      ...(data.name !== undefined && { fullName: data.name }),
+      ...(data.email !== undefined && { email: data.email }),
+    },
+  })
+}
+
+export async function updateUserPassword(id: number, passwordHash: string): Promise<void> {
+  await prisma.user.update({
+    where: { id },
+    data: { passwordHash },
+  })
+}
