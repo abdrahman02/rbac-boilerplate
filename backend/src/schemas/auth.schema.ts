@@ -1,17 +1,19 @@
 import { z } from 'zod'
 import { emailField } from './shared.js'
 
+const passwordField = z
+  .string()
+  .min(8, 'At least 8 characters')
+  .max(100)
+  .regex(
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
+    'Password must contain uppercase, lowercase, and a number',
+  )
+
 export const registerSchema = z.object({
   name: z.string().min(2).max(100).trim(),
   email: emailField,
-  password: z
-    .string()
-    .min(8)
-    .max(100)
-    .regex(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
-      'Password must contain uppercase, lowercase, and a number',
-    ),
+  password: passwordField,
 })
 
 export const loginSchema = z.object({
@@ -30,14 +32,7 @@ export const updateMeSchema = z
 
 export const changePasswordSchema = z.object({
   current_password: z.string().min(1, 'Current password is required'),
-  new_password: z
-    .string()
-    .min(8, 'At least 8 characters')
-    .max(100)
-    .regex(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
-      'Password must contain uppercase, lowercase, and a number',
-    ),
+  new_password: passwordField,
 })
 
 export type RegisterInput = z.infer<typeof registerSchema>
