@@ -176,3 +176,19 @@ export async function deletePermission(req: Request, res: Response): Promise<voi
     handleError(res, error)
   }
 }
+
+export async function exportPermissions(req: Request, res: Response): Promise<void> {
+  try {
+    const search = typeof req.query.search === 'string' ? req.query.search.trim() || undefined : undefined
+    const usage = typeof req.query.usage === 'string' ? req.query.usage.trim() || undefined : undefined
+
+    const buffer = await svc.buildPermissionsExportWorkbook(search, usage)
+    const dateStr = new Date().toISOString().slice(0, 10)
+
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    res.setHeader('Content-Disposition', `attachment; filename="permissions-${dateStr}.xlsx"`)
+    res.send(buffer)
+  } catch (error) {
+    handleError(res, error)
+  }
+}
