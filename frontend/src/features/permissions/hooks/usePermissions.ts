@@ -1,7 +1,10 @@
 "use client";
 
+import { useCallback } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/shared/lib/api-client";
+import { getErrorMessage } from "@/shared/lib/api-error";
+import { toast } from "@/shared/lib/toast";
 import type { PaginatedResponse, Permission } from "@/shared/types";
 
 interface CreatePermissionPayload {
@@ -62,4 +65,31 @@ export function useDeletePermission() {
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["permissions"] }),
   });
+}
+
+interface ExportPermissionsParams {
+  search: string;
+  usage: string;
+}
+
+export function useExportPermissions() {
+  const { mutate, isPending } = useMutation({
+    mutationFn: async (params: ExportPermissionsParams) => {
+      const res = await apiClient.get<Blob>("/permissions/export", {
+        responseType: "blob",
+        params,
+      });
+      const url = URL.createObjectURL(res.data);
+      const dateStr = new Date().toISOString().slice(0, 10);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = `permissions-${dateStr}.xlsx`;
+      anchor.click();
+      URL.revokeObjectURL(url);
+    },
+    onError: (err) => toast.error("Export failed", { description: getErrorMessage(err) }),
+  });
+
+  const exportPermissions = useCallback((params: ExportPermissionsParams) => mutate(params), [mutate]);
+  return { exportPermissions, isExporting: isPending };
 }
