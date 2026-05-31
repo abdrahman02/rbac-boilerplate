@@ -78,13 +78,7 @@ export const UserToolbar = memo(function UserToolbar({
 
       <RefreshButton isLoading={isFetching} onClick={onRefresh} />
 
-      <Button
-        variant="outline"
-        size="sm"
-        className="gap-1.5"
-        onClick={onExport}
-        disabled={isExporting}
-      >
+      <Button variant="outline" size="sm" className="gap-1.5" onClick={onExport} disabled={isExporting}>
         {isExporting ? <Spinner size="sm" /> : <Download size={14} />}
         Export
       </Button>
