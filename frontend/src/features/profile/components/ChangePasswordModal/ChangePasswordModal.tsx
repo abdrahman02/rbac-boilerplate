@@ -18,9 +18,7 @@ export function ChangePasswordModal({ isOpen, onClose }: ChangePasswordModalProp
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Change password">
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-3.5 pt-1">
-        <p className="text-sm text-muted-foreground -mt-0.5">
-          Enter your current password and choose a new one.
-        </p>
+        <p className="text-sm text-muted-foreground -mt-0.5">Enter your current password and choose a new one.</p>
 
         {errors.root && <Alert message={errors.root.message ?? "An error occurred"} />}
 

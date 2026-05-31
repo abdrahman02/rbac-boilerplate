@@ -24,13 +24,7 @@ export const SecurityCard = memo(function SecurityCard({ onChangePassword }: Sec
   );
 });
 
-const SecurityRow = memo(function SecurityRow({
-  item,
-  onAction,
-}: {
-  item: SecurityItem;
-  onAction?: () => void;
-}) {
+const SecurityRow = memo(function SecurityRow({ item, onAction }: { item: SecurityItem; onAction?: () => void }) {
   const Icon = item.icon;
   return (
     <div className="flex flex-col gap-1.5 p-3.5 rounded-lg border border-border bg-background">

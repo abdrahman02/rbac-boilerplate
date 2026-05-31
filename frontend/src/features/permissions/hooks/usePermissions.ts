@@ -1,7 +1,7 @@
 "use client";
 
-import { useCallback } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useCallback } from "react";
 import { apiClient } from "@/shared/lib/api-client";
 import { getErrorMessage } from "@/shared/lib/api-error";
 import { toast } from "@/shared/lib/toast";

@@ -19,7 +19,9 @@ export const ProfileCard = memo(function ProfileCard({ name, email, onEditProfil
         <h2 className="text-[17px] font-semibold tracking-tight truncate">{name}</h2>
         <p className="mt-0.5 text-sm text-muted-foreground truncate">{email}</p>
         <div className="flex flex-wrap gap-1.5 mt-2.5">
-          <Badge variant="success" dot>Active</Badge>
+          <Badge variant="success" dot>
+            Active
+          </Badge>
         </div>
       </div>
 

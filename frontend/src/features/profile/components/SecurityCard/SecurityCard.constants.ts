@@ -9,6 +9,6 @@ export interface SecurityItem {
 }
 
 export const SECURITY_ITEMS: SecurityItem[] = [
-  { icon: Lock,        label: "Password",       value: "Change your password", cta: "Change" },
-  { icon: ShieldCheck, label: "Two-factor auth", value: "Authenticator app",   cta: "Manage" },
+  { icon: Lock, label: "Password", value: "Change your password", cta: "Change" },
+  { icon: ShieldCheck, label: "Two-factor auth", value: "Authenticator app", cta: "Manage" },
 ];

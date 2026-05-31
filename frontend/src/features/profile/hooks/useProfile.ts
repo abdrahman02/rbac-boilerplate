@@ -6,10 +6,7 @@ import { useAuth } from "@/shared/hooks";
 export function useProfile() {
   const { user, isLoading } = useAuth();
 
-  const roles = useMemo(
-    () => (user?.roles ?? []).slice().sort((a, b) => a.localeCompare(b)),
-    [user?.roles],
-  );
+  const roles = useMemo(() => (user?.roles ?? []).slice().sort((a, b) => a.localeCompare(b)), [user?.roles]);
 
   const permissions = useMemo(
     () => (user?.permissions ?? []).slice().sort((a, b) => a.localeCompare(b)),

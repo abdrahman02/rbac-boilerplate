@@ -83,7 +83,10 @@ export async function updateMe(
     if (conflict) throw new Error('EMAIL_TAKEN')
   }
 
-  await repo.updateUserProfile(userId, { name: input.name, email: input.email })
+  await repo.updateUserProfile(userId, {
+    ...(input.name !== undefined && { name: input.name }),
+    ...(input.email !== undefined && { email: input.email }),
+  })
   return getMe(userId)
 }
 

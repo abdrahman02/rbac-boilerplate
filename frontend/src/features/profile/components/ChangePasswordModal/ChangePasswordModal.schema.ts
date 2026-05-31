@@ -6,10 +6,7 @@ export const changePasswordSchema = z
     new_password: z
       .string()
       .min(8, "At least 8 characters")
-      .refine(
-        (val) => /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(val),
-        "Must contain uppercase, lowercase, and a number",
-      ),
+      .refine((val) => /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(val), "Must contain uppercase, lowercase, and a number"),
     confirm_password: z.string().min(1, "Please confirm your new password"),
   })
   .refine((data) => data.new_password === data.confirm_password, {
