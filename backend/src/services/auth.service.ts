@@ -105,7 +105,12 @@ export async function resetPassword(token: string, password: string): Promise<vo
   if (new Date() > record.expiresAt) throw new Error("RESET_TOKEN_EXPIRED");
 
   const newPasswordHash = await hashPassword(password);
-  await passwordResetRepo.consumeTokenAndResetPassword(tokenHash, record.userId, newPasswordHash);
+  await passwordResetRepo.consumeTokenAndResetPassword(
+    tokenHash,
+    record.userId,
+    newPasswordHash,
+    record.isInvite,
+  );
 }
 
 export async function logout(userId: number, refreshTokenHash: string): Promise<void> {

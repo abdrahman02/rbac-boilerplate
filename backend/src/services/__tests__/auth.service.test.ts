@@ -399,6 +399,7 @@ describe("resetPassword", () => {
       expect.any(String),
       1,
       expect.any(String),
+      false,
     );
   });
 
@@ -424,5 +425,41 @@ describe("resetPassword", () => {
     });
 
     await expect(resetPassword("expiredtoken", "NewPassword1!")).rejects.toThrow("RESET_TOKEN_EXPIRED");
+  });
+
+  it("passes isInvite=true to consumeTokenAndResetPassword for invite tokens", async () => {
+    vi.mocked(passwordResetRepo.findByTokenHash).mockResolvedValueOnce({
+      ...MOCK_RESET_TOKEN,
+      isInvite: true,
+    });
+    vi.mocked(passwordResetRepo.consumeTokenAndResetPassword).mockResolvedValueOnce(undefined);
+    vi.mocked(hashPassword).mockResolvedValueOnce("newhash");
+
+    await resetPassword("invitetoken", "NewPassword1!");
+
+    expect(passwordResetRepo.consumeTokenAndResetPassword).toHaveBeenCalledWith(
+      expect.any(String),
+      1,
+      expect.any(String),
+      true,
+    );
+  });
+
+  it("passes isInvite=false to consumeTokenAndResetPassword for regular reset tokens", async () => {
+    vi.mocked(passwordResetRepo.findByTokenHash).mockResolvedValueOnce({
+      ...MOCK_RESET_TOKEN,
+      isInvite: false,
+    });
+    vi.mocked(passwordResetRepo.consumeTokenAndResetPassword).mockResolvedValueOnce(undefined);
+    vi.mocked(hashPassword).mockResolvedValueOnce("newhash");
+
+    await resetPassword("regulartoken", "NewPassword1!");
+
+    expect(passwordResetRepo.consumeTokenAndResetPassword).toHaveBeenCalledWith(
+      expect.any(String),
+      1,
+      expect.any(String),
+      false,
+    );
   });
 });
