@@ -29,6 +29,7 @@ export async function listUsers(
         name: u.fullName,
         email: u.email,
         is_active: u.isActive,
+        email_verified: u.emailVerifiedAt !== null,
         roles,
         created_at: u.createdAt,
       };
@@ -56,6 +57,7 @@ export async function getUser(userId: number): Promise<UserWithRoles | null> {
     name: user.fullName,
     email: user.email,
     is_active: user.isActive,
+    email_verified: user.emailVerifiedAt !== null,
     roles,
     created_at: user.createdAt,
   };

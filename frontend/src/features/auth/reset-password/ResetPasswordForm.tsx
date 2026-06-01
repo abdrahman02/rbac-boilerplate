@@ -3,6 +3,7 @@
 import { Check, Lock } from "lucide-react";
 import { memo } from "react";
 import { AuthShell } from "@/features/auth/components/AuthShell";
+import { AuthStatusCard } from "@/features/auth/components/AuthStatusCard";
 import { BackToSignInLink } from "@/features/auth/components/BackToSignInLink";
 import { Alert, Button, FormField, Input, PasswordStrengthMeter } from "@/shared/components/ui";
 import { useResetPasswordForm } from "./useResetPasswordForm";
@@ -10,35 +11,10 @@ import { useResetPasswordForm } from "./useResetPasswordForm";
 // Memoised at module level to avoid re-creating the wrapped component on every render
 const PasswordStrengthMeterMemo = memo(PasswordStrengthMeter);
 
-// --- SuccessState sub-component ---
-
-interface SuccessStateProps {
-  onContinue: () => void;
-}
-
-const SuccessState = memo(function SuccessState({ onContinue }: SuccessStateProps) {
-  return (
-    <div className="animate-scale-in">
-      <div className="w-14 h-14 rounded-2xl bg-success/12 text-success border border-success/22 inline-flex items-center justify-center mb-[18px]">
-        <Check size={26} />
-      </div>
-
-      <h1 className="text-2xl font-semibold tracking-tight m-0">Password updated</h1>
-      <p className="mt-2 mb-6 text-sm text-muted-foreground leading-relaxed">
-        You can now sign in with your new password.
-      </p>
-
-      <Button type="button" size="lg" onClick={onContinue}>
-        Continue to sign in
-      </Button>
-    </div>
-  );
-});
-
 // --- Main component (pure JSX — no useState, no useRouter, no async) ---
 
 export function ResetPasswordForm() {
-  const { form, isLoading, done, hasToken, password, onContinue, onSubmit } = useResetPasswordForm();
+  const { form, isLoading, done, hasToken, password, onSubmit } = useResetPasswordForm();
 
   const {
     register,
@@ -51,7 +27,12 @@ export function ResetPasswordForm() {
   if (done) {
     return (
       <AuthShell footer={<BackToSignInLink />}>
-        <SuccessState onContinue={onContinue} />
+        <AuthStatusCard
+          variant="success"
+          icon={<Check size={16} />}
+          title="Password updated"
+          description="You can now sign in with your new password."
+        />
       </AuthShell>
     );
   }

@@ -163,7 +163,7 @@ const UserRow = memo(function UserRow({
       </TableCell>
 
       <TableCell>
-        <StatusBadge isActive={user.is_active} />
+        <StatusBadge isActive={user.is_active} emailVerified={user.email_verified} />
       </TableCell>
 
       <TableCell className="text-[13px] text-muted-foreground">
