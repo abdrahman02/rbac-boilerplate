@@ -42,11 +42,11 @@ vi.mock("exceljs", () => ({
   },
 }));
 
+import * as passwordResetRepo from "../../repositories/password-reset.repository.js";
 import * as repo from "../../repositories/user.repository.js";
 import * as userRepo from "../../repositories/user.repository.js";
-import * as passwordResetRepo from "../../repositories/password-reset.repository.js";
-import * as tokenSvc from "../../services/token.service.js";
 import * as emailSvc from "../../services/email.service.js";
+import * as tokenSvc from "../../services/token.service.js";
 import { hashPassword } from "../../utils/hash.js";
 import { buildUsersExportWorkbook, createUser } from "../user.service.js";
 
@@ -125,12 +125,7 @@ describe("createUser", () => {
     const result = await createUser({ name: "Bob", email: "bob@example.com" });
 
     expect(result).toBe(42);
-    expect(passwordResetRepo.createToken).toHaveBeenCalledWith(
-      42,
-      "tokenhash",
-      expect.any(Date),
-      true,
-    );
+    expect(passwordResetRepo.createToken).toHaveBeenCalledWith(42, "tokenhash", expect.any(Date), true);
     expect(emailSvc.sendInviteEmail).toHaveBeenCalledWith("bob@example.com", "Bob", "rawtoken");
   });
 

@@ -6,9 +6,9 @@ import type { UserFilteredExportParams } from "../repositories/user.repository.j
 import * as repo from "../repositories/user.repository.js";
 import type { CreateUserInput, UpdateUserInput } from "../schemas/user.schema.js";
 import type { PaginatedResponse, UserWithRoles } from "../types/index.js";
+import { hashPassword } from "../utils/hash.js";
 import * as emailSvc from "./email.service.js";
 import * as tokenSvc from "./token.service.js";
-import { hashPassword } from "../utils/hash.js";
 
 const INVITE_TOKEN_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 

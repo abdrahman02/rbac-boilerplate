@@ -22,7 +22,12 @@ vi.mock("../../config/env.js", () => ({
   },
 }));
 
-import { sendInviteEmail, sendPasswordChangedEmail, sendPasswordResetEmail, sendVerificationEmail } from "../email.service.js";
+import {
+  sendInviteEmail,
+  sendPasswordChangedEmail,
+  sendPasswordResetEmail,
+  sendVerificationEmail,
+} from "../email.service.js";
 
 describe("sendVerificationEmail", () => {
   beforeEach(() => vi.resetAllMocks());

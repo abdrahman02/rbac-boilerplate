@@ -45,7 +45,11 @@ import type { EmailVerificationToken, User } from "../../generated/prisma/index.
 import * as repo from "../../repositories/auth.repository.js";
 import * as emailVerifRepo from "../../repositories/email-verification.repository.js";
 import * as passwordResetRepo from "../../repositories/password-reset.repository.js";
-import { sendPasswordChangedEmail, sendPasswordResetEmail, sendVerificationEmail } from "../../services/email.service.js";
+import {
+  sendPasswordChangedEmail,
+  sendPasswordResetEmail,
+  sendVerificationEmail,
+} from "../../services/email.service.js";
 import { comparePassword, hashPassword } from "../../utils/hash.js";
 import {
   changePassword,
