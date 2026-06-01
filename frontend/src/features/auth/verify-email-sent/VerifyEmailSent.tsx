@@ -23,7 +23,12 @@ export function VerifyEmailSent() {
 
   const [cooldown, setCooldown] = useState(0);
 
-  const { mutate: resend, isPending, error, isSuccess } = useMutation({
+  const {
+    mutate: resend,
+    isPending,
+    error,
+    isSuccess,
+  } = useMutation({
     mutationFn: () => apiClient.post("/auth/resend-verification", { email }),
     onSuccess: () => setCooldown(60),
   });
@@ -52,13 +57,7 @@ export function VerifyEmailSent() {
         </p>
 
         <div className="flex flex-col gap-2">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => resend()}
-            disabled={!canResend}
-            isLoading={isPending}
-          >
+          <Button type="button" variant="outline" onClick={() => resend()} disabled={!canResend} isLoading={isPending}>
             {cooldown > 0 ? `Resend in ${cooldown}s` : "Resend verification email"}
           </Button>
 
@@ -66,9 +65,7 @@ export function VerifyEmailSent() {
             <p className="text-xs text-success text-center">Email sent! Check your inbox.</p>
           )}
 
-          {error && (
-            <p className="text-xs text-destructive text-center">{getErrorMessage(error)}</p>
-          )}
+          {error && <p className="text-xs text-destructive text-center">{getErrorMessage(error)}</p>}
         </div>
       </div>
     </AuthShell>

@@ -50,9 +50,7 @@ export function useLoginForm(): UseLoginFormReturn {
       const message = getErrorMessage(err);
       // Detect EMAIL_NOT_VERIFIED (403 + "verify" in message) to show resend link
       const unverified =
-        axios.isAxiosError(err) &&
-        err.response?.status === 403 &&
-        message.toLowerCase().includes("verify");
+        axios.isAxiosError(err) && err.response?.status === 403 && message.toLowerCase().includes("verify");
       setIsUnverified(unverified);
       setError("root", { message });
     },

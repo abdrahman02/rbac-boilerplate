@@ -1,19 +1,13 @@
 import type { PasswordResetToken } from "../generated/prisma/index.js";
 import { prisma } from "../lib/prisma.js";
 
-export async function createToken(
-  userId: number,
-  tokenHash: string,
-  expiresAt: Date,
-): Promise<void> {
+export async function createToken(userId: number, tokenHash: string, expiresAt: Date): Promise<void> {
   await prisma.passwordResetToken.create({
     data: { userId, tokenHash, expiresAt },
   });
 }
 
-export async function findByTokenHash(
-  tokenHash: string,
-): Promise<PasswordResetToken | null> {
+export async function findByTokenHash(tokenHash: string): Promise<PasswordResetToken | null> {
   return prisma.passwordResetToken.findFirst({
     where: { tokenHash },
   });

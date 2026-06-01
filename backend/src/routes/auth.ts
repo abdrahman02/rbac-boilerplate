@@ -233,12 +233,7 @@ router.post(
  *       200:
  *         description: Reset link sent (or silently ignored if email not found)
  */
-router.post(
-  "/forgot-password",
-  authRateLimit,
-  validate(forgotPasswordSchema),
-  authController.forgotPassword,
-);
+router.post("/forgot-password", authRateLimit, validate(forgotPasswordSchema), authController.forgotPassword);
 
 /**
  * @swagger
@@ -264,11 +259,6 @@ router.post(
  *       400:
  *         description: Invalid or expired reset token
  */
-router.post(
-  "/reset-password",
-  authRateLimit,
-  validate(resetPasswordSchema),
-  authController.resetPassword,
-);
+router.post("/reset-password", authRateLimit, validate(resetPasswordSchema), authController.resetPassword);
 
 export default router;
