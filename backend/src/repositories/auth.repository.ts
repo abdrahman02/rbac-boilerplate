@@ -75,6 +75,13 @@ export async function revokeRefreshToken(tokenHash: string): Promise<void> {
   });
 }
 
+export async function revokeAllUserRefreshTokens(userId: number): Promise<void> {
+  await prisma.refreshToken.updateMany({
+    where: { userId, revokedAt: null },
+    data: { revokedAt: new Date() },
+  });
+}
+
 export async function findUserByEmailExcluding(email: string, excludeId: number): Promise<User | null> {
   return prisma.user.findFirst({
     where: { email, deletedAt: null, id: { not: excludeId } },
