@@ -28,6 +28,7 @@ export async function findAllUsers(
         email: true,
         fullName: true,
         isActive: true,
+        emailVerifiedAt: true,
         createdAt: true,
         updatedAt: true,
       },

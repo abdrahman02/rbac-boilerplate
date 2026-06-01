@@ -33,7 +33,7 @@ describe("sendVerificationEmail", () => {
     await sendVerificationEmail("user@example.com", "Alice", "rawtoken123");
 
     expect(mockSendMail).toHaveBeenCalledOnce();
-    const mail = mockSendMail.mock.calls[0][0];
+    const mail = mockSendMail.mock.calls[0]![0];
     expect(mail.to).toBe("user@example.com");
     expect(mail.html).toContain("http://localhost:3000/verify-email?token=rawtoken123");
     expect(mail.text).toContain("http://localhost:3000/verify-email?token=rawtoken123");
@@ -44,7 +44,7 @@ describe("sendVerificationEmail", () => {
 
     await sendVerificationEmail("user@example.com", "Alice", "rawtoken123");
 
-    const mail = mockSendMail.mock.calls[0][0];
+    const mail = mockSendMail.mock.calls[0]![0];
     expect(mail.subject).toContain("Verify");
   });
 
@@ -53,7 +53,7 @@ describe("sendVerificationEmail", () => {
 
     await sendVerificationEmail("user@example.com", "Alice", "rawtoken123");
 
-    const mail = mockSendMail.mock.calls[0][0];
+    const mail = mockSendMail.mock.calls[0]![0];
     expect(mail.html).toContain("Alice");
   });
 
