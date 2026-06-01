@@ -96,7 +96,7 @@ describe("consumeTokenAndResetPassword", () => {
     await consumeTokenAndResetPassword("abc123hash", 1, "newhash");
 
     expect(prisma.$transaction).toHaveBeenCalled();
-    const callArgs = vi.mocked(prisma.$transaction).mock.calls[0][0];
+    const callArgs = vi.mocked(prisma.$transaction).mock.calls[0]![0];
     expect(Array.isArray(callArgs)).toBe(true);
     expect(callArgs).toHaveLength(2);
   });
