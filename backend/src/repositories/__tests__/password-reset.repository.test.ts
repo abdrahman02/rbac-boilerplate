@@ -30,6 +30,7 @@ const MOCK_TOKEN: PasswordResetToken = {
   id: 1,
   userId: 1,
   tokenHash: "abc123hash",
+  isInvite: false,
   expiresAt: EXPIRES_AT,
   usedAt: null,
   createdAt: new Date(),
@@ -44,7 +45,30 @@ describe("createToken", () => {
     await createToken(1, "abc123hash", EXPIRES_AT);
 
     expect(prisma.passwordResetToken.create).toHaveBeenCalledWith({
-      data: { userId: 1, tokenHash: "abc123hash", expiresAt: EXPIRES_AT },
+      data: { userId: 1, tokenHash: "abc123hash", expiresAt: EXPIRES_AT, isInvite: false },
+    });
+  });
+
+  it("creates token with isInvite=true when flag is passed", async () => {
+    vi.mocked(prisma.passwordResetToken.create).mockResolvedValueOnce({
+      ...MOCK_TOKEN,
+      isInvite: true,
+    });
+
+    await createToken(1, "abc123hash", EXPIRES_AT, true);
+
+    expect(prisma.passwordResetToken.create).toHaveBeenCalledWith({
+      data: { userId: 1, tokenHash: "abc123hash", expiresAt: EXPIRES_AT, isInvite: true },
+    });
+  });
+
+  it("defaults isInvite to false when flag is omitted", async () => {
+    vi.mocked(prisma.passwordResetToken.create).mockResolvedValueOnce(MOCK_TOKEN);
+
+    await createToken(1, "abc123hash", EXPIRES_AT);
+
+    expect(prisma.passwordResetToken.create).toHaveBeenCalledWith({
+      data: { userId: 1, tokenHash: "abc123hash", expiresAt: EXPIRES_AT, isInvite: false },
     });
   });
 });
@@ -99,5 +123,21 @@ describe("consumeTokenAndResetPassword", () => {
     const callArgs = vi.mocked(prisma.$transaction).mock.calls[0]![0];
     expect(Array.isArray(callArgs)).toBe(true);
     expect(callArgs).toHaveLength(2);
+  });
+
+  it("activates user when activateUser=true", async () => {
+    vi.mocked(prisma.$transaction).mockResolvedValueOnce([]);
+
+    await consumeTokenAndResetPassword("abc123hash", 1, "newhash", true);
+
+    expect(prisma.$transaction).toHaveBeenCalledOnce();
+  });
+
+  it("does not activate user when activateUser=false (default)", async () => {
+    vi.mocked(prisma.$transaction).mockResolvedValueOnce([]);
+
+    await consumeTokenAndResetPassword("abc123hash", 1, "newhash");
+
+    expect(prisma.$transaction).toHaveBeenCalledOnce();
   });
 });

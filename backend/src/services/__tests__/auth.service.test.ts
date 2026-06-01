@@ -382,6 +382,7 @@ describe("resetPassword", () => {
     id: 1,
     userId: 1,
     tokenHash: "hashvalue",
+    isInvite: false,
     expiresAt: new Date(Date.now() + 30 * 60 * 1000),
     usedAt: null,
     createdAt: new Date(),
