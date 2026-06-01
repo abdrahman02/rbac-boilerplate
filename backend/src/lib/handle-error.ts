@@ -16,6 +16,8 @@ const ERROR_MAP: Record<string, { status: number; message: string }> = {
   INVALID_VERIFICATION_TOKEN: { status: 400, message: "This verification link is invalid or has already been used." },
   VERIFICATION_TOKEN_EXPIRED: { status: 400, message: "This verification link has expired. Please request a new one." },
   ALREADY_VERIFIED: { status: 400, message: "Your email address is already verified." },
+  INVALID_RESET_TOKEN: { status: 400, message: "This reset link is invalid or has already been used." },
+  RESET_TOKEN_EXPIRED: { status: 400, message: "This reset link has expired. Please request a new one." },
 };
 
 export function handleError(res: Response, err: unknown): void {
