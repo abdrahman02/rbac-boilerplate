@@ -4,10 +4,10 @@ import { memo } from "react";
 import { Button } from "@/shared/components/ui";
 import { QUICK_ACTIONS } from "./QuickActions.constant";
 
-export const QuickActions = memo(function QuickActions() {
+export const QuickActions = memo(function QuickActions({ activePermissions }: { activePermissions: string[] }) {
   return (
     <div className="flex flex-col gap-1.5">
-      {QUICK_ACTIONS.map(({ icon: Icon, label, href }) => (
+      {QUICK_ACTIONS.filter(({ permission }) => activePermissions.includes(permission)).map(({ icon: Icon, label, href }) => (
         <Button
           key={href}
           asChild
