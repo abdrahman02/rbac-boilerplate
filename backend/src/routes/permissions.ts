@@ -1,12 +1,12 @@
-import { Router } from 'express'
-import { authMiddleware } from '../middleware/auth.middleware.js'
-import { requirePermission } from '../middleware/permission.middleware.js'
-import { validate } from '../middleware/validate.middleware.js'
-import { createPermissionSchema, updatePermissionSchema } from '../schemas/permission.schema.js'
-import { auditLog } from '../middleware/audit-log.middleware.js'
-import * as ctrl from '../controllers/permission.controller.js'
+import { Router } from "express";
+import * as ctrl from "../controllers/permission.controller.js";
+import { auditLog } from "../middleware/audit-log.middleware.js";
+import { authMiddleware } from "../middleware/auth.middleware.js";
+import { requirePermission } from "../middleware/permission.middleware.js";
+import { validate } from "../middleware/validate.middleware.js";
+import { createPermissionSchema, updatePermissionSchema } from "../schemas/permission.schema.js";
 
-const router = Router()
+const router = Router();
 
 /**
  * @swagger
@@ -20,7 +20,12 @@ const router = Router()
  *       200:
  *         description: Permissions list
  */
-router.get('/', authMiddleware, requirePermission(['permissions:read', 'roles:read', 'roles:update']), ctrl.listPermissions)
+router.get(
+  "/",
+  authMiddleware,
+  requirePermission(["permissions:read", "roles:read", "roles:update"]),
+  ctrl.listPermissions,
+);
 
 /**
  * @swagger
@@ -41,7 +46,7 @@ router.get('/', authMiddleware, requirePermission(['permissions:read', 'roles:re
  *       200:
  *         description: Excel file with permissions data
  */
-router.get('/export', authMiddleware, requirePermission('permissions:read'), ctrl.exportPermissions)
+router.get("/export", authMiddleware, requirePermission("permissions:read"), ctrl.exportPermissions);
 
 /**
  * @swagger
@@ -62,7 +67,7 @@ router.get('/export', authMiddleware, requirePermission('permissions:read'), ctr
  *       404:
  *         description: Permission not found
  */
-router.get('/:id', authMiddleware, requirePermission('permissions:read'), ctrl.getPermission)
+router.get("/:id", authMiddleware, requirePermission("permissions:read"), ctrl.getPermission);
 
 /**
  * @swagger
@@ -87,7 +92,14 @@ router.get('/:id', authMiddleware, requirePermission('permissions:read'), ctrl.g
  *       409:
  *         description: Permission name already exists
  */
-router.post('/', authMiddleware, requirePermission('permissions:create'), validate(createPermissionSchema), auditLog('create_permission', 'permission'), ctrl.createPermission)
+router.post(
+  "/",
+  authMiddleware,
+  requirePermission("permissions:create"),
+  validate(createPermissionSchema),
+  auditLog("create_permission", "permission"),
+  ctrl.createPermission,
+);
 
 /**
  * @swagger
@@ -117,7 +129,14 @@ router.post('/', authMiddleware, requirePermission('permissions:create'), valida
  *       404:
  *         description: Permission not found
  */
-router.patch('/:id', authMiddleware, requirePermission('permissions:update'), validate(updatePermissionSchema), auditLog('update_permission', 'permission'), ctrl.updatePermission)
+router.patch(
+  "/:id",
+  authMiddleware,
+  requirePermission("permissions:update"),
+  validate(updatePermissionSchema),
+  auditLog("update_permission", "permission"),
+  ctrl.updatePermission,
+);
 
 /**
  * @swagger
@@ -138,6 +157,12 @@ router.patch('/:id', authMiddleware, requirePermission('permissions:update'), va
  *       404:
  *         description: Permission not found
  */
-router.delete('/:id', authMiddleware, requirePermission('permissions:delete'), auditLog('delete_permission', 'permission'), ctrl.deletePermission)
+router.delete(
+  "/:id",
+  authMiddleware,
+  requirePermission("permissions:delete"),
+  auditLog("delete_permission", "permission"),
+  ctrl.deletePermission,
+);
 
-export default router
+export default router;

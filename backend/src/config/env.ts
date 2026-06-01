@@ -1,12 +1,12 @@
-import dotenv from 'dotenv'
-import path from 'node:path'
-import { z } from 'zod'
+import path from "node:path";
+import dotenv from "dotenv";
+import { z } from "zod";
 
-dotenv.config({ path: path.resolve(import.meta.dirname, '../../.env') })
+dotenv.config({ path: path.resolve(import.meta.dirname, "../../.env") });
 
 const envSchema = z.object({
-  NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
-  PORT: z.string().default('3001'),
+  NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
+  PORT: z.string().default("3001"),
   FRONTEND_URL: z.url(),
 
   DB_HOST: z.string().min(1),
@@ -17,18 +17,18 @@ const envSchema = z.object({
 
   JWT_ACCESS_SECRET: z.string().min(32),
   JWT_REFRESH_SECRET: z.string().min(32),
-  JWT_ACCESS_EXPIRES_IN: z.string().default('15m'),
-  JWT_REFRESH_EXPIRES_IN: z.string().default('7d'),
-})
+  JWT_ACCESS_EXPIRES_IN: z.string().default("15m"),
+  JWT_REFRESH_EXPIRES_IN: z.string().default("7d"),
+});
 
-const result = envSchema.safeParse(process.env)
+const result = envSchema.safeParse(process.env);
 
 if (!result.success) {
-  console.error('❌ Invalid environment variables:')
+  console.error("❌ Invalid environment variables:");
   for (const issue of result.error.issues) {
-    console.error(`  ${issue.path.join('.')}: ${issue.message}`)
+    console.error(`  ${issue.path.join(".")}: ${issue.message}`);
   }
-  process.exit(1)
+  process.exit(1);
 }
 
-export const env = result.data
+export const env = result.data;

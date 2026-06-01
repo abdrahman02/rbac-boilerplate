@@ -1,34 +1,34 @@
-import { prisma } from '../lib/prisma.js'
+import { prisma } from "../lib/prisma.js";
 
 export interface RecentActivityItem {
-  id: number
-  action: string
-  resourceType: string
-  resourceId: number | null
-  userName: string | null
-  createdAt: Date
+  id: number;
+  action: string;
+  resourceType: string;
+  resourceId: number | null;
+  userName: string | null;
+  createdAt: Date;
 }
 
 export interface DashboardStatsRaw {
-  totalUsers: number
-  inactiveUsers: number
-  newUsersThisWeek: number
-  totalRoles: number
-  totalPermissionsAssigned: number
-  totalPermissions: number
-  totalEvents: number
-  eventsToday: number
-  recentActivity: RecentActivityItem[]
+  totalUsers: number;
+  inactiveUsers: number;
+  newUsersThisWeek: number;
+  totalRoles: number;
+  totalPermissionsAssigned: number;
+  totalPermissions: number;
+  totalEvents: number;
+  eventsToday: number;
+  recentActivity: RecentActivityItem[];
 }
 
-const RECENT_ACTIVITY_LIMIT = 20
-const ROLE_DISTRIBUTION_LIMIT = 6
+const RECENT_ACTIVITY_LIMIT = 20;
+const ROLE_DISTRIBUTION_LIMIT = 6;
 
 export interface RoleDistributionItem {
-  id: number
-  name: string
-  count: number
-  pct: number
+  id: number;
+  name: string;
+  count: number;
+  pct: number;
 }
 
 export async function getRoleDistribution(): Promise<RoleDistributionItem[]> {
@@ -36,26 +36,26 @@ export async function getRoleDistribution(): Promise<RoleDistributionItem[]> {
     prisma.user.count({ where: { deletedAt: null } }),
     prisma.role.findMany({
       take: ROLE_DISTRIBUTION_LIMIT,
-      orderBy: { name: 'asc' },
+      orderBy: { name: "asc" },
       select: {
         id: true,
         name: true,
         _count: { select: { users: true } },
       },
     }),
-  ])
+  ]);
 
   return roles.map((r) => ({
     id: r.id,
     name: r.name,
     count: r._count.users,
     pct: totalUsers > 0 ? Math.round((r._count.users / totalUsers) * 100) : 0,
-  }))
+  }));
 }
 
 export async function getDashboardStats(sinceDate: Date): Promise<DashboardStatsRaw> {
-  const now = new Date()
-  const todayMidnight = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()))
+  const now = new Date();
+  const todayMidnight = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
 
   const [
     totalUsers,
@@ -78,10 +78,10 @@ export async function getDashboardStats(sinceDate: Date): Promise<DashboardStats
     prisma.auditLog.count({ where: { createdAt: { gte: todayMidnight } } }),
     prisma.auditLog.findMany({
       take: RECENT_ACTIVITY_LIMIT,
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
       include: { user: { select: { fullName: true } } },
     }),
-  ])
+  ]);
 
   return {
     totalUsers,
@@ -100,5 +100,5 @@ export async function getDashboardStats(sinceDate: Date): Promise<DashboardStats
       userName: log.user?.fullName ?? null,
       createdAt: log.createdAt,
     })),
-  }
+  };
 }

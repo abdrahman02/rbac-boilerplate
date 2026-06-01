@@ -1,11 +1,12 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
-vi.mock('../../repositories/permission.repository.js', () => ({
+vi.mock("../../repositories/permission.repository.js", () => ({
   findAllPermissions: vi.fn(),
-}))
+}));
 
-vi.mock('exceljs', () => ({
+vi.mock("exceljs", () => ({
   default: {
+    // biome-ignore lint/complexity/useArrowFunction: must be a constructable function for `new Workbook()`
     Workbook: vi.fn(function () {
       return {
         addWorksheet: vi.fn(() => ({
@@ -14,50 +15,50 @@ vi.mock('exceljs', () => ({
           getColumn: vi.fn(() => ({ width: 0 })),
           views: [],
         })),
-        xlsx: { writeBuffer: vi.fn().mockResolvedValue(Buffer.from('xlsx')) },
-      }
+        xlsx: { writeBuffer: vi.fn().mockResolvedValue(Buffer.from("xlsx")) },
+      };
     }),
   },
-}))
+}));
 
-import * as repo from '../../repositories/permission.repository.js'
-import { buildPermissionsExportWorkbook } from '../permission.service.js'
+import * as repo from "../../repositories/permission.repository.js";
+import { buildPermissionsExportWorkbook } from "../permission.service.js";
 
 const MOCK_PERMISSIONS = [
   {
     id: 1,
-    name: 'users:read',
-    description: 'View users',
-    roles: ['admin', 'viewer'],
-    createdAt: new Date('2024-01-01T00:00:00.000Z'),
+    name: "users:read",
+    description: "View users",
+    roles: ["admin", "viewer"],
+    createdAt: new Date("2024-01-01T00:00:00.000Z"),
   },
   {
     id: 2,
-    name: 'users:create',
+    name: "users:create",
     description: null,
     roles: [],
-    createdAt: new Date('2024-02-01T00:00:00.000Z'),
+    createdAt: new Date("2024-02-01T00:00:00.000Z"),
   },
-]
+];
 
-describe('buildPermissionsExportWorkbook', () => {
-  beforeEach(() => vi.clearAllMocks())
+describe("buildPermissionsExportWorkbook", () => {
+  beforeEach(() => vi.clearAllMocks());
 
-  it('returns a Buffer', async () => {
-    vi.mocked(repo.findAllPermissions).mockResolvedValueOnce({ rows: MOCK_PERMISSIONS, total: 2 })
-    const result = await buildPermissionsExportWorkbook()
-    expect(Buffer.isBuffer(result)).toBe(true)
-  })
+  it("returns a Buffer", async () => {
+    vi.mocked(repo.findAllPermissions).mockResolvedValueOnce({ rows: MOCK_PERMISSIONS, total: 2 });
+    const result = await buildPermissionsExportWorkbook();
+    expect(Buffer.isBuffer(result)).toBe(true);
+  });
 
-  it('calls findAllPermissions with page 1, limit -1, and no filters when params are undefined', async () => {
-    vi.mocked(repo.findAllPermissions).mockResolvedValueOnce({ rows: MOCK_PERMISSIONS, total: 2 })
-    await buildPermissionsExportWorkbook()
-    expect(repo.findAllPermissions).toHaveBeenCalledWith(1, -1, undefined, undefined)
-  })
+  it("calls findAllPermissions with page 1, limit -1, and no filters when params are undefined", async () => {
+    vi.mocked(repo.findAllPermissions).mockResolvedValueOnce({ rows: MOCK_PERMISSIONS, total: 2 });
+    await buildPermissionsExportWorkbook();
+    expect(repo.findAllPermissions).toHaveBeenCalledWith(1, -1, undefined, undefined);
+  });
 
-  it('passes search and usage filters through to the repository', async () => {
-    vi.mocked(repo.findAllPermissions).mockResolvedValueOnce({ rows: MOCK_PERMISSIONS, total: 2 })
-    await buildPermissionsExportWorkbook('users', 'used')
-    expect(repo.findAllPermissions).toHaveBeenCalledWith(1, -1, 'users', 'used')
-  })
-})
+  it("passes search and usage filters through to the repository", async () => {
+    vi.mocked(repo.findAllPermissions).mockResolvedValueOnce({ rows: MOCK_PERMISSIONS, total: 2 });
+    await buildPermissionsExportWorkbook("users", "used");
+    expect(repo.findAllPermissions).toHaveBeenCalledWith(1, -1, "users", "used");
+  });
+});

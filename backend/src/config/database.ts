@@ -1,5 +1,5 @@
-import { prisma } from '../lib/prisma.js'
+import { prisma } from "../lib/prisma.js";
 
 export async function testConnection(): Promise<void> {
-  await prisma.$queryRaw`SELECT 1`
+  await prisma.$queryRaw`SELECT 1`;
 }

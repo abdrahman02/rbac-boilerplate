@@ -1,67 +1,67 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
-vi.mock('../../lib/prisma.js', () => ({
+vi.mock("../../lib/prisma.js", () => ({
   prisma: {
     user: { findMany: vi.fn() },
   },
-}))
+}));
 
-import { prisma } from '../../lib/prisma.js'
-import { findAllUsersForExport } from '../user.repository.js'
+import { prisma } from "../../lib/prisma.js";
+import { findAllUsersForExport } from "../user.repository.js";
 
-const CREATED_AT = new Date('2024-01-15T10:00:00.000Z')
+const CREATED_AT = new Date("2024-01-15T10:00:00.000Z");
 
-describe('findAllUsersForExport', () => {
-  beforeEach(() => vi.clearAllMocks())
+describe("findAllUsersForExport", () => {
+  beforeEach(() => vi.clearAllMocks());
 
-  it('returns mapped UserExportRow array with roles as string[]', async () => {
+  it("returns mapped UserExportRow array with roles as string[]", async () => {
     vi.mocked(prisma.user.findMany).mockResolvedValueOnce([
       {
         id: 1,
-        fullName: 'Alice',
-        email: 'alice@example.com',
+        fullName: "Alice",
+        email: "alice@example.com",
         isActive: true,
         createdAt: CREATED_AT,
-        roles: [{ role: { name: 'admin' } }],
+        roles: [{ role: { name: "admin" } }],
       },
-    ] as never)
+    ] as never);
 
-    const result = await findAllUsersForExport()
+    const result = await findAllUsersForExport();
 
-    expect(result).toHaveLength(1)
+    expect(result).toHaveLength(1);
     expect(result[0]).toEqual({
       id: 1,
-      fullName: 'Alice',
-      email: 'alice@example.com',
+      fullName: "Alice",
+      email: "alice@example.com",
       isActive: true,
-      roles: ['admin'],
+      roles: ["admin"],
       createdAt: CREATED_AT,
-    })
-  })
+    });
+  });
 
-  it('maps user with no roles to empty roles array', async () => {
+  it("maps user with no roles to empty roles array", async () => {
     vi.mocked(prisma.user.findMany).mockResolvedValueOnce([
       {
         id: 2,
-        fullName: 'Bob',
-        email: 'bob@example.com',
+        fullName: "Bob",
+        email: "bob@example.com",
         isActive: false,
         createdAt: CREATED_AT,
         roles: [],
       },
-    ] as never)
+    ] as never);
 
-    const result = await findAllUsersForExport()
+    const result = await findAllUsersForExport();
 
-    expect(result[0]?.roles).toEqual([])
-    expect(result[0]?.isActive).toBe(false)
-  })
+    expect(result[0]?.roles).toEqual([]);
+    expect(result[0]?.isActive).toBe(false);
+  });
 
-  it('returns empty array when no users exist', async () => {
-    vi.mocked(prisma.user.findMany).mockResolvedValueOnce([])
+  it("returns empty array when no users exist", async () => {
+    vi.mocked(prisma.user.findMany).mockResolvedValueOnce([]);
 
-    const result = await findAllUsersForExport()
+    const result = await findAllUsersForExport();
 
-    expect(result).toEqual([])
-  })
-})
+    expect(result).toEqual([]);
+  });
+});

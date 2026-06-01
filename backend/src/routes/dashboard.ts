@@ -1,8 +1,8 @@
-import { Router } from 'express'
-import { authMiddleware } from '../middleware/auth.middleware.js'
-import * as ctrl from '../controllers/dashboard.controller.js'
+import { Router } from "express";
+import * as ctrl from "../controllers/dashboard.controller.js";
+import { authMiddleware } from "../middleware/auth.middleware.js";
 
-const router = Router()
+const router = Router();
 
 /**
  * @swagger
@@ -34,8 +34,8 @@ const router = Router()
  *       401:
  *         description: Unauthorized
  */
-router.get('/stats', authMiddleware, ctrl.stats)
-router.get('/role-distribution', authMiddleware, ctrl.roleDistribution)
-router.get('/export', authMiddleware, ctrl.exportDashboard)
+router.get("/stats", authMiddleware, ctrl.stats);
+router.get("/role-distribution", authMiddleware, ctrl.roleDistribution);
+router.get("/export", authMiddleware, ctrl.exportDashboard);
 
-export default router
+export default router;

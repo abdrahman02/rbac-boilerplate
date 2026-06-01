@@ -1,12 +1,12 @@
-import { Router } from 'express'
-import { authMiddleware } from '../middleware/auth.middleware.js'
-import { requirePermission } from '../middleware/permission.middleware.js'
-import { validate } from '../middleware/validate.middleware.js'
-import { createUserSchema, updateUserSchema, syncRolesSchema } from '../schemas/user.schema.js'
-import { auditLog } from '../middleware/audit-log.middleware.js'
-import * as ctrl from '../controllers/user.controller.js'
+import { Router } from "express";
+import * as ctrl from "../controllers/user.controller.js";
+import { auditLog } from "../middleware/audit-log.middleware.js";
+import { authMiddleware } from "../middleware/auth.middleware.js";
+import { requirePermission } from "../middleware/permission.middleware.js";
+import { validate } from "../middleware/validate.middleware.js";
+import { createUserSchema, syncRolesSchema, updateUserSchema } from "../schemas/user.schema.js";
 
-const router = Router()
+const router = Router();
 
 /**
  * @swagger
@@ -27,7 +27,7 @@ const router = Router()
  *       200:
  *         description: Users list
  */
-router.get('/', authMiddleware, requirePermission('users:read'), ctrl.listUsers)
+router.get("/", authMiddleware, requirePermission("users:read"), ctrl.listUsers);
 
 /**
  * @swagger
@@ -51,7 +51,7 @@ router.get('/', authMiddleware, requirePermission('users:read'), ctrl.listUsers)
  *       200:
  *         description: Excel file with users data
  */
-router.get('/export', authMiddleware, requirePermission('users:read'), ctrl.exportUsers)
+router.get("/export", authMiddleware, requirePermission("users:read"), ctrl.exportUsers);
 
 /**
  * @swagger
@@ -72,7 +72,7 @@ router.get('/export', authMiddleware, requirePermission('users:read'), ctrl.expo
  *       404:
  *         description: User not found
  */
-router.get('/:id', authMiddleware, requirePermission('users:read'), ctrl.getUser)
+router.get("/:id", authMiddleware, requirePermission("users:read"), ctrl.getUser);
 
 /**
  * @swagger
@@ -99,7 +99,14 @@ router.get('/:id', authMiddleware, requirePermission('users:read'), ctrl.getUser
  *       409:
  *         description: Email already exists
  */
-router.post('/', authMiddleware, requirePermission('users:create'), validate(createUserSchema), auditLog('create_user', 'user'), ctrl.createUser)
+router.post(
+  "/",
+  authMiddleware,
+  requirePermission("users:create"),
+  validate(createUserSchema),
+  auditLog("create_user", "user"),
+  ctrl.createUser,
+);
 
 /**
  * @swagger
@@ -130,7 +137,14 @@ router.post('/', authMiddleware, requirePermission('users:create'), validate(cre
  *       404:
  *         description: User not found
  */
-router.patch('/:id', authMiddleware, requirePermission('users:update'), validate(updateUserSchema), auditLog('update_user', 'user'), ctrl.updateUser)
+router.patch(
+  "/:id",
+  authMiddleware,
+  requirePermission("users:update"),
+  validate(updateUserSchema),
+  auditLog("update_user", "user"),
+  ctrl.updateUser,
+);
 
 /**
  * @swagger
@@ -151,9 +165,22 @@ router.patch('/:id', authMiddleware, requirePermission('users:update'), validate
  *       404:
  *         description: User not found
  */
-router.delete('/:id', authMiddleware, requirePermission('users:delete'), auditLog('delete_user', 'user'), ctrl.deleteUser)
+router.delete(
+  "/:id",
+  authMiddleware,
+  requirePermission("users:delete"),
+  auditLog("delete_user", "user"),
+  ctrl.deleteUser,
+);
 
-router.put('/:id/roles', authMiddleware, requirePermission('users:update'), validate(syncRolesSchema), auditLog('sync_roles', 'user'), ctrl.syncRoles)
+router.put(
+  "/:id/roles",
+  authMiddleware,
+  requirePermission("users:update"),
+  validate(syncRolesSchema),
+  auditLog("sync_roles", "user"),
+  ctrl.syncRoles,
+);
 
 /**
  * @swagger
@@ -176,6 +203,12 @@ router.put('/:id/roles', authMiddleware, requirePermission('users:update'), vali
  *       200:
  *         description: Role removed
  */
-router.delete('/:id/roles/:roleId', authMiddleware, requirePermission('users:update'), auditLog('remove_role', 'user'), ctrl.removeRole)
+router.delete(
+  "/:id/roles/:roleId",
+  authMiddleware,
+  requirePermission("users:update"),
+  auditLog("remove_role", "user"),
+  ctrl.removeRole,
+);
 
-export default router
+export default router;

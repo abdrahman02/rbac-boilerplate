@@ -1,20 +1,20 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
-vi.mock('../../repositories/dashboard.repository.js', () => ({
+vi.mock("../../repositories/dashboard.repository.js", () => ({
   getDashboardStats: vi.fn(),
-}))
+}));
 
-vi.mock('../../repositories/user.repository.js', () => ({
+vi.mock("../../repositories/user.repository.js", () => ({
   findAllUsersForExport: vi.fn(),
-}))
+}));
 
-vi.mock('../../repositories/role.repository.js', () => ({
+vi.mock("../../repositories/role.repository.js", () => ({
   findAllRolesForExport: vi.fn(),
-}))
+}));
 
-vi.mock('exceljs', () => ({
+vi.mock("exceljs", () => ({
   default: {
-    // Regular function required — arrow functions cannot be used as constructors
+    // biome-ignore lint/complexity/useArrowFunction: must be a constructable function for `new Workbook()`
     Workbook: vi.fn(function () {
       return {
         addWorksheet: vi.fn(() => ({
@@ -23,17 +23,17 @@ vi.mock('exceljs', () => ({
           getColumn: vi.fn(() => ({ width: 0 })),
           views: [],
         })),
-        xlsx: { writeBuffer: vi.fn().mockResolvedValue(Buffer.from('xlsx')) },
-      }
+        xlsx: { writeBuffer: vi.fn().mockResolvedValue(Buffer.from("xlsx")) },
+      };
     }),
   },
-}))
+}));
 
-import * as repo from '../../repositories/dashboard.repository.js'
-import type { RecentActivityItem } from '../../repositories/dashboard.repository.js'
-import * as userRepo from '../../repositories/user.repository.js'
-import * as roleRepo from '../../repositories/role.repository.js'
-import { getDashboardStats, buildExportWorkbook } from '../dashboard.service.js'
+import type { RecentActivityItem } from "../../repositories/dashboard.repository.js";
+import * as repo from "../../repositories/dashboard.repository.js";
+import * as roleRepo from "../../repositories/role.repository.js";
+import * as userRepo from "../../repositories/user.repository.js";
+import { buildExportWorkbook, getDashboardStats } from "../dashboard.service.js";
 
 const MOCK_RAW = {
   totalUsers: 42,
@@ -47,113 +47,113 @@ const MOCK_RAW = {
   recentActivity: [
     {
       id: 1,
-      action: 'create_user',
-      resourceType: 'user',
+      action: "create_user",
+      resourceType: "user",
       resourceId: 5,
-      userName: 'Admin User',
-      createdAt: new Date('2024-01-15T10:00:00.000Z'),
+      userName: "Admin User",
+      createdAt: new Date("2024-01-15T10:00:00.000Z"),
     },
   ],
-}
+};
 
 const MOCK_USERS = [
   {
     id: 1,
-    fullName: 'Alice',
-    email: 'alice@example.com',
+    fullName: "Alice",
+    email: "alice@example.com",
     isActive: true,
-    roles: ['admin'],
-    createdAt: new Date('2024-01-15T10:00:00.000Z'),
+    roles: ["admin"],
+    createdAt: new Date("2024-01-15T10:00:00.000Z"),
   },
-]
+];
 
-const MOCK_ROLES = [{ id: 1, name: 'admin', permissionCount: 5 }]
+const MOCK_ROLES = [{ id: 1, name: "admin", permissionCount: 5 }];
 
-describe('dashboard service — getDashboardStats', () => {
-  beforeEach(() => vi.clearAllMocks())
+describe("dashboard service — getDashboardStats", () => {
+  beforeEach(() => vi.clearAllMocks());
 
-  it('returns success response with all fields', async () => {
-    vi.mocked(repo.getDashboardStats).mockResolvedValueOnce(MOCK_RAW)
+  it("returns success response with all fields", async () => {
+    vi.mocked(repo.getDashboardStats).mockResolvedValueOnce(MOCK_RAW);
 
-    const result = await getDashboardStats()
+    const result = await getDashboardStats();
 
-    expect(result.success).toBe(true)
-    expect(result.data?.totalUsers).toBe(42)
-    expect(result.data?.newUsersThisWeek).toBe(5)
-    expect(result.data?.inactiveUsers).toBe(3)
-    expect(result.data?.totalRoles).toBe(8)
-    expect(result.data?.totalPermissionsAssigned).toBe(24)
-    expect(result.data?.totalPermissions).toBe(10)
-    expect(result.data?.totalEvents).toBe(100)
-    expect(result.data?.eventsToday).toBe(7)
-    expect(result.message).toBeNull()
-  })
+    expect(result.success).toBe(true);
+    expect(result.data?.totalUsers).toBe(42);
+    expect(result.data?.newUsersThisWeek).toBe(5);
+    expect(result.data?.inactiveUsers).toBe(3);
+    expect(result.data?.totalRoles).toBe(8);
+    expect(result.data?.totalPermissionsAssigned).toBe(24);
+    expect(result.data?.totalPermissions).toBe(10);
+    expect(result.data?.totalEvents).toBe(100);
+    expect(result.data?.eventsToday).toBe(7);
+    expect(result.message).toBeNull();
+  });
 
-  it('converts createdAt Date to ISO 8601 string', async () => {
-    vi.mocked(repo.getDashboardStats).mockResolvedValueOnce(MOCK_RAW)
+  it("converts createdAt Date to ISO 8601 string", async () => {
+    vi.mocked(repo.getDashboardStats).mockResolvedValueOnce(MOCK_RAW);
 
-    const result = await getDashboardStats()
+    const result = await getDashboardStats();
 
-    expect(result.data?.recentActivity[0]?.createdAt).toBe('2024-01-15T10:00:00.000Z')
-    expect(typeof result.data?.recentActivity[0]?.createdAt).toBe('string')
-  })
+    expect(result.data?.recentActivity[0]?.createdAt).toBe("2024-01-15T10:00:00.000Z");
+    expect(typeof result.data?.recentActivity[0]?.createdAt).toBe("string");
+  });
 
-  it('preserves null userName in recentActivity', async () => {
+  it("preserves null userName in recentActivity", async () => {
     const rawWithNullUser = {
       ...MOCK_RAW,
       recentActivity: [{ ...MOCK_RAW.recentActivity[0], userName: null }] as RecentActivityItem[],
-    }
-    vi.mocked(repo.getDashboardStats).mockResolvedValueOnce(rawWithNullUser)
+    };
+    vi.mocked(repo.getDashboardStats).mockResolvedValueOnce(rawWithNullUser);
 
-    const result = await getDashboardStats()
+    const result = await getDashboardStats();
 
-    expect(result.data?.recentActivity[0]?.userName).toBeNull()
-  })
+    expect(result.data?.recentActivity[0]?.userName).toBeNull();
+  });
 
-  it('returns empty recentActivity array when no logs', async () => {
-    vi.mocked(repo.getDashboardStats).mockResolvedValueOnce({ ...MOCK_RAW, recentActivity: [] })
+  it("returns empty recentActivity array when no logs", async () => {
+    vi.mocked(repo.getDashboardStats).mockResolvedValueOnce({ ...MOCK_RAW, recentActivity: [] });
 
-    const result = await getDashboardStats()
+    const result = await getDashboardStats();
 
-    expect(result.data?.recentActivity).toEqual([])
-  })
-})
+    expect(result.data?.recentActivity).toEqual([]);
+  });
+});
 
-describe('dashboard service — buildExportWorkbook', () => {
-  beforeEach(() => vi.clearAllMocks())
+describe("dashboard service — buildExportWorkbook", () => {
+  beforeEach(() => vi.clearAllMocks());
 
-  it('always fetches stats and returns a Buffer', async () => {
-    vi.mocked(repo.getDashboardStats).mockResolvedValueOnce(MOCK_RAW)
+  it("always fetches stats and returns a Buffer", async () => {
+    vi.mocked(repo.getDashboardStats).mockResolvedValueOnce(MOCK_RAW);
 
-    const result = await buildExportWorkbook([])
+    const result = await buildExportWorkbook([]);
 
-    expect(repo.getDashboardStats).toHaveBeenCalledOnce()
-    expect(Buffer.isBuffer(result)).toBe(true)
-  })
+    expect(repo.getDashboardStats).toHaveBeenCalledOnce();
+    expect(Buffer.isBuffer(result)).toBe(true);
+  });
 
-  it('fetches users when users:read permission is present', async () => {
-    vi.mocked(repo.getDashboardStats).mockResolvedValueOnce(MOCK_RAW)
-    vi.mocked(userRepo.findAllUsersForExport).mockResolvedValueOnce(MOCK_USERS)
+  it("fetches users when users:read permission is present", async () => {
+    vi.mocked(repo.getDashboardStats).mockResolvedValueOnce(MOCK_RAW);
+    vi.mocked(userRepo.findAllUsersForExport).mockResolvedValueOnce(MOCK_USERS);
 
-    await buildExportWorkbook(['users:read'])
+    await buildExportWorkbook(["users:read"]);
 
-    expect(userRepo.findAllUsersForExport).toHaveBeenCalledOnce()
-  })
+    expect(userRepo.findAllUsersForExport).toHaveBeenCalledOnce();
+  });
 
-  it('does not fetch users when users:read permission is absent', async () => {
-    vi.mocked(repo.getDashboardStats).mockResolvedValueOnce(MOCK_RAW)
+  it("does not fetch users when users:read permission is absent", async () => {
+    vi.mocked(repo.getDashboardStats).mockResolvedValueOnce(MOCK_RAW);
 
-    await buildExportWorkbook([])
+    await buildExportWorkbook([]);
 
-    expect(userRepo.findAllUsersForExport).not.toHaveBeenCalled()
-  })
+    expect(userRepo.findAllUsersForExport).not.toHaveBeenCalled();
+  });
 
-  it('fetches roles when roles:read permission is present', async () => {
-    vi.mocked(repo.getDashboardStats).mockResolvedValueOnce(MOCK_RAW)
-    vi.mocked(roleRepo.findAllRolesForExport).mockResolvedValueOnce(MOCK_ROLES)
+  it("fetches roles when roles:read permission is present", async () => {
+    vi.mocked(repo.getDashboardStats).mockResolvedValueOnce(MOCK_RAW);
+    vi.mocked(roleRepo.findAllRolesForExport).mockResolvedValueOnce(MOCK_ROLES);
 
-    await buildExportWorkbook(['roles:read'])
+    await buildExportWorkbook(["roles:read"]);
 
-    expect(roleRepo.findAllRolesForExport).toHaveBeenCalledOnce()
-  })
-})
+    expect(roleRepo.findAllRolesForExport).toHaveBeenCalledOnce();
+  });
+});

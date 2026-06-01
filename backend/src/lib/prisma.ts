@@ -1,6 +1,6 @@
-import { PrismaMariaDb } from '@prisma/adapter-mariadb'
-import { PrismaClient } from '../generated/prisma/index.js'
-import { env } from '../config/env.js'
+import { PrismaMariaDb } from "@prisma/adapter-mariadb";
+import { env } from "../config/env.js";
+import { PrismaClient } from "../generated/prisma/index.js";
 
 const adapter = new PrismaMariaDb({
   host: env.DB_HOST,
@@ -10,9 +10,9 @@ const adapter = new PrismaMariaDb({
   database: env.DB_NAME,
   // Required for MySQL 8+ / 9.x caching_sha2_password auth plugin
   allowPublicKeyRetrieval: true,
-})
+});
 
 export const prisma = new PrismaClient({
   adapter,
-  log: env.NODE_ENV === 'development' ? ['warn', 'error'] : ['error'],
-})
+  log: env.NODE_ENV === "development" ? ["warn", "error"] : ["error"],
+});

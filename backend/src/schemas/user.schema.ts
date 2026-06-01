@@ -1,5 +1,5 @@
-import { z } from 'zod'
-import { emailField } from './shared.js'
+import { z } from "zod";
+import { emailField } from "./shared.js";
 
 export const createUserSchema = z.object({
   name: z.string().min(2).max(100).trim(),
@@ -8,12 +8,9 @@ export const createUserSchema = z.object({
     .string()
     .min(8)
     .max(100)
-    .regex(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
-      'Password must contain uppercase, lowercase, and a number',
-    ),
+    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, "Password must contain uppercase, lowercase, and a number"),
   role_ids: z.array(z.number().int().positive()).optional(),
-})
+});
 
 export const updateUserSchema = z
   .object({
@@ -22,13 +19,13 @@ export const updateUserSchema = z
     is_active: z.boolean().optional(),
   })
   .refine((data) => Object.keys(data).length > 0, {
-    message: 'At least one field must be provided',
-  })
+    message: "At least one field must be provided",
+  });
 
 export const syncRolesSchema = z.object({
   role_ids: z.array(z.number().int().positive()),
-})
+});
 
-export type CreateUserInput = z.infer<typeof createUserSchema>
-export type UpdateUserInput = z.infer<typeof updateUserSchema>
-export type SyncRolesInput = z.infer<typeof syncRolesSchema>
+export type CreateUserInput = z.infer<typeof createUserSchema>;
+export type UpdateUserInput = z.infer<typeof updateUserSchema>;
+export type SyncRolesInput = z.infer<typeof syncRolesSchema>;

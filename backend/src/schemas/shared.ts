@@ -1,3 +1,3 @@
-import { z } from 'zod'
+import { z } from "zod";
 
-export const emailField = z.email().toLowerCase()
+export const emailField = z.email().toLowerCase();

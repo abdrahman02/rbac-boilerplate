@@ -1,11 +1,11 @@
-import { Router } from 'express'
-import { authMiddleware } from '../middleware/auth.middleware.js'
-import { requirePermission } from '../middleware/permission.middleware.js'
-import * as auditLogController from '../controllers/audit-log.controller.js'
+import { Router } from "express";
+import * as auditLogController from "../controllers/audit-log.controller.js";
+import { authMiddleware } from "../middleware/auth.middleware.js";
+import { requirePermission } from "../middleware/permission.middleware.js";
 
-const router = Router()
+const router = Router();
 
-router.use(authMiddleware)
+router.use(authMiddleware);
 
 /**
  * @swagger
@@ -74,6 +74,6 @@ router.use(authMiddleware)
  *       403:
  *         description: Forbidden — requires audit_logs:read
  */
-router.get('/', requirePermission('audit_logs:read'), auditLogController.list)
+router.get("/", requirePermission("audit_logs:read"), auditLogController.list);
 
-export default router
+export default router;

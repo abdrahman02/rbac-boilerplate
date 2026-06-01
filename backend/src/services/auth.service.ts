@@ -1,69 +1,63 @@
-import * as repo from '../repositories/auth.repository.js'
-import * as tokenSvc from './token.service.js'
-import { hashPassword, comparePassword } from '../utils/hash.js'
-import type { AuthenticatedUser } from '../types/index.js'
-import type { RegisterInput, LoginInput, UpdateMeInput, ChangePasswordInput } from '../schemas/auth.schema.js'
+import * as repo from "../repositories/auth.repository.js";
+import type { ChangePasswordInput, LoginInput, RegisterInput, UpdateMeInput } from "../schemas/auth.schema.js";
+import type { AuthenticatedUser } from "../types/index.js";
+import { comparePassword, hashPassword } from "../utils/hash.js";
+import * as tokenSvc from "./token.service.js";
 
 export interface AuthResult {
-  user: AuthenticatedUser
-  accessToken: string
-  refreshToken: string
+  user: AuthenticatedUser;
+  accessToken: string;
+  refreshToken: string;
 }
 
 export async function register(input: RegisterInput): Promise<AuthResult> {
-  const existing = await repo.findUserByEmail(input.email)
-  if (existing) throw new Error('EMAIL_TAKEN')
+  const existing = await repo.findUserByEmail(input.email);
+  if (existing) throw new Error("EMAIL_TAKEN");
 
-  const passwordHash = await hashPassword(input.password)
-  const userId = await repo.createUser(input.name, input.email, passwordHash)
-  await repo.assignDefaultRole(userId)
+  const passwordHash = await hashPassword(input.password);
+  const userId = await repo.createUser(input.name, input.email, passwordHash);
+  await repo.assignDefaultRole(userId);
 
-  return buildAuthResult(userId)
+  return buildAuthResult(userId);
 }
 
 export async function login(input: LoginInput): Promise<AuthResult> {
-  const user = await repo.findUserByEmail(input.email)
-  if (!user) throw new Error('INVALID_CREDENTIALS')
+  const user = await repo.findUserByEmail(input.email);
+  if (!user) throw new Error("INVALID_CREDENTIALS");
 
-  const valid = await comparePassword(input.password, user.passwordHash)
-  if (!valid) throw new Error('INVALID_CREDENTIALS')
+  const valid = await comparePassword(input.password, user.passwordHash);
+  if (!valid) throw new Error("INVALID_CREDENTIALS");
 
-  if (!user.isActive) throw new Error('ACCOUNT_DISABLED')
+  if (!user.isActive) throw new Error("ACCOUNT_DISABLED");
 
-  return buildAuthResult(user.id)
+  return buildAuthResult(user.id);
 }
 
-export async function logout(
-  userId: number,
-  refreshTokenHash: string,
-): Promise<void> {
-  await repo.revokeRefreshToken(refreshTokenHash)
+export async function logout(userId: number, refreshTokenHash: string): Promise<void> {
+  await repo.revokeRefreshToken(refreshTokenHash);
 }
 
 export async function refresh(rawRefreshToken: string): Promise<AuthResult> {
-  const tokenHash = tokenSvc.hashRefreshToken(rawRefreshToken)
-  const stored = await repo.findRefreshToken(tokenHash)
+  const tokenHash = tokenSvc.hashRefreshToken(rawRefreshToken);
+  const stored = await repo.findRefreshToken(tokenHash);
 
-  if (!stored) throw new Error('INVALID_REFRESH_TOKEN')
+  if (!stored) throw new Error("INVALID_REFRESH_TOKEN");
 
-  const now = new Date()
+  const now = new Date();
   if (now > new Date(stored.expiresAt)) {
-    await repo.revokeRefreshToken(tokenHash)
-    throw new Error('REFRESH_TOKEN_EXPIRED')
+    await repo.revokeRefreshToken(tokenHash);
+    throw new Error("REFRESH_TOKEN_EXPIRED");
   }
 
-  await repo.revokeRefreshToken(tokenHash)
-  return buildAuthResult(stored.userId)
+  await repo.revokeRefreshToken(tokenHash);
+  return buildAuthResult(stored.userId);
 }
 
 export async function getMe(userId: number): Promise<AuthenticatedUser> {
-  const user = await repo.findUserById(userId)
-  if (!user) throw new Error('USER_NOT_FOUND')
+  const user = await repo.findUserById(userId);
+  if (!user) throw new Error("USER_NOT_FOUND");
 
-  const [roles, permissions] = await Promise.all([
-    repo.getUserRoles(userId),
-    repo.getUserPermissions(userId),
-  ])
+  const [roles, permissions] = await Promise.all([repo.getUserRoles(userId), repo.getUserPermissions(userId)]);
 
   return {
     id: user.id,
@@ -71,47 +65,38 @@ export async function getMe(userId: number): Promise<AuthenticatedUser> {
     email: user.email,
     roles,
     permissions,
-  }
+  };
 }
 
-export async function updateMe(
-  userId: number,
-  input: UpdateMeInput,
-): Promise<AuthenticatedUser> {
+export async function updateMe(userId: number, input: UpdateMeInput): Promise<AuthenticatedUser> {
   if (input.email) {
-    const conflict = await repo.findUserByEmailExcluding(input.email, userId)
-    if (conflict) throw new Error('EMAIL_TAKEN')
+    const conflict = await repo.findUserByEmailExcluding(input.email, userId);
+    if (conflict) throw new Error("EMAIL_TAKEN");
   }
 
   await repo.updateUserProfile(userId, {
     ...(input.name !== undefined && { name: input.name }),
     ...(input.email !== undefined && { email: input.email }),
-  })
-  return getMe(userId)
+  });
+  return getMe(userId);
 }
 
-export async function changePassword(
-  userId: number,
-  input: ChangePasswordInput,
-): Promise<void> {
-  const user = await repo.findUserById(userId)
-  if (!user) throw new Error('USER_NOT_FOUND')
+export async function changePassword(userId: number, input: ChangePasswordInput): Promise<void> {
+  const user = await repo.findUserById(userId);
+  if (!user) throw new Error("USER_NOT_FOUND");
 
-  const valid = await comparePassword(input.current_password, user.passwordHash)
-  if (!valid) throw new Error('WRONG_PASSWORD')
+  const valid = await comparePassword(input.current_password, user.passwordHash);
+  if (!valid) throw new Error("WRONG_PASSWORD");
 
-  const newHash = await hashPassword(input.new_password)
-  await repo.updateUserPassword(userId, newHash)
+  const newHash = await hashPassword(input.new_password);
+  await repo.updateUserPassword(userId, newHash);
 }
 
 async function buildAuthResult(userId: number): Promise<AuthResult> {
-  const user = await repo.findUserById(userId)
-  if (!user) throw new Error('USER_NOT_FOUND')
+  const user = await repo.findUserById(userId);
+  if (!user) throw new Error("USER_NOT_FOUND");
 
-  const [roles, permissions] = await Promise.all([
-    repo.getUserRoles(userId),
-    repo.getUserPermissions(userId),
-  ])
+  const [roles, permissions] = await Promise.all([repo.getUserRoles(userId), repo.getUserPermissions(userId)]);
 
   const authenticatedUser: AuthenticatedUser = {
     id: user.id,
@@ -119,19 +104,19 @@ async function buildAuthResult(userId: number): Promise<AuthResult> {
     email: user.email,
     roles,
     permissions,
-  }
+  };
 
   const accessToken = tokenSvc.signAccessToken({
     userId: user.id,
     email: user.email,
     roles,
     permissions,
-  })
+  });
 
-  const rawRefresh = tokenSvc.generateRefreshToken()
-  const refreshHash = tokenSvc.hashRefreshToken(rawRefresh)
-  const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-  await repo.saveRefreshToken(userId, refreshHash, expiresAt)
+  const rawRefresh = tokenSvc.generateRefreshToken();
+  const refreshHash = tokenSvc.hashRefreshToken(rawRefresh);
+  const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+  await repo.saveRefreshToken(userId, refreshHash, expiresAt);
 
-  return { user: authenticatedUser, accessToken, refreshToken: rawRefresh }
+  return { user: authenticatedUser, accessToken, refreshToken: rawRefresh };
 }

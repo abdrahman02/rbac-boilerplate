@@ -1,12 +1,12 @@
-import { Router } from 'express'
-import { authRateLimit } from '../middleware/rate-limit.middleware.js'
-import { authMiddleware } from '../middleware/auth.middleware.js'
-import { validate } from '../middleware/validate.middleware.js'
-import { registerSchema, loginSchema, updateMeSchema, changePasswordSchema } from '../schemas/auth.schema.js'
-import { auditLog } from '../middleware/audit-log.middleware.js'
-import * as authController from '../controllers/auth.controller.js'
+import { Router } from "express";
+import * as authController from "../controllers/auth.controller.js";
+import { auditLog } from "../middleware/audit-log.middleware.js";
+import { authMiddleware } from "../middleware/auth.middleware.js";
+import { authRateLimit } from "../middleware/rate-limit.middleware.js";
+import { validate } from "../middleware/validate.middleware.js";
+import { changePasswordSchema, loginSchema, registerSchema, updateMeSchema } from "../schemas/auth.schema.js";
 
-const router = Router()
+const router = Router();
 
 /**
  * @swagger
@@ -50,7 +50,13 @@ const router = Router()
  *       429:
  *         description: Too many requests
  */
-router.post('/register', authRateLimit, validate(registerSchema), auditLog('register', 'auth'), authController.register)
+router.post(
+  "/register",
+  authRateLimit,
+  validate(registerSchema),
+  auditLog("register", "auth"),
+  authController.register,
+);
 
 /**
  * @swagger
@@ -81,7 +87,7 @@ router.post('/register', authRateLimit, validate(registerSchema), auditLog('regi
  *       429:
  *         description: Too many requests
  */
-router.post('/login', authRateLimit, validate(loginSchema), auditLog('login', 'auth'), authController.login)
+router.post("/login", authRateLimit, validate(loginSchema), auditLog("login", "auth"), authController.login);
 
 /**
  * @swagger
@@ -97,7 +103,7 @@ router.post('/login', authRateLimit, validate(loginSchema), auditLog('login', 'a
  *       401:
  *         description: Unauthorized
  */
-router.post('/logout', authMiddleware, auditLog('logout', 'auth'), authController.logout)
+router.post("/logout", authMiddleware, auditLog("logout", "auth"), authController.logout);
 
 /**
  * @swagger
@@ -114,7 +120,7 @@ router.post('/logout', authMiddleware, auditLog('logout', 'auth'), authControlle
  *       429:
  *         description: Too many requests
  */
-router.post('/refresh', authRateLimit, authController.refresh)
+router.post("/refresh", authRateLimit, authController.refresh);
 
 /**
  * @swagger
@@ -130,9 +136,9 @@ router.post('/refresh', authRateLimit, authController.refresh)
  *       401:
  *         description: Unauthorized
  */
-router.get('/me', authMiddleware, authController.me)
+router.get("/me", authMiddleware, authController.me);
 
-router.patch('/me', authMiddleware, validate(updateMeSchema), authController.updateMe)
-router.post('/change-password', authMiddleware, validate(changePasswordSchema), authController.changePassword)
+router.patch("/me", authMiddleware, validate(updateMeSchema), authController.updateMe);
+router.post("/change-password", authMiddleware, validate(changePasswordSchema), authController.changePassword);
 
-export default router
+export default router;

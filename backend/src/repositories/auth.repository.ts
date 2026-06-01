@@ -1,46 +1,42 @@
-import type { RefreshToken, User } from '../generated/prisma/index.js'
-import { prisma } from '../lib/prisma.js'
+import type { RefreshToken, User } from "../generated/prisma/index.js";
+import { prisma } from "../lib/prisma.js";
 
 export async function findUserByEmail(email: string): Promise<User | null> {
-  return prisma.user.findFirst({ where: { email, deletedAt: null } })
+  return prisma.user.findFirst({ where: { email, deletedAt: null } });
 }
 
 export async function findUserById(id: number): Promise<User | null> {
-  return prisma.user.findFirst({ where: { id, deletedAt: null } })
+  return prisma.user.findFirst({ where: { id, deletedAt: null } });
 }
 
-export async function createUser(
-  name: string,
-  email: string,
-  passwordHash: string,
-): Promise<number> {
+export async function createUser(name: string, email: string, passwordHash: string): Promise<number> {
   const user = await prisma.user.create({
     data: { fullName: name, email, passwordHash },
     select: { id: true },
-  })
-  return user.id
+  });
+  return user.id;
 }
 
 export async function assignDefaultRole(userId: number): Promise<void> {
   const role = await prisma.role.findFirst({
-    where: { name: 'user' },
+    where: { name: "user" },
     select: { id: true },
-  })
-  if (!role) return
+  });
+  if (!role) return;
 
   await prisma.userRole.upsert({
     where: { userId_roleId: { userId, roleId: role.id } },
     create: { userId, roleId: role.id },
     update: {},
-  })
+  });
 }
 
 export async function getUserRoles(userId: number): Promise<string[]> {
   const rows = await prisma.userRole.findMany({
     where: { userId },
     select: { role: { select: { name: true } } },
-  })
-  return rows.map((r) => r.role.name)
+  });
+  return rows.map((r) => r.role.name);
 }
 
 export async function getUserPermissions(userId: number): Promise<string[]> {
@@ -53,61 +49,51 @@ export async function getUserPermissions(userId: number): Promise<string[]> {
         },
       },
     },
-  })
+  });
 
-  const names = new Set<string>()
+  const names = new Set<string>();
   for (const ur of rows) {
     for (const rp of ur.role.permissions) {
-      names.add(rp.permission.name)
+      names.add(rp.permission.name);
     }
   }
-  return [...names]
+  return [...names];
 }
 
-export async function saveRefreshToken(
-  userId: number,
-  tokenHash: string,
-  expiresAt: Date,
-): Promise<void> {
-  await prisma.refreshToken.create({ data: { userId, tokenHash, expiresAt } })
+export async function saveRefreshToken(userId: number, tokenHash: string, expiresAt: Date): Promise<void> {
+  await prisma.refreshToken.create({ data: { userId, tokenHash, expiresAt } });
 }
 
 export async function findRefreshToken(tokenHash: string): Promise<RefreshToken | null> {
-  return prisma.refreshToken.findFirst({ where: { tokenHash, revokedAt: null } })
+  return prisma.refreshToken.findFirst({ where: { tokenHash, revokedAt: null } });
 }
 
 export async function revokeRefreshToken(tokenHash: string): Promise<void> {
   await prisma.refreshToken.updateMany({
     where: { tokenHash },
     data: { revokedAt: new Date() },
-  })
+  });
 }
 
-export async function findUserByEmailExcluding(
-  email: string,
-  excludeId: number,
-): Promise<User | null> {
+export async function findUserByEmailExcluding(email: string, excludeId: number): Promise<User | null> {
   return prisma.user.findFirst({
     where: { email, deletedAt: null, id: { not: excludeId } },
-  })
+  });
 }
 
-export async function updateUserProfile(
-  id: number,
-  data: { name?: string; email?: string },
-): Promise<void> {
+export async function updateUserProfile(id: number, data: { name?: string; email?: string }): Promise<void> {
   await prisma.user.update({
     where: { id },
     data: {
       ...(data.name !== undefined && { fullName: data.name }),
       ...(data.email !== undefined && { email: data.email }),
     },
-  })
+  });
 }
 
 export async function updateUserPassword(id: number, passwordHash: string): Promise<void> {
   await prisma.user.update({
     where: { id },
     data: { passwordHash },
-  })
+  });
 }
