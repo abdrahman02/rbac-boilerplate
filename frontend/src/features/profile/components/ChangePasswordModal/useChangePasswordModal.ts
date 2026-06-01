@@ -2,17 +2,21 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { useLogout } from "@/shared/components/layout/Header/useLogout";
 import { apiClient } from "@/shared/lib/api-client";
 import { getErrorMessage } from "@/shared/lib/api-error";
-import { toast } from "@/shared/lib/toast";
 import { type ChangePasswordInput, changePasswordSchema } from "./ChangePasswordModal.schema";
 
 interface Params {
   isOpen: boolean;
+  // onClose is kept in the interface so ChangePasswordModal.tsx remains unchanged.
+  // The modal closes implicitly when logout redirects to /login.
   onClose: () => void;
 }
 
-export function useChangePasswordModal({ isOpen, onClose }: Params) {
+export function useChangePasswordModal({ isOpen }: Params) {
+  const logout = useLogout();
+
   const {
     register,
     handleSubmit,
@@ -32,10 +36,7 @@ export function useChangePasswordModal({ isOpen, onClose }: Params) {
         new_password: data.new_password,
       });
     },
-    onSuccess: () => {
-      toast.success("Password changed");
-      onClose();
-    },
+    onSuccess: () => logout(),
     onError: (err) => setError("root", { message: getErrorMessage(err) }),
   });
 
