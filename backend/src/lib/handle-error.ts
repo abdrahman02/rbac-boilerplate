@@ -12,6 +12,10 @@ const ERROR_MAP: Record<string, { status: number; message: string }> = {
   ROLE_NOT_FOUND: { status: 404, message: "Role not found." },
   ROLE_NAME_TAKEN: { status: 409, message: "A role with this name already exists." },
   PERMISSION_NAME_TAKEN: { status: 409, message: "A permission with this name already exists." },
+  EMAIL_NOT_VERIFIED: { status: 403, message: "Please verify your email address before logging in." },
+  INVALID_VERIFICATION_TOKEN: { status: 400, message: "This verification link is invalid or has already been used." },
+  VERIFICATION_TOKEN_EXPIRED: { status: 400, message: "This verification link has expired. Please request a new one." },
+  ALREADY_VERIFIED: { status: 400, message: "Your email address is already verified." },
 };
 
 export function handleError(res: Response, err: unknown): void {

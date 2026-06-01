@@ -97,3 +97,10 @@ export async function updateUserPassword(id: number, passwordHash: string): Prom
     data: { passwordHash },
   });
 }
+
+export async function setEmailVerified(userId: number): Promise<void> {
+  await prisma.user.update({
+    where: { id: userId },
+    data: { emailVerifiedAt: new Date() },
+  });
+}
