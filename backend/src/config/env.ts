@@ -19,6 +19,13 @@ const envSchema = z.object({
   JWT_REFRESH_SECRET: z.string().min(32),
   JWT_ACCESS_EXPIRES_IN: z.string().default("15m"),
   JWT_REFRESH_EXPIRES_IN: z.string().default("7d"),
+
+  SMTP_HOST: z.string().min(1),
+  SMTP_PORT: z.coerce.number().default(2525),
+  SMTP_USER: z.string().min(1),
+  SMTP_PASS: z.string().min(1),
+  SMTP_FROM: z.string().email(),
+  APP_NAME: z.string().default("RBAC App"),
 });
 
 const result = envSchema.safeParse(process.env);
