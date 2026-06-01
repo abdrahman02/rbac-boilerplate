@@ -22,7 +22,7 @@ vi.mock("../../config/env.js", () => ({
   },
 }));
 
-import { sendVerificationEmail } from "../email.service.js";
+import { sendPasswordResetEmail, sendVerificationEmail } from "../email.service.js";
 
 describe("sendVerificationEmail", () => {
   beforeEach(() => vi.resetAllMocks());
@@ -61,6 +61,48 @@ describe("sendVerificationEmail", () => {
     mockSendMail.mockRejectedValueOnce(new Error("SMTP connection refused"));
 
     await expect(sendVerificationEmail("user@example.com", "Alice", "rawtoken123")).rejects.toThrow(
+      "SMTP connection refused",
+    );
+  });
+});
+
+describe("sendPasswordResetEmail", () => {
+  beforeEach(() => vi.resetAllMocks());
+
+  it("sends email to the correct recipient with reset link in body", async () => {
+    mockSendMail.mockResolvedValueOnce({ messageId: "test-id" });
+
+    await sendPasswordResetEmail("user@example.com", "Alice", "rawtoken456");
+
+    expect(mockSendMail).toHaveBeenCalledOnce();
+    const mail = mockSendMail.mock.calls[0]![0];
+    expect(mail.to).toBe("user@example.com");
+    expect(mail.html).toContain("http://localhost:3000/reset-password?token=rawtoken456");
+    expect(mail.text).toContain("http://localhost:3000/reset-password?token=rawtoken456");
+  });
+
+  it("sets subject containing 'Reset'", async () => {
+    mockSendMail.mockResolvedValueOnce({ messageId: "test-id" });
+
+    await sendPasswordResetEmail("user@example.com", "Alice", "rawtoken456");
+
+    const mail = mockSendMail.mock.calls[0]![0];
+    expect(mail.subject).toContain("Reset");
+  });
+
+  it("includes user name in email html body", async () => {
+    mockSendMail.mockResolvedValueOnce({ messageId: "test-id" });
+
+    await sendPasswordResetEmail("user@example.com", "Alice", "rawtoken456");
+
+    const mail = mockSendMail.mock.calls[0]![0];
+    expect(mail.html).toContain("Alice");
+  });
+
+  it("throws when SMTP transport fails", async () => {
+    mockSendMail.mockRejectedValueOnce(new Error("SMTP connection refused"));
+
+    await expect(sendPasswordResetEmail("user@example.com", "Alice", "rawtoken456")).rejects.toThrow(
       "SMTP connection refused",
     );
   });

@@ -43,3 +43,37 @@ export async function sendVerificationEmail(to: string, name: string, token: str
     `,
   });
 }
+
+/**
+ * Sends a password reset email to the specified recipient.
+ *
+ * @param to    - Recipient email address
+ * @param name  - Recipient display name (used in the email greeting)
+ * @param token - Raw reset token to embed in the link
+ */
+export async function sendPasswordResetEmail(to: string, name: string, token: string): Promise<void> {
+  const resetUrl = `${env.FRONTEND_URL}/reset-password?token=${token}`;
+
+  await transporter.sendMail({
+    from: `"${env.APP_NAME}" <${env.SMTP_FROM}>`,
+    to,
+    subject: `Reset your password — ${env.APP_NAME}`,
+    text: `Hi ${name},\n\nYou requested a password reset. Visit the link below to set a new password:\n\n${resetUrl}\n\nThis link expires in 30 minutes.\n\nIf you did not request this, you can safely ignore this email.`,
+    html: `
+      <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 24px;">
+        <h2>Reset your password</h2>
+        <p>Hi ${name},</p>
+        <p>You requested a password reset. Click the button below to set a new password.</p>
+        <p style="margin: 32px 0;">
+          <a href="${resetUrl}"
+             style="display: inline-block; padding: 12px 24px; background: #4f46e5; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: 600;">
+            Reset Password
+          </a>
+        </p>
+        <p>Or copy this link into your browser:</p>
+        <p><a href="${resetUrl}">${resetUrl}</a></p>
+        <p><small>This link expires in 30 minutes. If you did not request a password reset, ignore this email.</small></p>
+      </div>
+    `,
+  });
+}
