@@ -22,7 +22,7 @@ vi.mock("../../config/env.js", () => ({
   },
 }));
 
-import { sendPasswordResetEmail, sendVerificationEmail } from "../email.service.js";
+import { sendInviteEmail, sendPasswordChangedEmail, sendPasswordResetEmail, sendVerificationEmail } from "../email.service.js";
 
 describe("sendVerificationEmail", () => {
   beforeEach(() => vi.resetAllMocks());
@@ -105,5 +105,89 @@ describe("sendPasswordResetEmail", () => {
     await expect(sendPasswordResetEmail("user@example.com", "Alice", "rawtoken456")).rejects.toThrow(
       "SMTP connection refused",
     );
+  });
+});
+
+describe("sendInviteEmail", () => {
+  beforeEach(() => vi.resetAllMocks());
+
+  it("sends to correct recipient with invite link in body", async () => {
+    mockSendMail.mockResolvedValueOnce({ messageId: "test-id" });
+
+    await sendInviteEmail("user@example.com", "Alice", "invitetoken123");
+
+    expect(mockSendMail).toHaveBeenCalledOnce();
+    const mail = mockSendMail.mock.calls[0]![0];
+    expect(mail.to).toBe("user@example.com");
+    expect(mail.html).toContain("http://localhost:3000/reset-password?token=invitetoken123");
+    expect(mail.text).toContain("http://localhost:3000/reset-password?token=invitetoken123");
+  });
+
+  it("sets subject containing 'invited'", async () => {
+    mockSendMail.mockResolvedValueOnce({ messageId: "test-id" });
+
+    await sendInviteEmail("user@example.com", "Alice", "invitetoken123");
+
+    const mail = mockSendMail.mock.calls[0]![0];
+    expect(mail.subject.toLowerCase()).toContain("invited");
+  });
+
+  it("includes user name in html body", async () => {
+    mockSendMail.mockResolvedValueOnce({ messageId: "test-id" });
+
+    await sendInviteEmail("user@example.com", "Alice", "invitetoken123");
+
+    const mail = mockSendMail.mock.calls[0]![0];
+    expect(mail.html).toContain("Alice");
+  });
+
+  it("throws when SMTP transport fails", async () => {
+    mockSendMail.mockRejectedValueOnce(new Error("SMTP error"));
+
+    await expect(sendInviteEmail("user@example.com", "Alice", "t")).rejects.toThrow("SMTP error");
+  });
+});
+
+describe("sendPasswordChangedEmail", () => {
+  beforeEach(() => vi.resetAllMocks());
+
+  it("sends to correct recipient with forgot-password link in body", async () => {
+    mockSendMail.mockResolvedValueOnce({ messageId: "test-id" });
+
+    await sendPasswordChangedEmail("user@example.com", "Alice");
+
+    expect(mockSendMail).toHaveBeenCalledOnce();
+    const mail = mockSendMail.mock.calls[0]![0];
+    expect(mail.to).toBe("user@example.com");
+    expect(mail.html).toContain("http://localhost:3000/forgot-password");
+    expect(mail.text).toContain("http://localhost:3000/forgot-password");
+  });
+
+  it("does NOT contain a reset token in the body", async () => {
+    mockSendMail.mockResolvedValueOnce({ messageId: "test-id" });
+
+    await sendPasswordChangedEmail("user@example.com", "Alice");
+
+    const mail = mockSendMail.mock.calls[0]![0];
+    expect(mail.html).not.toContain("token=");
+  });
+
+  it("sets subject containing 'password' and 'changed'", async () => {
+    mockSendMail.mockResolvedValueOnce({ messageId: "test-id" });
+
+    await sendPasswordChangedEmail("user@example.com", "Alice");
+
+    const mail = mockSendMail.mock.calls[0]![0];
+    expect(mail.subject.toLowerCase()).toContain("password");
+    expect(mail.subject.toLowerCase()).toContain("changed");
+  });
+
+  it("includes user name in html body", async () => {
+    mockSendMail.mockResolvedValueOnce({ messageId: "test-id" });
+
+    await sendPasswordChangedEmail("user@example.com", "Alice");
+
+    const mail = mockSendMail.mock.calls[0]![0];
+    expect(mail.html).toContain("Alice");
   });
 });
