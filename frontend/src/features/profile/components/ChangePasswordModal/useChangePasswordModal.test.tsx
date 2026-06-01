@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { renderHook, act } from "@testing-library/react";
+import { act, renderHook } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -38,10 +38,7 @@ describe("useChangePasswordModal", () => {
     vi.mocked(apiClient.post).mockResolvedValueOnce({});
 
     const onClose = vi.fn();
-    const { result } = renderHook(
-      () => useChangePasswordModal({ isOpen: true, onClose }),
-      { wrapper },
-    );
+    const { result } = renderHook(() => useChangePasswordModal({ isOpen: true, onClose }), { wrapper });
 
     await act(async () => {
       result.current.onSubmit({
@@ -56,15 +53,10 @@ describe("useChangePasswordModal", () => {
   });
 
   it("sets root error and does NOT call logout on API failure", async () => {
-    vi.mocked(apiClient.post).mockRejectedValueOnce(
-      new Error("Current password is incorrect"),
-    );
+    vi.mocked(apiClient.post).mockRejectedValueOnce(new Error("Current password is incorrect"));
 
     const onClose = vi.fn();
-    const { result } = renderHook(
-      () => useChangePasswordModal({ isOpen: true, onClose }),
-      { wrapper },
-    );
+    const { result } = renderHook(() => useChangePasswordModal({ isOpen: true, onClose }), { wrapper });
 
     await act(async () => {
       result.current.onSubmit({

@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 import type { BaseSyntheticEvent } from "react";
-import { useCallback, useEffect } from "react";
+import { useEffect } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { useForm, useWatch } from "react-hook-form";
 import { apiClient } from "@/shared/lib/api-client";
@@ -17,7 +17,6 @@ interface UseResetPasswordFormReturn {
   done: boolean;
   hasToken: boolean;
   password: string;
-  onContinue: () => void;
   onSubmit: (e?: BaseSyntheticEvent) => Promise<void>;
 }
 
@@ -47,9 +46,6 @@ export function useResetPasswordForm(): UseResetPasswordFormReturn {
   // useWatch feeds the PasswordStrengthMeter without triggering re-renders on the form
   const password = useWatch({ control: form.control, name: "password" }) ?? "";
 
-  // onContinue navigates to login — defined in hook so the component stays pure JSX
-  const onContinue = useCallback(() => router.push("/login"), [router]);
-
   const onSubmit = form.handleSubmit((data) => mutate(data));
 
   return {
@@ -58,7 +54,6 @@ export function useResetPasswordForm(): UseResetPasswordFormReturn {
     done: isSuccess,
     hasToken: Boolean(token),
     password,
-    onContinue,
     onSubmit,
   };
 }
