@@ -135,6 +135,9 @@ const UserRow = memo(function UserRow({
           <div>
             <div className="font-semibold text-[13.5px]">{user.name}</div>
             <div className="text-[12.5px] text-muted-foreground">{user.email}</div>
+            {!user.email_verified && (
+              <div className="text-[11.5px] text-warning mt-0.5">Pending email verification</div>
+            )}
           </div>
         </div>
       </TableCell>
@@ -163,7 +166,7 @@ const UserRow = memo(function UserRow({
       </TableCell>
 
       <TableCell>
-        <StatusBadge isActive={user.is_active} emailVerified={user.email_verified} />
+        <StatusBadge isActive={user.is_active} />
       </TableCell>
 
       <TableCell className="text-[13px] text-muted-foreground">
