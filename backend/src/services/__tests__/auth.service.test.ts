@@ -13,14 +13,12 @@ vi.mock("../../repositories/auth.repository.js", () => ({
   saveRefreshToken: vi.fn(),
   findRefreshToken: vi.fn(),
   revokeRefreshToken: vi.fn(),
-  setEmailVerified: vi.fn(),
 }));
 
 vi.mock("../../repositories/email-verification.repository.js", () => ({
   createToken: vi.fn(),
   findByTokenHash: vi.fn(),
   invalidateUserTokens: vi.fn(),
-  markTokenUsed: vi.fn(),
   consumeTokenAndActivateUser: vi.fn(),
 }));
 

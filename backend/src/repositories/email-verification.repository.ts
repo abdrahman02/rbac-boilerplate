@@ -20,13 +20,6 @@ export async function invalidateUserTokens(userId: number): Promise<void> {
   });
 }
 
-export async function markTokenUsed(tokenHash: string): Promise<void> {
-  await prisma.emailVerificationToken.update({
-    where: { tokenHash },
-    data: { usedAt: new Date() },
-  });
-}
-
 /**
  * Atomically marks the verification token as used AND activates the user's account
  * in a single database transaction. Prevents the race condition where a token could
