@@ -1,10 +1,13 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
 import type { BaseSyntheticEvent } from "react";
 import { useCallback, useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { useForm } from "react-hook-form";
+import { apiClient } from "@/shared/lib/api-client";
+import { getErrorMessage } from "@/shared/lib/api-error";
 import { type ForgotPasswordInput, forgotPasswordSchema } from "./ForgotPasswordForm.schema";
 
 interface UseForgotPasswordFormReturn {
@@ -17,7 +20,6 @@ interface UseForgotPasswordFormReturn {
 }
 
 export function useForgotPasswordForm(): UseForgotPasswordFormReturn {
-  const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [submittedEmail, setSubmittedEmail] = useState("");
 
@@ -25,19 +27,23 @@ export function useForgotPasswordForm(): UseForgotPasswordFormReturn {
     resolver: zodResolver(forgotPasswordSchema),
   });
 
-  // onRetry is passed as a prop to SuccessState, useCallback ensures referential stability
-  const onRetry = useCallback(() => setSuccess(false), []);
+  const { setError } = form;
 
-  const onSubmit = form.handleSubmit(async (data) => {
-    setIsLoading(true);
-    try {
-      // TODO: Replace with useMutation when POST /auth/forgot-password backend is ready
+  const { mutate, isPending } = useMutation({
+    mutationFn: async (data: ForgotPasswordInput) => {
+      await apiClient.post("/auth/forgot-password", data);
+    },
+    onSuccess: (_, data) => {
       setSubmittedEmail(data.email);
       setSuccess(true);
-    } finally {
-      setIsLoading(false);
-    }
+    },
+    onError: (err) => setError("root", { message: getErrorMessage(err) }),
   });
 
-  return { form, isLoading, success, submittedEmail, onRetry, onSubmit };
+  // onRetry is passed as a prop to SuccessState — useCallback ensures referential stability
+  const onRetry = useCallback(() => setSuccess(false), []);
+
+  const onSubmit = form.handleSubmit((data) => mutate(data));
+
+  return { form, isLoading: isPending, success, submittedEmail, onRetry, onSubmit };
 }
