@@ -13,6 +13,7 @@ vi.mock("../../repositories/auth.repository.js", () => ({
   saveRefreshToken: vi.fn(),
   findRefreshToken: vi.fn(),
   revokeRefreshToken: vi.fn(),
+  revokeAllUserRefreshTokens: vi.fn(),
 }));
 
 vi.mock("../../repositories/email-verification.repository.js", () => ({
@@ -32,6 +33,7 @@ vi.mock("../../repositories/password-reset.repository.js", () => ({
 vi.mock("../../services/email.service.js", () => ({
   sendVerificationEmail: vi.fn(),
   sendPasswordResetEmail: vi.fn(),
+  sendPasswordChangedEmail: vi.fn(),
 }));
 
 vi.mock("../../utils/hash.js", () => ({
@@ -43,7 +45,7 @@ import type { EmailVerificationToken, User } from "../../generated/prisma/index.
 import * as repo from "../../repositories/auth.repository.js";
 import * as emailVerifRepo from "../../repositories/email-verification.repository.js";
 import * as passwordResetRepo from "../../repositories/password-reset.repository.js";
-import { sendPasswordResetEmail, sendVerificationEmail } from "../../services/email.service.js";
+import { sendPasswordChangedEmail, sendPasswordResetEmail, sendVerificationEmail } from "../../services/email.service.js";
 import { comparePassword, hashPassword } from "../../utils/hash.js";
 import {
   changePassword,
@@ -317,28 +319,58 @@ describe("updateMe", () => {
   });
 });
 
-// ── changePassword (existing — kept intact) ────────────────────────────────────────────────────────
+// ── changePassword ────────────────────────────────────────────────────────
 describe("changePassword", () => {
   beforeEach(() => vi.resetAllMocks());
 
-  it("changes password when current password is correct", async () => {
+  it("revokes all user refresh tokens after successful password change", async () => {
     vi.mocked(repo.findUserById).mockResolvedValueOnce(MOCK_USER);
     vi.mocked(comparePassword).mockResolvedValueOnce(true);
     vi.mocked(hashPassword).mockResolvedValueOnce("newhash");
     vi.mocked(repo.updateUserPassword).mockResolvedValueOnce(undefined);
+    vi.mocked(repo.revokeAllUserRefreshTokens).mockResolvedValueOnce(undefined);
+    vi.mocked(sendPasswordChangedEmail).mockResolvedValueOnce(undefined);
 
-    await expect(changePassword(1, { current_password: "Old1234!", new_password: "New1234!" })).resolves.not.toThrow();
+    await changePassword(1, { current_password: "Old1234!", new_password: "New1234!" });
+
+    expect(repo.revokeAllUserRefreshTokens).toHaveBeenCalledWith(1);
+  });
+
+  it("sends password changed notification email after successful change", async () => {
+    vi.mocked(repo.findUserById).mockResolvedValueOnce(MOCK_USER);
+    vi.mocked(comparePassword).mockResolvedValueOnce(true);
+    vi.mocked(hashPassword).mockResolvedValueOnce("newhash");
+    vi.mocked(repo.updateUserPassword).mockResolvedValueOnce(undefined);
+    vi.mocked(repo.revokeAllUserRefreshTokens).mockResolvedValueOnce(undefined);
+    vi.mocked(sendPasswordChangedEmail).mockResolvedValueOnce(undefined);
+
+    await changePassword(1, { current_password: "Old1234!", new_password: "New1234!" });
+
+    expect(sendPasswordChangedEmail).toHaveBeenCalledWith(MOCK_USER.email, MOCK_USER.fullName);
+  });
+
+  it("still updates password hash correctly", async () => {
+    vi.mocked(repo.findUserById).mockResolvedValueOnce(MOCK_USER);
+    vi.mocked(comparePassword).mockResolvedValueOnce(true);
+    vi.mocked(hashPassword).mockResolvedValueOnce("newhash");
+    vi.mocked(repo.updateUserPassword).mockResolvedValueOnce(undefined);
+    vi.mocked(repo.revokeAllUserRefreshTokens).mockResolvedValueOnce(undefined);
+    vi.mocked(sendPasswordChangedEmail).mockResolvedValueOnce(undefined);
+
+    await changePassword(1, { current_password: "Old1234!", new_password: "New1234!" });
+
     expect(repo.updateUserPassword).toHaveBeenCalledWith(1, "newhash");
   });
 
-  it("throws WRONG_PASSWORD when current password is incorrect", async () => {
+  it("throws WRONG_PASSWORD and does NOT revoke tokens or send email", async () => {
     vi.mocked(repo.findUserById).mockResolvedValueOnce(MOCK_USER);
     vi.mocked(comparePassword).mockResolvedValueOnce(false);
 
     await expect(changePassword(1, { current_password: "wrong", new_password: "New1234!" })).rejects.toThrow(
       "WRONG_PASSWORD",
     );
-    expect(repo.updateUserPassword).not.toHaveBeenCalled();
+    expect(repo.revokeAllUserRefreshTokens).not.toHaveBeenCalled();
+    expect(sendPasswordChangedEmail).not.toHaveBeenCalled();
   });
 
   it("throws USER_NOT_FOUND when user does not exist", async () => {

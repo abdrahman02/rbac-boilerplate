@@ -170,6 +170,8 @@ export async function changePassword(userId: number, input: ChangePasswordInput)
 
   const newHash = await hashPassword(input.new_password);
   await authRepo.updateUserPassword(userId, newHash);
+  await authRepo.revokeAllUserRefreshTokens(userId);
+  await emailSvc.sendPasswordChangedEmail(user.email, user.fullName);
 }
 
 async function buildAuthResult(userId: number): Promise<AuthResult> {
