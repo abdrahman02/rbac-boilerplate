@@ -92,6 +92,7 @@ async function main() {
           fullName: name,
           passwordHash,
           isActive: true,
+          emailVerifiedAt: new Date(),
         },
         select: { id: true, email: true, fullName: true },
       })
