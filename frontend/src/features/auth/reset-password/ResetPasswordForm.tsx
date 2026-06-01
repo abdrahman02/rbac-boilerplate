@@ -4,7 +4,7 @@ import { Check, Lock } from "lucide-react";
 import Link from "next/link";
 import { memo } from "react";
 import { AuthShell } from "@/features/auth/components/AuthShell";
-import { Button, FormField, Input, PasswordStrengthMeter } from "@/shared/components/ui";
+import { Alert, Button, FormField, Input, PasswordStrengthMeter } from "@/shared/components/ui";
 import { useResetPasswordForm } from "./useResetPasswordForm";
 
 // Memoised at module level to avoid re-creating the wrapped component on every render
@@ -68,6 +68,8 @@ export function ResetPasswordForm() {
     <AuthShell footer={footer}>
       <h1 className="text-[26px] font-semibold tracking-tight m-0">Set a new password</h1>
       <p className="mt-1.5 mb-7 text-sm text-muted-foreground">Choose a password you haven&apos;t used before.</p>
+
+      {errors.root?.message && <Alert message={errors.root.message} className="mb-4" />}
 
       <form onSubmit={onSubmit} className="flex flex-col gap-3.5">
         <FormField label="New password" required error={errors.password?.message}>

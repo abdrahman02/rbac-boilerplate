@@ -32,9 +32,9 @@ export function useResetPasswordForm(): UseResetPasswordFormReturn {
 
   const { setError } = form;
 
-  // Redirect to /forgot-password if no token in URL
+  // Redirect to /forgot-password if token is absent or empty string (?token=)
   useEffect(() => {
-    if (token === null) router.replace("/forgot-password");
+    if (!token) router.replace("/forgot-password");
   }, [token, router]);
 
   const { mutate, isPending, isSuccess } = useMutation({
@@ -56,7 +56,7 @@ export function useResetPasswordForm(): UseResetPasswordFormReturn {
     form,
     isLoading: isPending,
     done: isSuccess,
-    hasToken: token !== null,
+    hasToken: Boolean(token),
     password,
     onContinue,
     onSubmit,

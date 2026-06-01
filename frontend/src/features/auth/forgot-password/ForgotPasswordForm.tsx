@@ -16,12 +16,13 @@ interface SuccessStateProps {
 
 const SuccessState = memo(function SuccessState({ email, onRetry }: SuccessStateProps) {
   return (
-    <div className="animate-scale-in">
-      <div className="w-14 h-14 rounded-2xl bg-success/12 text-success border border-success/22 inline-flex items-center justify-center mb-[18px]">
-        <Check size={26} />
-      </div>
-
-      <h1 className="text-2xl font-semibold tracking-tight m-0">Check your inbox</h1>
+    <div className="animate-scale-in mt-3">
+      <h1 className="text-2xl font-semibold tracking-tight m-0 inline-flex items-center gap-2">
+        <div className="w-6 h-6 rounded-full bg-success/12 text-success border border-success/22 inline-flex items-center justify-center">
+          <Check size={16} />
+        </div>
+        Check your inbox
+      </h1>
       <p className="mt-2 mb-6 text-sm text-muted-foreground leading-relaxed">
         We&apos;ve sent a reset link to <b className="text-foreground font-semibold">{email}</b>. The link expires in 30
         minutes.
