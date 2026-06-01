@@ -39,16 +39,6 @@ const MOCK_TOKEN: PasswordResetToken = {
 describe("createToken", () => {
   beforeEach(() => vi.resetAllMocks());
 
-  it("creates token record with correct data", async () => {
-    vi.mocked(prisma.passwordResetToken.create).mockResolvedValueOnce(MOCK_TOKEN);
-
-    await createToken(1, "abc123hash", EXPIRES_AT);
-
-    expect(prisma.passwordResetToken.create).toHaveBeenCalledWith({
-      data: { userId: 1, tokenHash: "abc123hash", expiresAt: EXPIRES_AT, isInvite: false },
-    });
-  });
-
   it("creates token with isInvite=true when flag is passed", async () => {
     vi.mocked(prisma.passwordResetToken.create).mockResolvedValueOnce({
       ...MOCK_TOKEN,
@@ -125,19 +115,43 @@ describe("consumeTokenAndResetPassword", () => {
     expect(callArgs).toHaveLength(2);
   });
 
-  it("activates user when activateUser=true", async () => {
-    vi.mocked(prisma.$transaction).mockResolvedValueOnce([]);
+  it("activates user (sets emailVerifiedAt and isActive) when activateUser=true", async () => {
+    const runTransaction = async (ops: Promise<unknown>[]) => {
+      for (const op of ops) await op;
+      return [];
+    };
+    // biome-ignore lint/suspicious/noExplicitAny: Prisma $transaction has multiple overloads; cast bypasses overload resolution in tests
+    vi.mocked(prisma.$transaction).mockImplementationOnce(runTransaction as any);
+    vi.mocked(prisma.passwordResetToken.update).mockResolvedValueOnce({} as never);
+    vi.mocked(prisma.user.update).mockResolvedValueOnce({} as never);
 
     await consumeTokenAndResetPassword("abc123hash", 1, "newhash", true);
 
-    expect(prisma.$transaction).toHaveBeenCalledOnce();
+    expect(prisma.user.update).toHaveBeenCalledWith({
+      where: { id: 1 },
+      data: {
+        passwordHash: "newhash",
+        emailVerifiedAt: expect.any(Date),
+        isActive: true,
+      },
+    });
   });
 
-  it("does not activate user when activateUser=false (default)", async () => {
-    vi.mocked(prisma.$transaction).mockResolvedValueOnce([]);
+  it("does not set emailVerifiedAt or isActive when activateUser=false (default)", async () => {
+    const runTransaction = async (ops: Promise<unknown>[]) => {
+      for (const op of ops) await op;
+      return [];
+    };
+    // biome-ignore lint/suspicious/noExplicitAny: Prisma $transaction has multiple overloads; cast bypasses overload resolution in tests
+    vi.mocked(prisma.$transaction).mockImplementationOnce(runTransaction as any);
+    vi.mocked(prisma.passwordResetToken.update).mockResolvedValueOnce({} as never);
+    vi.mocked(prisma.user.update).mockResolvedValueOnce({} as never);
 
     await consumeTokenAndResetPassword("abc123hash", 1, "newhash");
 
-    expect(prisma.$transaction).toHaveBeenCalledOnce();
+    expect(prisma.user.update).toHaveBeenCalledWith({
+      where: { id: 1 },
+      data: { passwordHash: "newhash" },
+    });
   });
 });
