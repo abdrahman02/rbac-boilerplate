@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { generateRefreshToken, hashRefreshToken, signAccessToken, verifyAccessToken } from "../token.service.js";
+import {
+  generateRefreshToken,
+  hashRefreshToken,
+  signAccessToken,
+  verifyAccessToken,
+  generateVerificationToken,
+  hashVerificationToken,
+} from "../token.service.js";
 
 describe("TokenService", () => {
   const payload = {
@@ -44,5 +51,24 @@ describe("TokenService", () => {
 
   it("different raw tokens produce different hashes", () => {
     expect(hashRefreshToken("token-a")).not.toBe(hashRefreshToken("token-b"));
+  });
+});
+
+describe("VerificationToken", () => {
+  it("generates unique verification tokens of 80 chars", () => {
+    const t1 = generateVerificationToken();
+    const t2 = generateVerificationToken();
+    expect(t1).not.toBe(t2);
+    expect(t1).toHaveLength(80);
+  });
+
+  it("hashes verification token deterministically", () => {
+    const raw = "test-verification-token";
+    expect(hashVerificationToken(raw)).toBe(hashVerificationToken(raw));
+    expect(hashVerificationToken(raw)).toHaveLength(64);
+  });
+
+  it("different raw tokens produce different hashes", () => {
+    expect(hashVerificationToken("token-a")).not.toBe(hashVerificationToken("token-b"));
   });
 });

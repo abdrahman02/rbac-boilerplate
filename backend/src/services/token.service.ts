@@ -55,3 +55,11 @@ export function clearAuthCookies(res: Response): void {
   res.clearCookie("access_token");
   res.clearCookie("refresh_token", { path: "/api/auth/refresh" });
 }
+
+export function generateVerificationToken(): string {
+  return randomBytes(40).toString("hex");
+}
+
+export function hashVerificationToken(raw: string): string {
+  return createHash("sha256").update(raw).digest("hex");
+}
