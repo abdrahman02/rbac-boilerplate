@@ -16,7 +16,7 @@ const footer = (
 );
 
 export function LoginForm() {
-  const { form, isPending, showPassword, toggleShowPassword, onSubmit } = useLoginForm();
+  const { form, isPending, isUnverified, submittedEmail, showPassword, toggleShowPassword, onSubmit } = useLoginForm();
 
   const {
     register,
@@ -28,7 +28,18 @@ export function LoginForm() {
       <h1 className="text-[26px] font-semibold tracking-tight m-0">Welcome back</h1>
       <p className="mt-1.5 mb-7 text-sm text-muted-foreground">Sign in to your RBAC workspace.</p>
 
-      {errors.root?.message && <Alert message={errors.root.message} className="mb-4" />}
+      {errors.root?.message && <Alert message={errors.root.message} className="mb-2" />}
+
+      {isUnverified && (
+        <p className="text-sm text-muted-foreground mb-4">
+          <Link
+            href={`/verify-email-sent?email=${encodeURIComponent(submittedEmail)}`}
+            className="text-primary font-medium no-underline"
+          >
+            Resend verification email
+          </Link>
+        </p>
+      )}
 
       <form onSubmit={onSubmit} className="flex flex-col gap-3.5">
         <FormField label="Email" required error={errors.email?.message}>
