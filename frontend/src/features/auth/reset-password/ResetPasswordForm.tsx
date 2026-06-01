@@ -46,12 +46,15 @@ const footer = (
 // --- Main component (pure JSX — no useState, no useRouter, no async) ---
 
 export function ResetPasswordForm() {
-  const { form, isLoading, done, password, onContinue, onSubmit } = useResetPasswordForm();
+  const { form, isLoading, done, hasToken, password, onContinue, onSubmit } = useResetPasswordForm();
 
   const {
     register,
     formState: { errors },
   } = form;
+
+  // Render nothing while redirect to /forgot-password is in-flight
+  if (!hasToken) return null;
 
   if (done) {
     return (
