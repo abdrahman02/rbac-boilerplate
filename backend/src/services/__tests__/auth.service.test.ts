@@ -22,8 +22,16 @@ vi.mock("../../repositories/email-verification.repository.js", () => ({
   consumeTokenAndActivateUser: vi.fn(),
 }));
 
+vi.mock("../../repositories/password-reset.repository.js", () => ({
+  createToken: vi.fn(),
+  findByTokenHash: vi.fn(),
+  invalidateUserTokens: vi.fn(),
+  consumeTokenAndResetPassword: vi.fn(),
+}));
+
 vi.mock("../../services/email.service.js", () => ({
   sendVerificationEmail: vi.fn(),
+  sendPasswordResetEmail: vi.fn(),
 }));
 
 vi.mock("../../utils/hash.js", () => ({
@@ -34,14 +42,17 @@ vi.mock("../../utils/hash.js", () => ({
 import type { EmailVerificationToken, User } from "../../generated/prisma/index.js";
 import * as repo from "../../repositories/auth.repository.js";
 import * as emailVerifRepo from "../../repositories/email-verification.repository.js";
-import { sendVerificationEmail } from "../../services/email.service.js";
+import * as passwordResetRepo from "../../repositories/password-reset.repository.js";
+import { sendPasswordResetEmail, sendVerificationEmail } from "../../services/email.service.js";
 import { comparePassword, hashPassword } from "../../utils/hash.js";
 import {
   changePassword,
+  forgotPassword,
   login,
   refresh,
   register,
   resendVerification,
+  resetPassword,
   updateMe,
   verifyEmail,
 } from "../auth.service.js";
@@ -336,5 +347,81 @@ describe("changePassword", () => {
     await expect(changePassword(999, { current_password: "any", new_password: "New1234!" })).rejects.toThrow(
       "USER_NOT_FOUND",
     );
+  });
+});
+
+// ── forgotPassword ────────────────────────────────────────────────────────
+describe("forgotPassword", () => {
+  beforeEach(() => vi.resetAllMocks());
+
+  it("invalidates old tokens, creates new token, sends reset email", async () => {
+    vi.mocked(repo.findUserByEmail).mockResolvedValueOnce(MOCK_UNVERIFIED_USER);
+    vi.mocked(passwordResetRepo.invalidateUserTokens).mockResolvedValueOnce(undefined);
+    vi.mocked(passwordResetRepo.createToken).mockResolvedValueOnce(undefined);
+    vi.mocked(sendPasswordResetEmail).mockResolvedValueOnce(undefined);
+
+    await forgotPassword("alice@example.com");
+
+    expect(passwordResetRepo.invalidateUserTokens).toHaveBeenCalledWith(1);
+    expect(passwordResetRepo.createToken).toHaveBeenCalledWith(1, expect.any(String), expect.any(Date));
+  });
+
+  it("returns silently when email not found (prevent user enumeration)", async () => {
+    vi.mocked(repo.findUserByEmail).mockResolvedValueOnce(null);
+
+    await expect(forgotPassword("unknown@example.com")).resolves.toBeUndefined();
+    expect(passwordResetRepo.createToken).not.toHaveBeenCalled();
+  });
+});
+
+// ── resetPassword ────────────────────────────────────────────────────────
+describe("resetPassword", () => {
+  beforeEach(() => vi.resetAllMocks());
+
+  const MOCK_RESET_TOKEN = {
+    id: 1,
+    userId: 1,
+    tokenHash: "hashvalue",
+    expiresAt: new Date(Date.now() + 30 * 60 * 1000),
+    usedAt: null,
+    createdAt: new Date(),
+  };
+
+  it("consumes token and resets password atomically", async () => {
+    vi.mocked(passwordResetRepo.findByTokenHash).mockResolvedValueOnce(MOCK_RESET_TOKEN);
+    vi.mocked(passwordResetRepo.consumeTokenAndResetPassword).mockResolvedValueOnce(undefined);
+    vi.mocked(hashPassword).mockResolvedValueOnce("newhash");
+
+    await resetPassword("rawtoken", "NewPassword1!");
+
+    expect(passwordResetRepo.consumeTokenAndResetPassword).toHaveBeenCalledWith(
+      expect.any(String),
+      1,
+      expect.any(String),
+    );
+  });
+
+  it("throws INVALID_RESET_TOKEN when token not found", async () => {
+    vi.mocked(passwordResetRepo.findByTokenHash).mockResolvedValueOnce(null);
+
+    await expect(resetPassword("badtoken", "NewPassword1!")).rejects.toThrow("INVALID_RESET_TOKEN");
+  });
+
+  it("throws INVALID_RESET_TOKEN when token already used", async () => {
+    vi.mocked(passwordResetRepo.findByTokenHash).mockResolvedValueOnce({
+      ...MOCK_RESET_TOKEN,
+      usedAt: new Date(),
+    });
+
+    await expect(resetPassword("usedtoken", "NewPassword1!")).rejects.toThrow("INVALID_RESET_TOKEN");
+  });
+
+  it("throws RESET_TOKEN_EXPIRED when token is past expiry", async () => {
+    vi.mocked(passwordResetRepo.findByTokenHash).mockResolvedValueOnce({
+      ...MOCK_RESET_TOKEN,
+      expiresAt: new Date(Date.now() - 1000),
+    });
+
+    await expect(resetPassword("expiredtoken", "NewPassword1!")).rejects.toThrow("RESET_TOKEN_EXPIRED");
   });
 });

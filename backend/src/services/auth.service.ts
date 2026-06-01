@@ -1,5 +1,6 @@
 import * as authRepo from "../repositories/auth.repository.js";
 import * as emailVerifRepo from "../repositories/email-verification.repository.js";
+import * as passwordResetRepo from "../repositories/password-reset.repository.js";
 import type { ChangePasswordInput, LoginInput, RegisterInput, UpdateMeInput } from "../schemas/auth.schema.js";
 import type { AuthenticatedUser } from "../types/index.js";
 import { comparePassword, hashPassword } from "../utils/hash.js";
@@ -7,6 +8,7 @@ import * as emailSvc from "./email.service.js";
 import * as tokenSvc from "./token.service.js";
 
 const VERIFICATION_TOKEN_TTL_MS = 24 * 60 * 60 * 1000;
+const RESET_TOKEN_TTL_MS = 30 * 60 * 1000;
 const REFRESH_TOKEN_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
 export interface AuthResult {
@@ -80,6 +82,30 @@ export async function resendVerification(email: string): Promise<void> {
   const expiresAt = new Date(Date.now() + VERIFICATION_TOKEN_TTL_MS);
   await emailVerifRepo.createToken(user.id, tokenHash, expiresAt);
   await emailSvc.sendVerificationEmail(user.email, user.fullName, rawToken);
+}
+
+export async function forgotPassword(email: string): Promise<void> {
+  const user = await authRepo.findUserByEmail(email);
+  if (!user) return;
+
+  await passwordResetRepo.invalidateUserTokens(user.id);
+
+  const rawToken = tokenSvc.generateVerificationToken();
+  const tokenHash = tokenSvc.hashVerificationToken(rawToken);
+  const expiresAt = new Date(Date.now() + RESET_TOKEN_TTL_MS);
+  await passwordResetRepo.createToken(user.id, tokenHash, expiresAt);
+  await emailSvc.sendPasswordResetEmail(user.email, user.fullName, rawToken);
+}
+
+export async function resetPassword(token: string, password: string): Promise<void> {
+  const tokenHash = tokenSvc.hashVerificationToken(token);
+  const record = await passwordResetRepo.findByTokenHash(tokenHash);
+
+  if (!record || record.usedAt !== null) throw new Error("INVALID_RESET_TOKEN");
+  if (new Date() > record.expiresAt) throw new Error("RESET_TOKEN_EXPIRED");
+
+  const newPasswordHash = await hashPassword(password);
+  await passwordResetRepo.consumeTokenAndResetPassword(tokenHash, record.userId, newPasswordHash);
 }
 
 export async function logout(userId: number, refreshTokenHash: string): Promise<void> {
