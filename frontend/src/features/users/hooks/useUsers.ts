@@ -10,7 +10,6 @@ import type { PaginatedResponse, UserWithRoles } from "@/shared/types";
 interface CreateUserPayload {
   name: string;
   email: string;
-  password: string;
 }
 
 interface UpdateUserPayload {

@@ -28,16 +28,11 @@ export const useUserModal = ({ isOpen, onClose, user }: Params) => {
 
   useEffect(() => {
     if (isOpen) {
-      reset(isEditing ? { name: user.name, email: user.email, password: "" } : {});
+      reset(isEditing ? { name: user.name, email: user.email } : {});
     }
   }, [isOpen, isEditing, user, reset]);
 
   const onSubmit = (data: UserModalInput) => {
-    if (!isEditing && !data.password) {
-      setError("password", { message: "Password is required" });
-      return;
-    }
-
     if (isEditing) {
       updateUser.mutate(
         { id: user.id, payload: { name: data.name, email: data.email } },
@@ -52,10 +47,10 @@ export const useUserModal = ({ isOpen, onClose, user }: Params) => {
       );
     } else {
       createUser.mutate(
-        { name: data.name, email: data.email, password: data.password! },
+        { name: data.name, email: data.email },
         {
           onSuccess: () => {
-            toast.success("User created", { description: data.name });
+            toast.success("Invite sent", { description: `Invitation email sent to ${data.email}` });
             onClose();
             reset();
           },

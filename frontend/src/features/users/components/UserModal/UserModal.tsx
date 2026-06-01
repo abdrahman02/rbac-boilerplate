@@ -1,6 +1,6 @@
 "use client";
 
-import { Lock, Mail, User } from "lucide-react";
+import { Mail, User } from "lucide-react";
 import { Alert, Button, FormField, Input, Modal } from "@/shared/components/ui";
 import type { UserWithRoles } from "@/shared/types";
 import { useUserModal } from "./useUserModal";
@@ -20,7 +20,7 @@ export function UserModal({ isOpen, onClose, user }: UserModalProps) {
         <p className="text-sm text-muted-foreground -mt-0.5">
           {isEditing
             ? "Update this user's basic information."
-            : "Set a temporary password the user can change after signing in."}
+            : "An invitation email will be sent so the user can set their own password."}
         </p>
 
         {errors.root && <Alert message={errors.root.message ?? "An error occurred"} />}
@@ -46,31 +46,12 @@ export function UserModal({ isOpen, onClose, user }: UserModalProps) {
           />
         </FormField>
 
-        {!isEditing && (
-          <FormField
-            label="Temporary password"
-            htmlFor="user-password"
-            required
-            error={errors.password?.message}
-            hint={!errors.password?.message ? "Lowercase, uppercase, and at least one number required." : undefined}
-          >
-            <Input
-              id="user-password"
-              type="password"
-              {...register("password")}
-              placeholder="Uppercase, number, min 8 chars"
-              iconLeft={<Lock size={15} />}
-              error={errors.password?.message}
-            />
-          </FormField>
-        )}
-
         <div className="flex justify-end gap-2 pt-2">
           <Button type="button" variant="secondary" onClick={onClose}>
             Cancel
           </Button>
           <Button type="submit" isLoading={isSubmitting}>
-            {isEditing ? "Save changes" : "Add user"}
+            {isEditing ? "Save changes" : "Send invite"}
           </Button>
         </div>
       </form>
