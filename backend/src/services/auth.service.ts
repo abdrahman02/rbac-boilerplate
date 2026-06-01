@@ -1,7 +1,9 @@
-import * as repo from "../repositories/auth.repository.js";
+import * as emailVerifRepo from "../repositories/email-verification.repository.js";
+import * as authRepo from "../repositories/auth.repository.js";
 import type { ChangePasswordInput, LoginInput, RegisterInput, UpdateMeInput } from "../schemas/auth.schema.js";
 import type { AuthenticatedUser } from "../types/index.js";
 import { comparePassword, hashPassword } from "../utils/hash.js";
+import * as emailSvc from "./email.service.js";
 import * as tokenSvc from "./token.service.js";
 
 export interface AuthResult {
@@ -10,71 +12,109 @@ export interface AuthResult {
   refreshToken: string;
 }
 
-export async function register(input: RegisterInput): Promise<AuthResult> {
-  const existing = await repo.findUserByEmail(input.email);
+export interface RegisterUserResult {
+  id: number;
+  name: string;
+  email: string;
+}
+
+export async function register(input: RegisterInput): Promise<RegisterUserResult> {
+  const existing = await authRepo.findUserByEmail(input.email);
   if (existing) throw new Error("EMAIL_TAKEN");
 
   const passwordHash = await hashPassword(input.password);
-  const userId = await repo.createUser(input.name, input.email, passwordHash);
-  await repo.assignDefaultRole(userId);
+  const userId = await authRepo.createUser(input.name, input.email, passwordHash);
+  await authRepo.assignDefaultRole(userId);
 
-  return buildAuthResult(userId);
+  const rawToken = tokenSvc.generateVerificationToken();
+  const tokenHash = tokenSvc.hashVerificationToken(rawToken);
+  const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+  await emailVerifRepo.createToken(userId, tokenHash, expiresAt);
+  await emailSvc.sendVerificationEmail(input.email, input.name, rawToken);
+
+  return { id: userId, name: input.name, email: input.email };
 }
 
 export async function login(input: LoginInput): Promise<AuthResult> {
-  const user = await repo.findUserByEmail(input.email);
+  const user = await authRepo.findUserByEmail(input.email);
   if (!user) throw new Error("INVALID_CREDENTIALS");
 
   const valid = await comparePassword(input.password, user.passwordHash);
   if (!valid) throw new Error("INVALID_CREDENTIALS");
 
   if (!user.isActive) throw new Error("ACCOUNT_DISABLED");
+  if (!user.emailVerifiedAt) throw new Error("EMAIL_NOT_VERIFIED");
 
   return buildAuthResult(user.id);
 }
 
+export async function verifyEmail(token: string): Promise<AuthResult> {
+  const tokenHash = tokenSvc.hashVerificationToken(token);
+  const record = await emailVerifRepo.findByTokenHash(tokenHash);
+
+  if (!record || record.usedAt !== null) throw new Error("INVALID_VERIFICATION_TOKEN");
+  if (new Date() > record.expiresAt) throw new Error("VERIFICATION_TOKEN_EXPIRED");
+
+  await emailVerifRepo.markTokenUsed(tokenHash);
+  await authRepo.setEmailVerified(record.userId);
+
+  return buildAuthResult(record.userId);
+}
+
+export async function resendVerification(email: string): Promise<void> {
+  const user = await authRepo.findUserByEmail(email);
+  if (!user) return;
+
+  if (user.emailVerifiedAt !== null) throw new Error("ALREADY_VERIFIED");
+
+  await emailVerifRepo.invalidateUserTokens(user.id);
+
+  const rawToken = tokenSvc.generateVerificationToken();
+  const tokenHash = tokenSvc.hashVerificationToken(rawToken);
+  const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+  await emailVerifRepo.createToken(user.id, tokenHash, expiresAt);
+  await emailSvc.sendVerificationEmail(user.email, user.fullName, rawToken);
+}
+
 export async function logout(userId: number, refreshTokenHash: string): Promise<void> {
-  await repo.revokeRefreshToken(refreshTokenHash);
+  await authRepo.revokeRefreshToken(refreshTokenHash);
 }
 
 export async function refresh(rawRefreshToken: string): Promise<AuthResult> {
   const tokenHash = tokenSvc.hashRefreshToken(rawRefreshToken);
-  const stored = await repo.findRefreshToken(tokenHash);
+  const stored = await authRepo.findRefreshToken(tokenHash);
 
   if (!stored) throw new Error("INVALID_REFRESH_TOKEN");
 
   const now = new Date();
   if (now > new Date(stored.expiresAt)) {
-    await repo.revokeRefreshToken(tokenHash);
+    await authRepo.revokeRefreshToken(tokenHash);
     throw new Error("REFRESH_TOKEN_EXPIRED");
   }
 
-  await repo.revokeRefreshToken(tokenHash);
+  await authRepo.revokeRefreshToken(tokenHash);
   return buildAuthResult(stored.userId);
 }
 
 export async function getMe(userId: number): Promise<AuthenticatedUser> {
-  const user = await repo.findUserById(userId);
+  const user = await authRepo.findUserById(userId);
   if (!user) throw new Error("USER_NOT_FOUND");
 
-  const [roles, permissions] = await Promise.all([repo.getUserRoles(userId), repo.getUserPermissions(userId)]);
+  const [roles, permissions] = await Promise.all([
+    authRepo.getUserRoles(userId),
+    authRepo.getUserPermissions(userId),
+  ]);
 
-  return {
-    id: user.id,
-    name: user.fullName,
-    email: user.email,
-    roles,
-    permissions,
-  };
+  return { id: user.id, name: user.fullName, email: user.email, roles, permissions };
 }
 
 export async function updateMe(userId: number, input: UpdateMeInput): Promise<AuthenticatedUser> {
   if (input.email) {
-    const conflict = await repo.findUserByEmailExcluding(input.email, userId);
+    const conflict = await authRepo.findUserByEmailExcluding(input.email, userId);
     if (conflict) throw new Error("EMAIL_TAKEN");
   }
 
-  await repo.updateUserProfile(userId, {
+  await authRepo.updateUserProfile(userId, {
     ...(input.name !== undefined && { name: input.name }),
     ...(input.email !== undefined && { email: input.email }),
   });
@@ -82,21 +122,24 @@ export async function updateMe(userId: number, input: UpdateMeInput): Promise<Au
 }
 
 export async function changePassword(userId: number, input: ChangePasswordInput): Promise<void> {
-  const user = await repo.findUserById(userId);
+  const user = await authRepo.findUserById(userId);
   if (!user) throw new Error("USER_NOT_FOUND");
 
   const valid = await comparePassword(input.current_password, user.passwordHash);
   if (!valid) throw new Error("WRONG_PASSWORD");
 
   const newHash = await hashPassword(input.new_password);
-  await repo.updateUserPassword(userId, newHash);
+  await authRepo.updateUserPassword(userId, newHash);
 }
 
 async function buildAuthResult(userId: number): Promise<AuthResult> {
-  const user = await repo.findUserById(userId);
+  const user = await authRepo.findUserById(userId);
   if (!user) throw new Error("USER_NOT_FOUND");
 
-  const [roles, permissions] = await Promise.all([repo.getUserRoles(userId), repo.getUserPermissions(userId)]);
+  const [roles, permissions] = await Promise.all([
+    authRepo.getUserRoles(userId),
+    authRepo.getUserPermissions(userId),
+  ]);
 
   const authenticatedUser: AuthenticatedUser = {
     id: user.id,
@@ -116,7 +159,7 @@ async function buildAuthResult(userId: number): Promise<AuthResult> {
   const rawRefresh = tokenSvc.generateRefreshToken();
   const refreshHash = tokenSvc.hashRefreshToken(rawRefresh);
   const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-  await repo.saveRefreshToken(userId, refreshHash, expiresAt);
+  await authRepo.saveRefreshToken(userId, refreshHash, expiresAt);
 
   return { user: authenticatedUser, accessToken, refreshToken: rawRefresh };
 }

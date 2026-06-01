@@ -13,6 +13,18 @@ vi.mock("../../repositories/auth.repository.js", () => ({
   saveRefreshToken: vi.fn(),
   findRefreshToken: vi.fn(),
   revokeRefreshToken: vi.fn(),
+  setEmailVerified: vi.fn(),
+}));
+
+vi.mock("../../repositories/email-verification.repository.js", () => ({
+  createToken: vi.fn(),
+  findByTokenHash: vi.fn(),
+  invalidateUserTokens: vi.fn(),
+  markTokenUsed: vi.fn(),
+}));
+
+vi.mock("../../services/email.service.js", () => ({
+  sendVerificationEmail: vi.fn(),
 }));
 
 vi.mock("../../utils/hash.js", () => ({
@@ -22,8 +34,10 @@ vi.mock("../../utils/hash.js", () => ({
 
 import type { User } from "../../generated/prisma/index.js";
 import * as repo from "../../repositories/auth.repository.js";
+import * as emailVerifRepo from "../../repositories/email-verification.repository.js";
+import { sendVerificationEmail } from "../../services/email.service.js";
 import { comparePassword, hashPassword } from "../../utils/hash.js";
-import { changePassword, updateMe } from "../auth.service.js";
+import { changePassword, login, register, resendVerification, updateMe, verifyEmail } from "../auth.service.js";
 
 const MOCK_USER = {
   id: 1,
@@ -31,11 +45,154 @@ const MOCK_USER = {
   email: "alice@example.com",
   passwordHash: "hashed",
   isActive: true,
+  emailVerifiedAt: new Date(),
   deletedAt: null,
   createdAt: new Date(),
   updatedAt: new Date(),
 } as User;
 
+const MOCK_UNVERIFIED_USER = { ...MOCK_USER, emailVerifiedAt: null } as User;
+
+const MOCK_TOKEN = {
+  id: 1,
+  userId: 1,
+  tokenHash: "hashvalue",
+  expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
+  usedAt: null,
+  createdAt: new Date(),
+};
+
+// ── register ────────────────────────────────────────────────────────
+describe("register", () => {
+  beforeEach(() => vi.resetAllMocks());
+
+  it("creates user, sends verification email, returns user data without tokens", async () => {
+    vi.mocked(repo.findUserByEmail).mockResolvedValueOnce(null);
+    vi.mocked(hashPassword).mockResolvedValueOnce("hashed");
+    vi.mocked(repo.createUser).mockResolvedValueOnce(1);
+    vi.mocked(repo.assignDefaultRole).mockResolvedValueOnce(undefined);
+    vi.mocked(emailVerifRepo.createToken).mockResolvedValueOnce(undefined);
+    vi.mocked(sendVerificationEmail).mockResolvedValueOnce(undefined);
+
+    const result = await register({ name: "Alice", email: "alice@example.com", password: "Pass123!" });
+
+    expect(sendVerificationEmail).toHaveBeenCalledWith("alice@example.com", "Alice", expect.any(String));
+    expect(result).toEqual({ id: 1, name: "Alice", email: "alice@example.com" });
+  });
+
+  it("throws EMAIL_TAKEN when email already exists", async () => {
+    vi.mocked(repo.findUserByEmail).mockResolvedValueOnce(MOCK_USER);
+
+    await expect(register({ name: "Bob", email: "alice@example.com", password: "Pass123!" })).rejects.toThrow(
+      "EMAIL_TAKEN",
+    );
+    expect(sendVerificationEmail).not.toHaveBeenCalled();
+  });
+});
+
+// ── login ────────────────────────────────────────────────────────
+describe("login", () => {
+  beforeEach(() => vi.resetAllMocks());
+
+  it("throws EMAIL_NOT_VERIFIED when emailVerifiedAt is null", async () => {
+    vi.mocked(repo.findUserByEmail).mockResolvedValueOnce(MOCK_UNVERIFIED_USER);
+    vi.mocked(comparePassword).mockResolvedValueOnce(true);
+
+    await expect(login({ email: "alice@example.com", password: "Pass123!" })).rejects.toThrow("EMAIL_NOT_VERIFIED");
+  });
+
+  it("throws INVALID_CREDENTIALS for wrong password", async () => {
+    vi.mocked(repo.findUserByEmail).mockResolvedValueOnce(MOCK_USER);
+    vi.mocked(comparePassword).mockResolvedValueOnce(false);
+
+    await expect(login({ email: "alice@example.com", password: "wrong" })).rejects.toThrow("INVALID_CREDENTIALS");
+  });
+
+  it("throws ACCOUNT_DISABLED for inactive user", async () => {
+    vi.mocked(repo.findUserByEmail).mockResolvedValueOnce({ ...MOCK_USER, isActive: false } as User);
+    vi.mocked(comparePassword).mockResolvedValueOnce(true);
+
+    await expect(login({ email: "alice@example.com", password: "Pass123!" })).rejects.toThrow("ACCOUNT_DISABLED");
+  });
+});
+
+// ── verifyEmail ────────────────────────────────────────────────────────
+describe("verifyEmail", () => {
+  beforeEach(() => vi.resetAllMocks());
+
+  it("marks token used, sets emailVerifiedAt, returns auth result with tokens", async () => {
+    vi.mocked(emailVerifRepo.findByTokenHash).mockResolvedValueOnce(MOCK_TOKEN);
+    vi.mocked(emailVerifRepo.markTokenUsed).mockResolvedValueOnce(undefined);
+    vi.mocked(repo.setEmailVerified).mockResolvedValueOnce(undefined);
+    vi.mocked(repo.findUserById).mockResolvedValueOnce(MOCK_USER);
+    vi.mocked(repo.getUserRoles).mockResolvedValueOnce(["user"]);
+    vi.mocked(repo.getUserPermissions).mockResolvedValueOnce([]);
+    vi.mocked(repo.saveRefreshToken).mockResolvedValueOnce(undefined);
+
+    const result = await verifyEmail("rawtoken");
+
+    expect(emailVerifRepo.markTokenUsed).toHaveBeenCalled();
+    expect(repo.setEmailVerified).toHaveBeenCalledWith(1);
+    expect(result.user.email).toBe("alice@example.com");
+    expect(result.accessToken).toBeDefined();
+    expect(result.refreshToken).toBeDefined();
+  });
+
+  it("throws INVALID_VERIFICATION_TOKEN when token not found", async () => {
+    vi.mocked(emailVerifRepo.findByTokenHash).mockResolvedValueOnce(null);
+
+    await expect(verifyEmail("badtoken")).rejects.toThrow("INVALID_VERIFICATION_TOKEN");
+  });
+
+  it("throws INVALID_VERIFICATION_TOKEN when token already used", async () => {
+    vi.mocked(emailVerifRepo.findByTokenHash).mockResolvedValueOnce({ ...MOCK_TOKEN, usedAt: new Date() });
+
+    await expect(verifyEmail("usedtoken")).rejects.toThrow("INVALID_VERIFICATION_TOKEN");
+  });
+
+  it("throws VERIFICATION_TOKEN_EXPIRED when token is past expiry", async () => {
+    vi.mocked(emailVerifRepo.findByTokenHash).mockResolvedValueOnce({
+      ...MOCK_TOKEN,
+      expiresAt: new Date(Date.now() - 1000),
+    });
+
+    await expect(verifyEmail("expiredtoken")).rejects.toThrow("VERIFICATION_TOKEN_EXPIRED");
+  });
+});
+
+// ── resendVerification ────────────────────────────────────────────────────────
+describe("resendVerification", () => {
+  beforeEach(() => vi.resetAllMocks());
+
+  it("invalidates old tokens, creates new one, sends email", async () => {
+    vi.mocked(repo.findUserByEmail).mockResolvedValueOnce(MOCK_UNVERIFIED_USER);
+    vi.mocked(emailVerifRepo.invalidateUserTokens).mockResolvedValueOnce(undefined);
+    vi.mocked(emailVerifRepo.createToken).mockResolvedValueOnce(undefined);
+    vi.mocked(sendVerificationEmail).mockResolvedValueOnce(undefined);
+
+    await resendVerification("alice@example.com");
+
+    expect(emailVerifRepo.invalidateUserTokens).toHaveBeenCalledWith(1);
+    expect(emailVerifRepo.createToken).toHaveBeenCalledWith(1, expect.any(String), expect.any(Date));
+    expect(sendVerificationEmail).toHaveBeenCalledWith("alice@example.com", "Alice", expect.any(String));
+  });
+
+  it("returns silently when email not found (prevent user enumeration)", async () => {
+    vi.mocked(repo.findUserByEmail).mockResolvedValueOnce(null);
+
+    await expect(resendVerification("unknown@example.com")).resolves.toBeUndefined();
+    expect(sendVerificationEmail).not.toHaveBeenCalled();
+  });
+
+  it("throws ALREADY_VERIFIED when user is already verified", async () => {
+    vi.mocked(repo.findUserByEmail).mockResolvedValueOnce(MOCK_USER);
+
+    await expect(resendVerification("alice@example.com")).rejects.toThrow("ALREADY_VERIFIED");
+    expect(sendVerificationEmail).not.toHaveBeenCalled();
+  });
+});
+
+// ── updateMe (existing — kept intact) ────────────────────────────────────────────────────────
 describe("updateMe", () => {
   beforeEach(() => vi.resetAllMocks());
 
@@ -71,6 +228,7 @@ describe("updateMe", () => {
   });
 });
 
+// ── changePassword (existing — kept intact) ────────────────────────────────────────────────────────
 describe("changePassword", () => {
   beforeEach(() => vi.resetAllMocks());
 
@@ -81,7 +239,6 @@ describe("changePassword", () => {
     vi.mocked(repo.updateUserPassword).mockResolvedValueOnce(undefined);
 
     await expect(changePassword(1, { current_password: "Old1234!", new_password: "New1234!" })).resolves.not.toThrow();
-
     expect(repo.updateUserPassword).toHaveBeenCalledWith(1, "newhash");
   });
 
@@ -92,7 +249,6 @@ describe("changePassword", () => {
     await expect(changePassword(1, { current_password: "wrong", new_password: "New1234!" })).rejects.toThrow(
       "WRONG_PASSWORD",
     );
-
     expect(repo.updateUserPassword).not.toHaveBeenCalled();
   });
 
