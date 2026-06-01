@@ -1,14 +1,14 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import type { BaseSyntheticEvent } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { useForm, useWatch } from "react-hook-form";
 import { apiClient } from "@/shared/lib/api-client";
 import { getErrorMessage } from "@/shared/lib/api-error";
-import { type AuthenticatedUser, authenticatedUserSchema } from "@/shared/types";
+import { type RegisterResponse, registerResponseSchema } from "@/shared/types";
 import { type RegisterInput, registerSchema } from "./RegisterForm.schema";
 
 type RegisterApiInput = Pick<RegisterInput, "name" | "email" | "password">;
@@ -23,19 +23,17 @@ interface UseRegisterFormReturn {
 
 export function useRegisterForm(): UseRegisterFormReturn {
   const router = useRouter();
-  const queryClient = useQueryClient();
 
   const form = useForm<RegisterInput>({ resolver: zodResolver(registerSchema) });
   const { setError } = form;
 
-  const { mutate, isPending } = useMutation<AuthenticatedUser, Error, RegisterApiInput>({
+  const { mutate, isPending } = useMutation<RegisterResponse, Error, RegisterApiInput>({
     mutationFn: async (data) => {
       const response = await apiClient.post("/auth/register", data);
-      return authenticatedUserSchema.parse(response.data.data);
+      return registerResponseSchema.parse(response.data.data);
     },
     onSuccess: (user) => {
-      queryClient.setQueryData(["auth", "me"], user);
-      router.push("/dashboard");
+      router.push(`/verify-email-sent?email=${encodeURIComponent(user.email)}`);
     },
     onError: (err) => setError("root", { message: getErrorMessage(err) }),
   });

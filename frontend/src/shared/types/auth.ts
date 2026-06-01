@@ -9,3 +9,11 @@ export const authenticatedUserSchema = z.object({
 });
 
 export type AuthenticatedUser = z.infer<typeof authenticatedUserSchema>;
+
+export const registerResponseSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  email: z.string().email(),
+});
+
+export type RegisterResponse = z.infer<typeof registerResponseSchema>;
