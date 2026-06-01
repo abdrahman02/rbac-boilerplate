@@ -13,12 +13,7 @@ vi.mock("../../lib/prisma.js", () => ({
 
 import type { EmailVerificationToken } from "../../generated/prisma/index.js";
 import { prisma } from "../../lib/prisma.js";
-import {
-  createToken,
-  findByTokenHash,
-  invalidateUserTokens,
-  markTokenUsed,
-} from "../email-verification.repository.js";
+import { createToken, findByTokenHash, invalidateUserTokens, markTokenUsed } from "../email-verification.repository.js";
 
 const EXPIRES_AT = new Date(Date.now() + 24 * 60 * 60 * 1000);
 

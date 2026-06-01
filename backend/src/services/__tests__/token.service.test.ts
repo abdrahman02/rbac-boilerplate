@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
 import {
   generateRefreshToken,
+  generateVerificationToken,
   hashRefreshToken,
+  hashVerificationToken,
   signAccessToken,
   verifyAccessToken,
-  generateVerificationToken,
-  hashVerificationToken,
 } from "../token.service.js";
 
 describe("TokenService", () => {

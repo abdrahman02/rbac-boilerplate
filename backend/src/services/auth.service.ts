@@ -1,5 +1,5 @@
-import * as emailVerifRepo from "../repositories/email-verification.repository.js";
 import * as authRepo from "../repositories/auth.repository.js";
+import * as emailVerifRepo from "../repositories/email-verification.repository.js";
 import type { ChangePasswordInput, LoginInput, RegisterInput, UpdateMeInput } from "../schemas/auth.schema.js";
 import type { AuthenticatedUser } from "../types/index.js";
 import { comparePassword, hashPassword } from "../utils/hash.js";
@@ -112,10 +112,7 @@ export async function getMe(userId: number): Promise<AuthenticatedUser> {
   const user = await authRepo.findUserById(userId);
   if (!user) throw new Error("USER_NOT_FOUND");
 
-  const [roles, permissions] = await Promise.all([
-    authRepo.getUserRoles(userId),
-    authRepo.getUserPermissions(userId),
-  ]);
+  const [roles, permissions] = await Promise.all([authRepo.getUserRoles(userId), authRepo.getUserPermissions(userId)]);
 
   return { id: user.id, name: user.fullName, email: user.email, roles, permissions };
 }
@@ -148,10 +145,7 @@ async function buildAuthResult(userId: number): Promise<AuthResult> {
   const user = await authRepo.findUserById(userId);
   if (!user) throw new Error("USER_NOT_FOUND");
 
-  const [roles, permissions] = await Promise.all([
-    authRepo.getUserRoles(userId),
-    authRepo.getUserPermissions(userId),
-  ]);
+  const [roles, permissions] = await Promise.all([authRepo.getUserRoles(userId), authRepo.getUserPermissions(userId)]);
 
   const authenticatedUser: AuthenticatedUser = {
     id: user.id,

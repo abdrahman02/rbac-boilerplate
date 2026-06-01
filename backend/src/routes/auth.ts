@@ -203,6 +203,11 @@ router.post("/verify-email", authRateLimit, validate(verifyEmailSchema), authCon
  *       429:
  *         description: Too many requests
  */
-router.post("/resend-verification", authRateLimit, validate(resendVerificationSchema), authController.resendVerification);
+router.post(
+  "/resend-verification",
+  authRateLimit,
+  validate(resendVerificationSchema),
+  authController.resendVerification,
+);
 
 export default router;
