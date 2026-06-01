@@ -1,10 +1,16 @@
+import { randomBytes } from "node:crypto";
 import { Prisma } from "../generated/prisma/index.js";
 import { buildUsersWorkbook } from "../lib/exporters/users-exporter.js";
+import * as passwordResetRepo from "../repositories/password-reset.repository.js";
 import type { UserFilteredExportParams } from "../repositories/user.repository.js";
 import * as repo from "../repositories/user.repository.js";
 import type { CreateUserInput, UpdateUserInput } from "../schemas/user.schema.js";
 import type { PaginatedResponse, UserWithRoles } from "../types/index.js";
+import * as emailSvc from "./email.service.js";
+import * as tokenSvc from "./token.service.js";
 import { hashPassword } from "../utils/hash.js";
+
+const INVITE_TOKEN_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
 export async function listUsers(
   page: number,
@@ -62,11 +68,12 @@ export async function createUser(input: CreateUserInput): Promise<number> {
   // Free the email constraint from any soft-deleted rows (legacy data before anonymization fix)
   await repo.anonymizeDeletedEmail(input.email);
 
-  const passwordHash = await hashPassword(input.password);
+  // Generate a random placeholder hash — the real password is set via the invite flow
+  const placeholderHash = await hashPassword(randomBytes(32).toString("hex"));
 
   let userId: number;
   try {
-    userId = await repo.createUser(input.name, input.email, passwordHash);
+    userId = await repo.createUser(input.name, input.email, placeholderHash);
   } catch (err) {
     if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2002") {
       throw new Error("EMAIL_TAKEN");
@@ -79,6 +86,13 @@ export async function createUser(input: CreateUserInput): Promise<number> {
       await repo.assignRoleToUser(userId, roleId);
     }
   }
+
+  // Generate an invite token (isInvite=true, 7-day TTL) and send the invite email
+  const rawToken = tokenSvc.generateVerificationToken();
+  const tokenHash = tokenSvc.hashVerificationToken(rawToken);
+  const expiresAt = new Date(Date.now() + INVITE_TOKEN_TTL_MS);
+  await passwordResetRepo.createToken(userId, tokenHash, expiresAt, true);
+  await emailSvc.sendInviteEmail(input.email, input.name, rawToken);
 
   return userId;
 }

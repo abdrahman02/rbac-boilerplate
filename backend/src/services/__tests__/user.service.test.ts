@@ -2,6 +2,27 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("../../repositories/user.repository.js", () => ({
   findUsersForExport: vi.fn(),
+  emailExists: vi.fn(),
+  anonymizeDeletedEmail: vi.fn(),
+  createUser: vi.fn(),
+  assignRoleToUser: vi.fn(),
+}));
+
+vi.mock("../../repositories/password-reset.repository.js", () => ({
+  createToken: vi.fn(),
+}));
+
+vi.mock("../../services/token.service.js", () => ({
+  generateVerificationToken: vi.fn(),
+  hashVerificationToken: vi.fn(),
+}));
+
+vi.mock("../../services/email.service.js", () => ({
+  sendInviteEmail: vi.fn(),
+}));
+
+vi.mock("../../utils/hash.js", () => ({
+  hashPassword: vi.fn(),
 }));
 
 vi.mock("exceljs", () => ({
@@ -22,7 +43,12 @@ vi.mock("exceljs", () => ({
 }));
 
 import * as repo from "../../repositories/user.repository.js";
-import { buildUsersExportWorkbook } from "../user.service.js";
+import * as userRepo from "../../repositories/user.repository.js";
+import * as passwordResetRepo from "../../repositories/password-reset.repository.js";
+import * as tokenSvc from "../../services/token.service.js";
+import * as emailSvc from "../../services/email.service.js";
+import { hashPassword } from "../../utils/hash.js";
+import { buildUsersExportWorkbook, createUser } from "../user.service.js";
 
 const MOCK_USERS = [
   {
@@ -80,5 +106,74 @@ describe("buildUsersExportWorkbook", () => {
     vi.mocked(repo.findUsersForExport).mockResolvedValueOnce(MOCK_USERS);
     await buildUsersExportWorkbook(undefined, undefined, "unknown");
     expect(repo.findUsersForExport).toHaveBeenCalledWith({ search: undefined, role: undefined, status: undefined });
+  });
+});
+
+describe("createUser", () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it("creates user with placeholder hash and sends invite email", async () => {
+    vi.mocked(userRepo.emailExists).mockResolvedValueOnce(false);
+    vi.mocked(userRepo.anonymizeDeletedEmail).mockResolvedValueOnce(undefined);
+    vi.mocked(hashPassword).mockResolvedValueOnce("placeholder-hash");
+    vi.mocked(userRepo.createUser).mockResolvedValueOnce(42);
+    vi.mocked(tokenSvc.generateVerificationToken).mockReturnValueOnce("rawtoken");
+    vi.mocked(tokenSvc.hashVerificationToken).mockReturnValueOnce("tokenhash");
+    vi.mocked(passwordResetRepo.createToken).mockResolvedValueOnce(undefined);
+    vi.mocked(emailSvc.sendInviteEmail).mockResolvedValueOnce(undefined);
+
+    const result = await createUser({ name: "Bob", email: "bob@example.com" });
+
+    expect(result).toBe(42);
+    expect(passwordResetRepo.createToken).toHaveBeenCalledWith(
+      42,
+      "tokenhash",
+      expect.any(Date),
+      true,
+    );
+    expect(emailSvc.sendInviteEmail).toHaveBeenCalledWith("bob@example.com", "Bob", "rawtoken");
+  });
+
+  it("invite token expires approximately 7 days from now", async () => {
+    vi.mocked(userRepo.emailExists).mockResolvedValueOnce(false);
+    vi.mocked(userRepo.anonymizeDeletedEmail).mockResolvedValueOnce(undefined);
+    vi.mocked(hashPassword).mockResolvedValueOnce("placeholder-hash");
+    vi.mocked(userRepo.createUser).mockResolvedValueOnce(1);
+    vi.mocked(tokenSvc.generateVerificationToken).mockReturnValueOnce("rawtoken");
+    vi.mocked(tokenSvc.hashVerificationToken).mockReturnValueOnce("tokenhash");
+    vi.mocked(passwordResetRepo.createToken).mockResolvedValueOnce(undefined);
+    vi.mocked(emailSvc.sendInviteEmail).mockResolvedValueOnce(undefined);
+
+    const before = Date.now();
+    await createUser({ name: "Bob", email: "bob@example.com" });
+    const after = Date.now();
+
+    const expiresAt = vi.mocked(passwordResetRepo.createToken).mock.calls[0]![2] as Date;
+    const sevenDaysMs = 7 * 24 * 60 * 60 * 1000;
+    expect(expiresAt.getTime()).toBeGreaterThanOrEqual(before + sevenDaysMs - 1000);
+    expect(expiresAt.getTime()).toBeLessThanOrEqual(after + sevenDaysMs + 1000);
+  });
+
+  it("throws EMAIL_TAKEN when email already exists", async () => {
+    vi.mocked(userRepo.emailExists).mockResolvedValueOnce(true);
+
+    await expect(createUser({ name: "Bob", email: "bob@example.com" })).rejects.toThrow("EMAIL_TAKEN");
+    expect(emailSvc.sendInviteEmail).not.toHaveBeenCalled();
+  });
+
+  it("assigns roles when role_ids are provided", async () => {
+    vi.mocked(userRepo.emailExists).mockResolvedValueOnce(false);
+    vi.mocked(userRepo.anonymizeDeletedEmail).mockResolvedValueOnce(undefined);
+    vi.mocked(hashPassword).mockResolvedValueOnce("placeholder-hash");
+    vi.mocked(userRepo.createUser).mockResolvedValueOnce(5);
+    vi.mocked(tokenSvc.generateVerificationToken).mockReturnValueOnce("rawtoken");
+    vi.mocked(tokenSvc.hashVerificationToken).mockReturnValueOnce("tokenhash");
+    vi.mocked(passwordResetRepo.createToken).mockResolvedValueOnce(undefined);
+    vi.mocked(emailSvc.sendInviteEmail).mockResolvedValueOnce(undefined);
+    vi.mocked(userRepo.assignRoleToUser).mockResolvedValueOnce(undefined);
+
+    await createUser({ name: "Bob", email: "bob@example.com", role_ids: [1] });
+
+    expect(userRepo.assignRoleToUser).toHaveBeenCalledWith(5, 1);
   });
 });
