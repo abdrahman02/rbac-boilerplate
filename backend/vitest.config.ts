@@ -10,6 +10,7 @@ export default defineConfig({
         'src/**/*.test.ts',
         'src/**/__tests__/**',
         'src/index.ts',
+        'src/generated/**',
       ],
     },
   },
