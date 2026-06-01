@@ -4,20 +4,28 @@ import { ChevronRight, Download, Loader2, UserPlus } from "lucide-react";
 import Link from "next/link";
 import { PageHeader } from "@/shared/components/common";
 import { Button, buttonVariants } from "@/shared/components/ui";
+import { useAnyPermission, usePermission } from "@/shared/hooks";
 import { ActivityFeed } from "./components/ActivityFeed";
 import { QuickActions } from "./components/QuickActions";
 import { RoleDistribution } from "./components/RoleDistribution";
 import { StatCard } from "./components/StatCard";
 import { useDashboardPage } from "./hooks";
-import { useAnyPermission, usePermission } from "@/shared/hooks";
 
 export function DashboardPage() {
-  const { firstName, activePermissions, statCards, recentActivity, isLoading, isStatsError, isExporting, exportDashboard } =
-    useDashboardPage();
+  const {
+    firstName,
+    activePermissions,
+    statCards,
+    recentActivity,
+    isLoading,
+    isStatsError,
+    isExporting,
+    exportDashboard,
+  } = useDashboardPage();
 
-  const canInviteUser = usePermission("users:create");
+  const canInviteUser = usePermission("users:read");
   const canViewAuditLogs = usePermission("audit_logs:read");
-  const hasAnyQuickAction = useAnyPermission(["users:create", "roles:create", "permissions:create", "audit_logs:read"]);
+  const hasAnyQuickAction = useAnyPermission(["users:read", "roles:read", "permissions:read", "audit_logs:read"]);
 
   return (
     <div className="flex flex-col gap-6">

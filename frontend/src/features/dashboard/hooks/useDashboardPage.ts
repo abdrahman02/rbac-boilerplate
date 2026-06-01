@@ -12,6 +12,7 @@ export function useDashboardPage() {
   const { exportDashboard, isExporting } = useExportDashboard();
 
   const firstName = user?.name?.split(" ")[0] ?? "there";
+  const activePermissions = useMemo(() => user?.permissions ?? [], [user?.permissions]);
 
   const statCards = useMemo<StatCardConfig[]>(
     () => [
@@ -46,6 +47,7 @@ export function useDashboardPage() {
 
   return {
     firstName,
+    activePermissions,
     statCards,
     recentActivity: stats?.recentActivity ?? [],
     isLoading,
