@@ -101,6 +101,8 @@ export async function updateUserPassword(id: number, passwordHash: string): Prom
 export async function setEmailVerified(userId: number): Promise<void> {
   await prisma.user.update({
     where: { id: userId },
-    data: { emailVerifiedAt: new Date() },
+    // Activate the account at the same time as marking email verified —
+    // users register with isActive=false and become active only after verification.
+    data: { emailVerifiedAt: new Date(), isActive: true },
   });
 }

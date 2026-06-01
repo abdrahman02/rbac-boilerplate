@@ -6,6 +6,9 @@ import { comparePassword, hashPassword } from "../utils/hash.js";
 import * as emailSvc from "./email.service.js";
 import * as tokenSvc from "./token.service.js";
 
+const VERIFICATION_TOKEN_TTL_MS = 24 * 60 * 60 * 1000;
+const REFRESH_TOKEN_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+
 export interface AuthResult {
   user: AuthenticatedUser;
   accessToken: string;
@@ -28,7 +31,7 @@ export async function register(input: RegisterInput): Promise<RegisterUserResult
 
   const rawToken = tokenSvc.generateVerificationToken();
   const tokenHash = tokenSvc.hashVerificationToken(rawToken);
-  const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+  const expiresAt = new Date(Date.now() + VERIFICATION_TOKEN_TTL_MS);
   await emailVerifRepo.createToken(userId, tokenHash, expiresAt);
   await emailSvc.sendVerificationEmail(input.email, input.name, rawToken);
 
@@ -42,8 +45,10 @@ export async function login(input: LoginInput): Promise<AuthResult> {
   const valid = await comparePassword(input.password, user.passwordHash);
   if (!valid) throw new Error("INVALID_CREDENTIALS");
 
-  if (!user.isActive) throw new Error("ACCOUNT_DISABLED");
+  // emailVerifiedAt checked before isActive: unverified users get EMAIL_NOT_VERIFIED (actionable),
+  // not ACCOUNT_DISABLED. isActive=false on verified accounts means admin explicitly disabled it.
   if (!user.emailVerifiedAt) throw new Error("EMAIL_NOT_VERIFIED");
+  if (!user.isActive) throw new Error("ACCOUNT_DISABLED");
 
   return buildAuthResult(user.id);
 }
@@ -71,7 +76,7 @@ export async function resendVerification(email: string): Promise<void> {
 
   const rawToken = tokenSvc.generateVerificationToken();
   const tokenHash = tokenSvc.hashVerificationToken(rawToken);
-  const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+  const expiresAt = new Date(Date.now() + VERIFICATION_TOKEN_TTL_MS);
   await emailVerifRepo.createToken(user.id, tokenHash, expiresAt);
   await emailSvc.sendVerificationEmail(user.email, user.fullName, rawToken);
 }
@@ -158,7 +163,7 @@ async function buildAuthResult(userId: number): Promise<AuthResult> {
 
   const rawRefresh = tokenSvc.generateRefreshToken();
   const refreshHash = tokenSvc.hashRefreshToken(rawRefresh);
-  const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+  const expiresAt = new Date(Date.now() + REFRESH_TOKEN_TTL_MS);
   await authRepo.saveRefreshToken(userId, refreshHash, expiresAt);
 
   return { user: authenticatedUser, accessToken, refreshToken: rawRefresh };

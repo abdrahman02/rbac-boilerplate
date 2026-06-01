@@ -32,7 +32,7 @@ vi.mock("../../utils/hash.js", () => ({
   comparePassword: vi.fn(),
 }));
 
-import type { User } from "../../generated/prisma/index.js";
+import type { EmailVerificationToken, User } from "../../generated/prisma/index.js";
 import * as repo from "../../repositories/auth.repository.js";
 import * as emailVerifRepo from "../../repositories/email-verification.repository.js";
 import { sendVerificationEmail } from "../../services/email.service.js";
@@ -51,9 +51,10 @@ const MOCK_USER = {
   updatedAt: new Date(),
 } as User;
 
-const MOCK_UNVERIFIED_USER = { ...MOCK_USER, emailVerifiedAt: null } as User;
+// Unverified users have isActive=false because accounts are inactive until email verification.
+const MOCK_UNVERIFIED_USER = { ...MOCK_USER, emailVerifiedAt: null, isActive: false } as User;
 
-const MOCK_TOKEN = {
+const MOCK_TOKEN: EmailVerificationToken = {
   id: 1,
   userId: 1,
   tokenHash: "hashvalue",
@@ -108,11 +109,21 @@ describe("login", () => {
     await expect(login({ email: "alice@example.com", password: "wrong" })).rejects.toThrow("INVALID_CREDENTIALS");
   });
 
-  it("throws ACCOUNT_DISABLED for inactive user", async () => {
+  it("throws ACCOUNT_DISABLED for verified user disabled by admin", async () => {
+    // MOCK_USER has emailVerifiedAt set, so isActive=false here means admin-disabled.
     vi.mocked(repo.findUserByEmail).mockResolvedValueOnce({ ...MOCK_USER, isActive: false } as User);
     vi.mocked(comparePassword).mockResolvedValueOnce(true);
 
     await expect(login({ email: "alice@example.com", password: "Pass123!" })).rejects.toThrow("ACCOUNT_DISABLED");
+  });
+
+  it("throws EMAIL_NOT_VERIFIED (not ACCOUNT_DISABLED) for unverified user", async () => {
+    // Unverified users have isActive=false by design, but the error should be EMAIL_NOT_VERIFIED
+    // so users know to check their inbox — not a vague ACCOUNT_DISABLED.
+    vi.mocked(repo.findUserByEmail).mockResolvedValueOnce(MOCK_UNVERIFIED_USER);
+    vi.mocked(comparePassword).mockResolvedValueOnce(true);
+
+    await expect(login({ email: "alice@example.com", password: "Pass123!" })).rejects.toThrow("EMAIL_NOT_VERIFIED");
   });
 });
 
@@ -131,7 +142,8 @@ describe("verifyEmail", () => {
 
     const result = await verifyEmail("rawtoken");
 
-    expect(emailVerifRepo.markTokenUsed).toHaveBeenCalled();
+    expect(emailVerifRepo.markTokenUsed).toHaveBeenCalledWith(expect.any(String));
+    // setEmailVerified also sets isActive=true — account becomes active after verification.
     expect(repo.setEmailVerified).toHaveBeenCalledWith(1);
     expect(result.user.email).toBe("alice@example.com");
     expect(result.accessToken).toBeDefined();
