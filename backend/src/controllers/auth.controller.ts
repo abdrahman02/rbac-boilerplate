@@ -58,3 +58,13 @@ export const resendVerification = asyncHandler(async (req, res) => {
   await authService.resendVerification(req.body.email);
   sendSuccess(res, null, 200, "If your email is registered and unverified, a new verification link has been sent.");
 });
+
+export const forgotPassword = asyncHandler(async (req, res) => {
+  await authService.forgotPassword(req.body.email);
+  sendSuccess(res, null, 200, "If your email is registered, a reset link has been sent.");
+});
+
+export const resetPassword = asyncHandler(async (req, res) => {
+  await authService.resetPassword(req.body.token, req.body.password);
+  sendSuccess(res, null, 200, "Password updated successfully.");
+});

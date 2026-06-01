@@ -6,9 +6,11 @@ import { authRateLimit } from "../middleware/rate-limit.middleware.js";
 import { validate } from "../middleware/validate.middleware.js";
 import {
   changePasswordSchema,
+  forgotPasswordSchema,
   loginSchema,
   registerSchema,
   resendVerificationSchema,
+  resetPasswordSchema,
   updateMeSchema,
   verifyEmailSchema,
 } from "../schemas/auth.schema.js";
@@ -208,6 +210,65 @@ router.post(
   authRateLimit,
   validate(resendVerificationSchema),
   authController.resendVerification,
+);
+
+/**
+ * @swagger
+ * /auth/forgot-password:
+ *   post:
+ *     summary: Request a password reset email
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [email]
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *     responses:
+ *       200:
+ *         description: Reset link sent (or silently ignored if email not found)
+ */
+router.post(
+  "/forgot-password",
+  authRateLimit,
+  validate(forgotPasswordSchema),
+  authController.forgotPassword,
+);
+
+/**
+ * @swagger
+ * /auth/reset-password:
+ *   post:
+ *     summary: Reset password using token from email
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [token, password]
+ *             properties:
+ *               token:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Password updated successfully
+ *       400:
+ *         description: Invalid or expired reset token
+ */
+router.post(
+  "/reset-password",
+  authRateLimit,
+  validate(resetPasswordSchema),
+  authController.resetPassword,
 );
 
 export default router;
