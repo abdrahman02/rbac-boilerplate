@@ -60,8 +60,9 @@ export async function verifyEmail(token: string): Promise<AuthResult> {
   if (!record || record.usedAt !== null) throw new Error("INVALID_VERIFICATION_TOKEN");
   if (new Date() > record.expiresAt) throw new Error("VERIFICATION_TOKEN_EXPIRED");
 
-  await emailVerifRepo.markTokenUsed(tokenHash);
-  await authRepo.setEmailVerified(record.userId);
+  // Mark token used and activate user account atomically — prevents partial failure
+  // where the token is consumed but the account remains inactive (or vice-versa).
+  await emailVerifRepo.consumeTokenAndActivateUser(tokenHash, record.userId);
 
   return buildAuthResult(record.userId);
 }
@@ -91,11 +92,17 @@ export async function refresh(rawRefreshToken: string): Promise<AuthResult> {
 
   if (!stored) throw new Error("INVALID_REFRESH_TOKEN");
 
-  const now = new Date();
-  if (now > new Date(stored.expiresAt)) {
+  // stored.expiresAt is already a Date from Prisma — compare directly.
+  if (new Date() > stored.expiresAt) {
     await authRepo.revokeRefreshToken(tokenHash);
     throw new Error("REFRESH_TOKEN_EXPIRED");
   }
+
+  // Validate the user is still active and verified before issuing new tokens.
+  const user = await authRepo.findUserById(stored.userId);
+  if (!user) throw new Error("USER_NOT_FOUND");
+  if (!user.emailVerifiedAt) throw new Error("EMAIL_NOT_VERIFIED");
+  if (!user.isActive) throw new Error("ACCOUNT_DISABLED");
 
   await authRepo.revokeRefreshToken(tokenHash);
   return buildAuthResult(stored.userId);

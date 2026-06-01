@@ -21,6 +21,7 @@ vi.mock("../../repositories/email-verification.repository.js", () => ({
   findByTokenHash: vi.fn(),
   invalidateUserTokens: vi.fn(),
   markTokenUsed: vi.fn(),
+  consumeTokenAndActivateUser: vi.fn(),
 }));
 
 vi.mock("../../services/email.service.js", () => ({
@@ -37,7 +38,15 @@ import * as repo from "../../repositories/auth.repository.js";
 import * as emailVerifRepo from "../../repositories/email-verification.repository.js";
 import { sendVerificationEmail } from "../../services/email.service.js";
 import { comparePassword, hashPassword } from "../../utils/hash.js";
-import { changePassword, login, register, resendVerification, updateMe, verifyEmail } from "../auth.service.js";
+import {
+  changePassword,
+  login,
+  refresh,
+  register,
+  resendVerification,
+  updateMe,
+  verifyEmail,
+} from "../auth.service.js";
 
 const MOCK_USER = {
   id: 1,
@@ -131,10 +140,9 @@ describe("login", () => {
 describe("verifyEmail", () => {
   beforeEach(() => vi.resetAllMocks());
 
-  it("marks token used, sets emailVerifiedAt, returns auth result with tokens", async () => {
+  it("atomically consumes token and activates user, returns auth result with tokens", async () => {
     vi.mocked(emailVerifRepo.findByTokenHash).mockResolvedValueOnce(MOCK_TOKEN);
-    vi.mocked(emailVerifRepo.markTokenUsed).mockResolvedValueOnce(undefined);
-    vi.mocked(repo.setEmailVerified).mockResolvedValueOnce(undefined);
+    vi.mocked(emailVerifRepo.consumeTokenAndActivateUser).mockResolvedValueOnce(undefined);
     vi.mocked(repo.findUserById).mockResolvedValueOnce(MOCK_USER);
     vi.mocked(repo.getUserRoles).mockResolvedValueOnce(["user"]);
     vi.mocked(repo.getUserPermissions).mockResolvedValueOnce([]);
@@ -142,9 +150,8 @@ describe("verifyEmail", () => {
 
     const result = await verifyEmail("rawtoken");
 
-    expect(emailVerifRepo.markTokenUsed).toHaveBeenCalledWith(expect.any(String));
-    // setEmailVerified also sets isActive=true — account becomes active after verification.
-    expect(repo.setEmailVerified).toHaveBeenCalledWith(1);
+    // consumeTokenAndActivateUser handles both markTokenUsed + setEmailVerified atomically.
+    expect(emailVerifRepo.consumeTokenAndActivateUser).toHaveBeenCalledWith(expect.any(String), 1);
     expect(result.user.email).toBe("alice@example.com");
     expect(result.accessToken).toBeDefined();
     expect(result.refreshToken).toBeDefined();
@@ -169,6 +176,67 @@ describe("verifyEmail", () => {
     });
 
     await expect(verifyEmail("expiredtoken")).rejects.toThrow("VERIFICATION_TOKEN_EXPIRED");
+  });
+});
+
+// ── refresh ────────────────────────────────────────────────────────
+describe("refresh", () => {
+  beforeEach(() => vi.resetAllMocks());
+
+  const MOCK_STORED_TOKEN = {
+    id: 10,
+    userId: 1,
+    tokenHash: "hashvalue",
+    expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+    createdAt: new Date(),
+    revokedAt: null,
+  };
+
+  it("revokes old token, returns new auth result for active verified user", async () => {
+    vi.mocked(repo.findRefreshToken).mockResolvedValueOnce(MOCK_STORED_TOKEN);
+    // findUserById is called twice: once in refresh() for validation, once in buildAuthResult().
+    vi.mocked(repo.findUserById).mockResolvedValue(MOCK_USER);
+    vi.mocked(repo.getUserRoles).mockResolvedValueOnce(["user"]);
+    vi.mocked(repo.getUserPermissions).mockResolvedValueOnce([]);
+    vi.mocked(repo.revokeRefreshToken).mockResolvedValueOnce(undefined);
+    vi.mocked(repo.saveRefreshToken).mockResolvedValueOnce(undefined);
+
+    const result = await refresh("rawtoken");
+
+    expect(repo.revokeRefreshToken).toHaveBeenCalled();
+    expect(result.accessToken).toBeDefined();
+    expect(result.refreshToken).toBeDefined();
+  });
+
+  it("throws INVALID_REFRESH_TOKEN when token not found", async () => {
+    vi.mocked(repo.findRefreshToken).mockResolvedValueOnce(null);
+
+    await expect(refresh("badtoken")).rejects.toThrow("INVALID_REFRESH_TOKEN");
+  });
+
+  it("throws REFRESH_TOKEN_EXPIRED and revokes token when past expiry", async () => {
+    vi.mocked(repo.findRefreshToken).mockResolvedValueOnce({
+      ...MOCK_STORED_TOKEN,
+      expiresAt: new Date(Date.now() - 1000),
+    });
+    vi.mocked(repo.revokeRefreshToken).mockResolvedValueOnce(undefined);
+
+    await expect(refresh("expiredtoken")).rejects.toThrow("REFRESH_TOKEN_EXPIRED");
+    expect(repo.revokeRefreshToken).toHaveBeenCalled();
+  });
+
+  it("throws ACCOUNT_DISABLED when user is deactivated after token was issued", async () => {
+    vi.mocked(repo.findRefreshToken).mockResolvedValueOnce(MOCK_STORED_TOKEN);
+    vi.mocked(repo.findUserById).mockResolvedValueOnce({ ...MOCK_USER, isActive: false } as User);
+
+    await expect(refresh("rawtoken")).rejects.toThrow("ACCOUNT_DISABLED");
+  });
+
+  it("throws EMAIL_NOT_VERIFIED when user has no verified email", async () => {
+    vi.mocked(repo.findRefreshToken).mockResolvedValueOnce(MOCK_STORED_TOKEN);
+    vi.mocked(repo.findUserById).mockResolvedValueOnce(MOCK_UNVERIFIED_USER);
+
+    await expect(refresh("rawtoken")).rejects.toThrow("EMAIL_NOT_VERIFIED");
   });
 });
 

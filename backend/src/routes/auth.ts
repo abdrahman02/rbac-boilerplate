@@ -49,7 +49,7 @@ const router = Router();
  *                 example: Secret123
  *     responses:
  *       201:
- *         description: User registered, httpOnly cookies set
+ *         description: User registered — verification email sent; account inactive until email is confirmed
  *       409:
  *         description: Email already taken
  *       422:
