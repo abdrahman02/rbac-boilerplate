@@ -1,8 +1,8 @@
-import * as repo from '../repositories/role.repository.js'
-import type { RoleWithPermissions, PaginatedResponse } from '../types/index.js'
-import type { CreateRoleInput, UpdateRoleInput } from '../schemas/role.schema.js'
-import ExcelJS from 'exceljs'
-import { freezeHeaderRow, autoFitColumns } from '../lib/excel-styles.js'
+import { PAGINATION } from "../constants/pagination.js";
+import { buildRolesWorkbook } from "../lib/exporters/roles-exporter.js";
+import * as repo from "../repositories/role.repository.js";
+import type { CreateRoleInput, UpdateRoleInput } from "../schemas/role.schema.js";
+import type { PaginatedResponse, RoleWithPermissions } from "../types/index.js";
 
 export async function listRoles(
   page: number,
@@ -10,7 +10,7 @@ export async function listRoles(
   search?: string,
   permission?: string,
 ): Promise<PaginatedResponse<RoleWithPermissions>> {
-  const { rows, total } = await repo.findAllRoles(page, limit, search, permission)
+  const { rows, total } = await repo.findAllRoles(page, limit, search, permission);
 
   return {
     success: true,
@@ -23,96 +23,66 @@ export async function listRoles(
       created_at: r.createdAt,
     })),
     meta: { total, page, limit },
-  }
+  };
 }
 
 export async function getRole(roleId: number): Promise<RoleWithPermissions | null> {
-  const role = await repo.findRoleById(roleId)
-  if (!role) return null
+  const role = await repo.findRoleById(roleId);
+  if (!role) return null;
 
-  const permissions = await repo.getRolePermissions(roleId)
+  const permissions = await repo.getRolePermissions(roleId);
   return {
     id: role.id,
     name: role.name,
     description: role.description,
     permissions,
     created_at: role.createdAt,
-  }
+  };
 }
 
 export async function createRole(input: CreateRoleInput): Promise<number> {
-  const existing = await repo.findRoleByName(input.name)
-  if (existing) throw new Error('ROLE_NAME_TAKEN')
+  const existing = await repo.findRoleByName(input.name);
+  if (existing) throw new Error("ROLE_NAME_TAKEN");
 
-  return repo.createRole(input.name, input.description)
+  return repo.createRole(input.name, input.description);
 }
 
 export async function updateRole(roleId: number, input: UpdateRoleInput): Promise<boolean> {
   if (input.name) {
-    const existing = await repo.findRoleByName(input.name)
-    if (existing && existing.id !== roleId) throw new Error('ROLE_NAME_TAKEN')
+    const existing = await repo.findRoleByName(input.name);
+    if (existing && existing.id !== roleId) throw new Error("ROLE_NAME_TAKEN");
   }
 
-  const updateFields: { name?: string; description?: string | null } = {}
-  if (input.name) updateFields.name = input.name
-  if (input.description !== undefined) updateFields.description = input.description
+  const updateFields: { name?: string; description?: string | null } = {};
+  if (input.name) updateFields.name = input.name;
+  if (input.description !== undefined) updateFields.description = input.description;
 
-  return repo.updateRole(roleId, updateFields)
+  return repo.updateRole(roleId, updateFields);
 }
 
 export async function deleteRole(roleId: number): Promise<boolean> {
-  return repo.deleteRole(roleId)
+  return repo.deleteRole(roleId);
 }
 
 export async function assignPermission(roleId: number, permissionId: number): Promise<void> {
-  const role = await repo.findRoleById(roleId)
-  if (!role) throw new Error('ROLE_NOT_FOUND')
+  const role = await repo.findRoleById(roleId);
+  if (!role) throw new Error("ROLE_NOT_FOUND");
 
-  await repo.assignPermissionToRole(roleId, permissionId)
+  await repo.assignPermissionToRole(roleId, permissionId);
 }
 
 export async function removePermission(roleId: number, permissionId: number): Promise<boolean> {
-  return repo.removePermissionFromRole(roleId, permissionId)
+  return repo.removePermissionFromRole(roleId, permissionId);
 }
 
 export async function syncPermissions(roleId: number, permissionIds: number[]): Promise<void> {
-  const role = await repo.findRoleById(roleId)
-  if (!role) throw new Error('ROLE_NOT_FOUND')
+  const role = await repo.findRoleById(roleId);
+  if (!role) throw new Error("ROLE_NOT_FOUND");
 
-  await repo.syncRolePermissions(roleId, permissionIds)
+  await repo.syncRolePermissions(roleId, permissionIds);
 }
 
-export async function buildRolesExportWorkbook(
-  search?: string,
-  permission?: string,
-): Promise<Buffer> {
-  const { rows } = await repo.findAllRoles(1, -1, search, permission)
-
-  const wb = new ExcelJS.Workbook()
-  const sheet = wb.addWorksheet('Roles')
-  freezeHeaderRow(sheet)
-  sheet.addTable({
-    name: 'Roles',
-    ref: 'A1',
-    headerRow: true,
-    totalsRow: false,
-    style: { theme: 'TableStyleMedium2', showRowStripes: false },
-    columns: [
-      { name: 'Name' },
-      { name: 'Description' },
-      { name: 'Permissions' },
-      { name: 'User Count' },
-      { name: 'Created At' },
-    ],
-    rows: rows.map((r) => [
-      r.name,
-      r.description ?? '',
-      r.permissions.join(', '),
-      r.users.length,
-      r.createdAt.toISOString().slice(0, 10),
-    ]),
-  })
-  autoFitColumns(sheet)
-
-  return Buffer.from(await wb.xlsx.writeBuffer())
+export async function buildRolesExportWorkbook(search?: string, permission?: string): Promise<Buffer> {
+  const { rows } = await repo.findAllRoles(1, PAGINATION.UNPAGINATED, search, permission);
+  return buildRolesWorkbook(rows);
 }
