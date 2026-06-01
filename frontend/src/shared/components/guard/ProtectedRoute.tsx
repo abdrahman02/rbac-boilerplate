@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { type ReactNode, useEffect } from "react";
 import { useAuth } from "@/shared/hooks";
+import { Spinner } from "../ui";
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -27,7 +28,11 @@ export function ProtectedRoute({ children, requiredPermission }: ProtectedRouteP
   }, [isLoading, isAuthenticated, requiredPermission, user, router]);
 
   if (isLoading) {
-    return <div className="flex h-screen items-center justify-center">Loading...</div>;
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <Spinner size="lg" />
+      </div>
+    );
   }
 
   if (!isAuthenticated) {

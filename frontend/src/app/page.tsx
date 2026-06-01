@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { Spinner } from "@/shared/components/ui";
 import { useAuth } from "@/shared/hooks";
 
 export default function HomePage() {
@@ -20,7 +21,9 @@ export default function HomePage() {
 
   return (
     <div className="flex h-screen items-center justify-center">
-      <div>Loading...</div>
+      <div>
+        <Spinner size="lg" />
+      </div>
     </div>
   );
 }
