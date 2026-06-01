@@ -1,274 +1,106 @@
-import type { Request, Response } from 'express'
-import * as svc from '../services/user.service.js'
-import { handleError } from '../lib/handle-error.js'
-import type { ApiResponse, UserWithRoles, PaginatedResponse } from '../types/index.js'
-import type { CreateUserInput, UpdateUserInput, SyncRolesInput } from '../schemas/user.schema.js'
+import { asyncHandler } from "../lib/async-handler.js";
+import { sendBadRequest, sendCreated, sendNotFound, sendSuccess } from "../lib/http-response.js";
+import { parseId, parsePagination, parseQueryString } from "../lib/request-parser.js";
+import type { CreateUserInput, SyncRolesInput, UpdateUserInput } from "../schemas/user.schema.js";
+import * as svc from "../services/user.service.js";
 
-export async function listUsers(req: Request, res: Response): Promise<void> {
-  try {
-    const page = Math.max(1, parseInt(req.query.page as string, 10) || 1)
-    const rawLimit = parseInt(req.query.limit as string, 10) || 10
-    const limit = rawLimit === -1 ? -1 : Math.min(100, Math.max(1, rawLimit))
-    const search = typeof req.query.search === 'string' ? req.query.search.trim() || undefined : undefined
-    const role = typeof req.query.role === 'string' ? req.query.role.trim() || undefined : undefined
-    const statusStr = typeof req.query.status === 'string' ? req.query.status : undefined
-    const status = statusStr === 'active' ? true : statusStr === 'inactive' ? false : undefined
+const INVALID_USER_ID = "Invalid user ID";
+const USER_NOT_FOUND = "User not found";
 
-    const result = await svc.listUsers(page, limit, search, role, status)
-    res.status(200).json(result)
-  } catch (error) {
-    handleError(res, error)
-  }
+/**
+ * Maps the `status` query string ("active"/"inactive") to a boolean filter,
+ * or undefined when no recognised value is provided.
+ */
+function parseStatusFilter(value: unknown): boolean | undefined {
+  if (value === "active") return true;
+  if (value === "inactive") return false;
+  return undefined;
 }
 
-export async function getUser(req: Request, res: Response): Promise<void> {
-  try {
-    const id = typeof req.params.id === 'string' ? req.params.id : undefined
-    if (!id) {
-      const body: ApiResponse<null> = {
-        success: false,
-        data: null,
-        message: 'Invalid user ID',
-      }
-      res.status(400).json(body)
-      return
-    }
+export const listUsers = asyncHandler(async (req, res) => {
+  const { page, limit } = parsePagination(req.query);
+  const search = parseQueryString(req.query.search);
+  const role = parseQueryString(req.query.role);
+  const status = parseStatusFilter(req.query.status);
 
-    const userId = parseInt(id, 10)
-    if (Number.isNaN(userId)) {
-      const body: ApiResponse<null> = {
-        success: false,
-        data: null,
-        message: 'Invalid user ID',
-      }
-      res.status(400).json(body)
-      return
-    }
+  const result = await svc.listUsers(page, limit, search, role, status);
+  res.status(200).json(result);
+});
 
-    const user = await svc.getUser(userId)
-    if (!user) {
-      const body: ApiResponse<null> = {
-        success: false,
-        data: null,
-        message: 'User not found',
-      }
-      res.status(404).json(body)
-      return
-    }
+export const getUser = asyncHandler(async (req, res) => {
+  const userId = parseId(req.params.id);
+  if (userId === null) return sendBadRequest(res, INVALID_USER_ID);
 
-    const body: ApiResponse<UserWithRoles> = {
-      success: true,
-      data: user,
-      message: null,
-    }
-    res.status(200).json(body)
-  } catch (error) {
-    handleError(res, error)
+  const user = await svc.getUser(userId);
+  if (!user) return sendNotFound(res, USER_NOT_FOUND);
+
+  sendSuccess(res, user);
+});
+
+export const createUser = asyncHandler(async (req, res) => {
+  const input = req.body as CreateUserInput;
+  const userId = await svc.createUser(input);
+
+  const user = await svc.getUser(userId);
+  sendCreated(res, user);
+});
+
+export const updateUser = asyncHandler(async (req, res) => {
+  const userId = parseId(req.params.id);
+  if (userId === null) return sendBadRequest(res, INVALID_USER_ID);
+
+  const input = req.body as UpdateUserInput;
+  const updated = await svc.updateUser(userId, input);
+  if (!updated) return sendNotFound(res, USER_NOT_FOUND);
+
+  const user = await svc.getUser(userId);
+  sendSuccess(res, user);
+});
+
+export const deleteUser = asyncHandler(async (req, res) => {
+  const userId = parseId(req.params.id);
+  if (userId === null) return sendBadRequest(res, INVALID_USER_ID);
+
+  const deleted = await svc.deleteUser(userId);
+  if (!deleted) return sendNotFound(res, USER_NOT_FOUND);
+
+  sendSuccess(res, null);
+});
+
+export const syncRoles = asyncHandler(async (req, res) => {
+  const userId = parseId(req.params.id);
+  if (userId === null) return sendBadRequest(res, INVALID_USER_ID);
+
+  const input = req.body as SyncRolesInput;
+  await svc.syncRoles(userId, input.role_ids);
+
+  const user = await svc.getUser(userId);
+  sendSuccess(res, user);
+});
+
+export const removeRole = asyncHandler(async (req, res) => {
+  const userId = parseId(req.params.id);
+  const roleId = parseId(req.params.roleId);
+  if (userId === null || roleId === null) {
+    return sendBadRequest(res, "Invalid user ID or role ID");
   }
-}
 
-export async function createUser(req: Request, res: Response): Promise<void> {
-  try {
-    const input = req.body as CreateUserInput
-    const userId = await svc.createUser(input)
+  const removed = await svc.removeRole(userId, roleId);
+  if (!removed) return sendNotFound(res, "User or role not found");
 
-    const user = await svc.getUser(userId)
-    const body: ApiResponse<UserWithRoles> = {
-      success: true,
-      data: user,
-      message: null,
-    }
-    res.status(201).json(body)
-  } catch (error) {
-    handleError(res, error)
-  }
-}
+  const user = await svc.getUser(userId);
+  sendSuccess(res, user);
+});
 
-export async function updateUser(req: Request, res: Response): Promise<void> {
-  try {
-    const id = typeof req.params.id === 'string' ? req.params.id : undefined
-    if (!id) {
-      const body: ApiResponse<null> = {
-        success: false,
-        data: null,
-        message: 'Invalid user ID',
-      }
-      res.status(400).json(body)
-      return
-    }
+export const exportUsers = asyncHandler(async (req, res) => {
+  const search = parseQueryString(req.query.search);
+  const role = parseQueryString(req.query.role);
+  const status = parseQueryString(req.query.status);
 
-    const userId = parseInt(id, 10)
-    if (Number.isNaN(userId)) {
-      const body: ApiResponse<null> = {
-        success: false,
-        data: null,
-        message: 'Invalid user ID',
-      }
-      res.status(400).json(body)
-      return
-    }
+  const buffer = await svc.buildUsersExportWorkbook(search, role, status);
+  const dateStr = new Date().toISOString().slice(0, 10);
 
-    const input = req.body as UpdateUserInput
-    const updated = await svc.updateUser(userId, input)
-    if (!updated) {
-      const body: ApiResponse<null> = {
-        success: false,
-        data: null,
-        message: 'User not found',
-      }
-      res.status(404).json(body)
-      return
-    }
-
-    const user = await svc.getUser(userId)
-    const body: ApiResponse<UserWithRoles> = {
-      success: true,
-      data: user,
-      message: null,
-    }
-    res.status(200).json(body)
-  } catch (error) {
-    handleError(res, error)
-  }
-}
-
-export async function deleteUser(req: Request, res: Response): Promise<void> {
-  try {
-    const id = typeof req.params.id === 'string' ? req.params.id : undefined
-    if (!id) {
-      const body: ApiResponse<null> = {
-        success: false,
-        data: null,
-        message: 'Invalid user ID',
-      }
-      res.status(400).json(body)
-      return
-    }
-
-    const userId = parseInt(id, 10)
-    if (Number.isNaN(userId)) {
-      const body: ApiResponse<null> = {
-        success: false,
-        data: null,
-        message: 'Invalid user ID',
-      }
-      res.status(400).json(body)
-      return
-    }
-
-    const deleted = await svc.deleteUser(userId)
-    if (!deleted) {
-      const body: ApiResponse<null> = {
-        success: false,
-        data: null,
-        message: 'User not found',
-      }
-      res.status(404).json(body)
-      return
-    }
-
-    const body: ApiResponse<null> = {
-      success: true,
-      data: null,
-      message: null,
-    }
-    res.status(200).json(body)
-  } catch (error) {
-    handleError(res, error)
-  }
-}
-
-export async function syncRoles(req: Request, res: Response): Promise<void> {
-  try {
-    const id = typeof req.params.id === 'string' ? req.params.id : undefined
-    if (!id) {
-      const body: ApiResponse<null> = { success: false, data: null, message: 'Invalid user ID' }
-      res.status(400).json(body)
-      return
-    }
-
-    const userId = parseInt(id, 10)
-    if (Number.isNaN(userId)) {
-      const body: ApiResponse<null> = { success: false, data: null, message: 'Invalid user ID' }
-      res.status(400).json(body)
-      return
-    }
-
-    const input = req.body as SyncRolesInput
-    await svc.syncRoles(userId, input.role_ids)
-
-    const user = await svc.getUser(userId)
-    const body: ApiResponse<UserWithRoles> = { success: true, data: user, message: null }
-    res.status(200).json(body)
-  } catch (error) {
-    handleError(res, error)
-  }
-}
-
-export async function removeRole(req: Request, res: Response): Promise<void> {
-  try {
-    const id = typeof req.params.id === 'string' ? req.params.id : undefined
-    const roleIdStr = typeof req.params.roleId === 'string' ? req.params.roleId : undefined
-
-    if (!id || !roleIdStr) {
-      const body: ApiResponse<null> = {
-        success: false,
-        data: null,
-        message: 'Invalid user ID or role ID',
-      }
-      res.status(400).json(body)
-      return
-    }
-
-    const userId = parseInt(id, 10)
-    const roleId = parseInt(roleIdStr, 10)
-
-    if (Number.isNaN(userId) || Number.isNaN(roleId)) {
-      const body: ApiResponse<null> = {
-        success: false,
-        data: null,
-        message: 'Invalid user ID or role ID',
-      }
-      res.status(400).json(body)
-      return
-    }
-
-    const removed = await svc.removeRole(userId, roleId)
-    if (!removed) {
-      const body: ApiResponse<null> = {
-        success: false,
-        data: null,
-        message: 'User or role not found',
-      }
-      res.status(404).json(body)
-      return
-    }
-
-    const user = await svc.getUser(userId)
-    const body: ApiResponse<UserWithRoles> = {
-      success: true,
-      data: user,
-      message: null,
-    }
-    res.status(200).json(body)
-  } catch (error) {
-    handleError(res, error)
-  }
-}
-
-export async function exportUsers(req: Request, res: Response): Promise<void> {
-  try {
-    const search = typeof req.query.search === 'string' ? req.query.search.trim() || undefined : undefined
-    const role = typeof req.query.role === 'string' ? req.query.role.trim() || undefined : undefined
-    const status = typeof req.query.status === 'string' ? req.query.status : undefined
-
-    const buffer = await svc.buildUsersExportWorkbook(search, role, status)
-    const dateStr = new Date().toISOString().slice(0, 10)
-
-    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-    res.setHeader('Content-Disposition', `attachment; filename="users-${dateStr}.xlsx"`)
-    res.send(buffer)
-  } catch (error) {
-    handleError(res, error)
-  }
-}
+  res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+  res.setHeader("Content-Disposition", `attachment; filename="users-${dateStr}.xlsx"`);
+  res.send(buffer);
+});
