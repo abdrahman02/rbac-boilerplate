@@ -4,7 +4,6 @@ import { Check, ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { AuthShell } from "@/features/auth/components/AuthShell";
-import { Button } from "@/shared/components/ui";
 
 const backLink = (
   <Link href="/login" className="text-primary font-medium no-underline inline-flex items-center gap-1">
@@ -27,8 +26,8 @@ export function VerifyEmailSent() {
           Check your inbox
         </h1>
         <p className="mt-2 mb-6 text-sm text-muted-foreground leading-relaxed">
-          We&apos;ve sent a verification link to{" "}
-          <b className="text-foreground font-semibold">{email}</b>. The link expires in 24 hours.
+          We&apos;ve sent a verification link to <b className="text-foreground font-semibold">{email}</b>. The link
+          expires in 24 hours.
         </p>
 
         <p className="text-sm text-muted-foreground mb-4">

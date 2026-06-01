@@ -64,9 +64,7 @@ const ErrorState = memo(function ErrorState({ error }: ErrorStateProps) {
           </div>
           Verification failed
         </h1>
-        <p className="mt-2 mb-6 text-sm text-muted-foreground leading-relaxed">
-          {getErrorMessage(error)}
-        </p>
+        <p className="mt-2 mb-6 text-sm text-muted-foreground leading-relaxed">{getErrorMessage(error)}</p>
         <Button variant="outline" asChild>
           <Link href="/login">Go to sign in</Link>
         </Button>
