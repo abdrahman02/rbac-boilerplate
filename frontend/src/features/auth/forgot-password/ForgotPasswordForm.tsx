@@ -1,13 +1,12 @@
 "use client";
 
-import { Check, ChevronLeft, Mail } from "lucide-react";
-import Link from "next/link";
+import { Check, Mail } from "lucide-react";
 import { memo } from "react";
 import { AuthShell } from "@/features/auth/components/AuthShell";
+import { AuthStatusCard } from "@/features/auth/components/AuthStatusCard";
+import { BackToSignInLink } from "@/features/auth/components/BackToSignInLink";
 import { Button, FormField, Input } from "@/shared/components/ui";
 import { useForgotPasswordForm } from "./useForgotPasswordForm";
-
-// --- SuccessState sub-component ---
 
 interface SuccessStateProps {
   email: string;
@@ -16,33 +15,23 @@ interface SuccessStateProps {
 
 const SuccessState = memo(function SuccessState({ email, onRetry }: SuccessStateProps) {
   return (
-    <div className="animate-scale-in mt-3">
-      <h1 className="text-2xl font-semibold tracking-tight m-0 inline-flex items-center gap-2">
-        <div className="w-6 h-6 rounded-full bg-success/12 text-success border border-success/22 inline-flex items-center justify-center">
-          <Check size={16} />
-        </div>
-        Check your inbox
-      </h1>
-      <p className="mt-2 mb-6 text-sm text-muted-foreground leading-relaxed">
-        We&apos;ve sent a reset link to <b className="text-foreground font-semibold">{email}</b>. The link expires in 30
-        minutes.
-      </p>
-
+    <AuthStatusCard
+      variant="success"
+      icon={<Check size={16} />}
+      title="Check your inbox"
+      description={
+        <>
+          We&apos;ve sent a reset link to <b className="text-foreground font-semibold">{email}</b>. The link expires in
+          30 minutes.
+        </>
+      }
+    >
       <Button type="button" variant="outline" onClick={onRetry}>
         Try a different email
       </Button>
-    </div>
+    </AuthStatusCard>
   );
 });
-
-// --- Main component ---
-
-const backLink = (
-  <Link href="/login" className="text-primary font-medium no-underline inline-flex items-center gap-1">
-    <ChevronLeft size={14} />
-    Back to sign in
-  </Link>
-);
 
 export function ForgotPasswordForm() {
   const { form, isLoading, success, submittedEmail, onRetry, onSubmit } = useForgotPasswordForm();
@@ -54,14 +43,14 @@ export function ForgotPasswordForm() {
 
   if (success) {
     return (
-      <AuthShell footer={backLink}>
+      <AuthShell footer={<BackToSignInLink />}>
         <SuccessState email={submittedEmail} onRetry={onRetry} />
       </AuthShell>
     );
   }
 
   return (
-    <AuthShell footer={backLink}>
+    <AuthShell footer={<BackToSignInLink />}>
       <h1 className="text-[26px] font-semibold tracking-tight m-0">Forgot your password?</h1>
       <p className="mt-1.5 mb-7 text-sm text-muted-foreground">
         Enter your email and we&apos;ll send you a reset link.

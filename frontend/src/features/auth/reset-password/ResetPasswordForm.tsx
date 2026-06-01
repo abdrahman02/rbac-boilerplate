@@ -1,9 +1,9 @@
 "use client";
 
 import { Check, Lock } from "lucide-react";
-import Link from "next/link";
 import { memo } from "react";
 import { AuthShell } from "@/features/auth/components/AuthShell";
+import { BackToSignInLink } from "@/features/auth/components/BackToSignInLink";
 import { Alert, Button, FormField, Input, PasswordStrengthMeter } from "@/shared/components/ui";
 import { useResetPasswordForm } from "./useResetPasswordForm";
 
@@ -35,14 +35,6 @@ const SuccessState = memo(function SuccessState({ onContinue }: SuccessStateProp
   );
 });
 
-// --- Shared footer link ---
-
-const footer = (
-  <Link href="/login" className="text-primary font-medium no-underline">
-    Back to sign in
-  </Link>
-);
-
 // --- Main component (pure JSX — no useState, no useRouter, no async) ---
 
 export function ResetPasswordForm() {
@@ -58,14 +50,14 @@ export function ResetPasswordForm() {
 
   if (done) {
     return (
-      <AuthShell footer={footer}>
+      <AuthShell footer={<BackToSignInLink />}>
         <SuccessState onContinue={onContinue} />
       </AuthShell>
     );
   }
 
   return (
-    <AuthShell footer={footer}>
+    <AuthShell footer={<BackToSignInLink />}>
       <h1 className="text-[26px] font-semibold tracking-tight m-0">Set a new password</h1>
       <p className="mt-1.5 mb-7 text-sm text-muted-foreground">Choose a password you haven&apos;t used before.</p>
 
