@@ -1,7 +1,7 @@
 import { tv } from "tailwind-variants";
 
 export const spinnerVariants = tv({
-  base: "animate-spin rounded-full border-2 border-current border-t-transparent",
+  base: "inline-block animate-spin rounded-full border-2 border-current border-t-transparent",
   variants: {
     size: {
       sm: "h-4 w-4",
