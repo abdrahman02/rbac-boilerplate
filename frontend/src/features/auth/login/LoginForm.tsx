@@ -3,7 +3,7 @@
 import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 import Link from "next/link";
 import { AuthShell } from "@/features/auth/components/AuthShell";
-import { Alert, Button, Divider, FormField, Input } from "@/shared/components/ui";
+import { Alert, Button, FormField, Input } from "@/shared/components/ui";
 import { useLoginForm } from "./useLoginForm";
 
 const footer = (
@@ -89,17 +89,6 @@ export function LoginForm() {
           Sign in
         </Button>
       </form>
-
-      <Divider label="OR CONTINUE WITH" />
-
-      <div className="grid grid-cols-2 gap-2">
-        <Button type="button" variant="outline">
-          SSO / SAML
-        </Button>
-        <Button type="button" variant="outline">
-          Google Workspace
-        </Button>
-      </div>
     </AuthShell>
   );
 }
