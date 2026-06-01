@@ -4,18 +4,14 @@ import * as authService from "../services/auth.service.js";
 import { clearAuthCookies, hashRefreshToken, setAuthCookies } from "../services/token.service.js";
 
 export const register = asyncHandler(async (req, res) => {
-  const result = await authService.register(req.body);
-  setAuthCookies(res, result.accessToken, result.refreshToken);
-  res.locals.loggedInUserId = result.user.id;
-
-  sendCreated(res, result.user);
+  const user = await authService.register(req.body);
+  sendCreated(res, user);
 });
 
 export const login = asyncHandler(async (req, res) => {
   const result = await authService.login(req.body);
   setAuthCookies(res, result.accessToken, result.refreshToken);
   res.locals.loggedInUserId = result.user.id;
-
   sendSuccess(res, result.user);
 });
 
@@ -25,7 +21,6 @@ export const logout = asyncHandler(async (req, res) => {
     await authService.logout(req.user.id, hashRefreshToken(rawToken));
   }
   clearAuthCookies(res);
-
   sendSuccess(res, null);
 });
 
@@ -35,7 +30,6 @@ export const refresh = asyncHandler(async (req, res) => {
 
   const result = await authService.refresh(rawToken);
   setAuthCookies(res, result.accessToken, result.refreshToken);
-
   sendSuccess(res, result.user);
 });
 
@@ -52,4 +46,15 @@ export const updateMe = asyncHandler(async (req, res) => {
 export const changePassword = asyncHandler(async (req, res) => {
   await authService.changePassword(req.user!.id, req.body);
   sendSuccess(res, null, 200, "Password updated successfully.");
+});
+
+export const verifyEmail = asyncHandler(async (req, res) => {
+  const result = await authService.verifyEmail(req.body.token);
+  setAuthCookies(res, result.accessToken, result.refreshToken);
+  sendSuccess(res, result.user);
+});
+
+export const resendVerification = asyncHandler(async (req, res) => {
+  await authService.resendVerification(req.body.email);
+  sendSuccess(res, null, 200, "If your email is registered and unverified, a new verification link has been sent.");
 });

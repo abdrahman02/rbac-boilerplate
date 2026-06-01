@@ -4,7 +4,14 @@ import { auditLog } from "../middleware/audit-log.middleware.js";
 import { authMiddleware } from "../middleware/auth.middleware.js";
 import { authRateLimit } from "../middleware/rate-limit.middleware.js";
 import { validate } from "../middleware/validate.middleware.js";
-import { changePasswordSchema, loginSchema, registerSchema, updateMeSchema } from "../schemas/auth.schema.js";
+import {
+  changePasswordSchema,
+  loginSchema,
+  registerSchema,
+  resendVerificationSchema,
+  updateMeSchema,
+  verifyEmailSchema,
+} from "../schemas/auth.schema.js";
 
 const router = Router();
 
@@ -140,5 +147,62 @@ router.get("/me", authMiddleware, authController.me);
 
 router.patch("/me", authMiddleware, validate(updateMeSchema), authController.updateMe);
 router.post("/change-password", authMiddleware, validate(changePasswordSchema), authController.changePassword);
+
+/**
+ * @swagger
+ * /auth/verify-email:
+ *   post:
+ *     tags: [Auth]
+ *     summary: Verify email address with token from verification email
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [token]
+ *             properties:
+ *               token:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Email verified, httpOnly cookies set (auto-login)
+ *       400:
+ *         description: Invalid or expired token
+ *       422:
+ *         description: Validation error
+ *       429:
+ *         description: Too many requests
+ */
+router.post("/verify-email", authRateLimit, validate(verifyEmailSchema), authController.verifyEmail);
+
+/**
+ * @swagger
+ * /auth/resend-verification:
+ *   post:
+ *     tags: [Auth]
+ *     summary: Resend email verification link
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [email]
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *     responses:
+ *       200:
+ *         description: Verification email sent if account exists and is unverified
+ *       400:
+ *         description: Email already verified
+ *       422:
+ *         description: Validation error
+ *       429:
+ *         description: Too many requests
+ */
+router.post("/resend-verification", authRateLimit, validate(resendVerificationSchema), authController.resendVerification);
 
 export default router;
