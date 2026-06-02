@@ -13,7 +13,7 @@ Step-by-step instructions for running RBAC Boilerplate locally.
 ## 1. Create the Project
 
 ```bash
-npx create-rbac-app my-dashboard
+npx rbac-boilerplate my-dashboard
 cd my-dashboard
 ```
 

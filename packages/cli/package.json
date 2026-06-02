@@ -1,10 +1,10 @@
 {
-  "name": "create-rbac-app",
+  "name": "rbac-boilerplate",
   "version": "1.0.0",
   "description": "Create a new RBAC boilerplate project with Express.js, Next.js, and MySQL",
   "type": "module",
   "bin": {
-    "create-rbac-app": "./bin/create-rbac-app.js"
+    "rbac-boilerplate": "./bin/rbac-boilerplate.js"
   },
   "files": [
     "bin/",

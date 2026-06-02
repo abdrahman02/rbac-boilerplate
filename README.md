@@ -35,7 +35,7 @@ permissions, audit logging, and an admin UI — ready to clone and customize.
 **Prerequisites:** Node.js 20+, MySQL 8+, npm
 
 ```bash
-npx create-rbac-app my-dashboard
+npx rbac-boilerplate my-dashboard
 cd my-dashboard
 ```
 
