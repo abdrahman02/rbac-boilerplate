@@ -41,6 +41,15 @@ export interface PaginatedResponse<T> {
   };
 }
 
+export interface NotificationItem {
+  id: number;
+  title: string;
+  message: string;
+  is_read: boolean;
+  creator_name: string;
+  created_at: Date;
+}
+
 declare global {
   namespace Express {
     interface Request {
