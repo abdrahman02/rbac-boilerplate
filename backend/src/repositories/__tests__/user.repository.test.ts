@@ -2,12 +2,13 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("../../lib/prisma.js", () => ({
   prisma: {
-    user: { findMany: vi.fn() },
+    $transaction: vi.fn(),
+    user: { findMany: vi.fn(), count: vi.fn() },
   },
 }));
 
 import { prisma } from "../../lib/prisma.js";
-import { findAllUsersForExport } from "../user.repository.js";
+import { findAllUsers, findAllUsersForExport, findUsersForExport } from "../user.repository.js";
 
 const CREATED_AT = new Date("2024-01-15T10:00:00.000Z");
 
@@ -63,5 +64,43 @@ describe("findAllUsersForExport", () => {
     const result = await findAllUsersForExport();
 
     expect(result).toEqual([]);
+  });
+
+  it("sorts by updatedAt descending", async () => {
+    vi.mocked(prisma.user.findMany).mockResolvedValueOnce([]);
+
+    await findAllUsersForExport();
+
+    expect(prisma.user.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({ orderBy: { updatedAt: "desc" } }),
+    );
+  });
+});
+
+describe("findAllUsers", () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it("sorts by updatedAt descending", async () => {
+    vi.mocked(prisma.$transaction).mockResolvedValueOnce([0, []] as never);
+
+    await findAllUsers(1, 10);
+
+    expect(prisma.user.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({ orderBy: { updatedAt: "desc" } }),
+    );
+  });
+});
+
+describe("findUsersForExport", () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it("sorts by updatedAt descending", async () => {
+    vi.mocked(prisma.user.findMany).mockResolvedValueOnce([]);
+
+    await findUsersForExport();
+
+    expect(prisma.user.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({ orderBy: { updatedAt: "desc" } }),
+    );
   });
 });

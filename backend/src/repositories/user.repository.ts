@@ -31,7 +31,7 @@ export async function findAllUsers(
         createdAt: true,
         updatedAt: true,
       },
-      orderBy: { createdAt: "desc" },
+      orderBy: { updatedAt: "desc" },
       skip: offset,
       ...(fetchAll ? {} : { take: limit }),
     }),
@@ -150,7 +150,7 @@ export async function findAllUsersForExport(): Promise<UserExportRow[]> {
         select: { role: { select: { name: true } } },
       },
     },
-    orderBy: { createdAt: "desc" },
+    orderBy: { updatedAt: "desc" },
   });
 
   return users.map((u) => ({
@@ -188,7 +188,7 @@ export async function findUsersForExport(filters: UserFilteredExportParams = {})
       createdAt: true,
       roles: { select: { role: { select: { name: true } } } },
     },
-    orderBy: { createdAt: "desc" },
+    orderBy: { updatedAt: "desc" },
   });
 
   return users.map((u) => ({
