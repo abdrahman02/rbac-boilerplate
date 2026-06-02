@@ -208,8 +208,6 @@ body {
   animation: slideInLeft 0.28s cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 
-/* Toast styling dipindahkan ke shared/lib/toast-config.ts via toastOptions.classNames */
-
 /* ─── Auth aside hide on mobile ─────────────────────────────── */
 @media (max-width: 767px) {
   .auth-aside {
