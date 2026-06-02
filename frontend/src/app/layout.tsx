@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "sonner";
 import "./globals.css";
-import { TOAST_OPTIONS } from "@/shared/lib/toast-config";
+import { TOAST_OPTIONS } from "@/shared/lib/toast";
 import { QueryProvider } from "@/shared/providers/QueryProvider";
 
 export const metadata: Metadata = {
