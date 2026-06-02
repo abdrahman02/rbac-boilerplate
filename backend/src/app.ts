@@ -7,6 +7,7 @@ import { setupSwagger } from "./config/swagger.js";
 import auditLogsRouter from "./routes/audit-logs.js";
 import authRouter from "./routes/auth.js";
 import dashboardRouter from "./routes/dashboard.js";
+import notificationsRouter from "./routes/notifications.js";
 import permissionsRouter from "./routes/permissions.js";
 import rolesRouter from "./routes/roles.js";
 import usersRouter from "./routes/users.js";
@@ -35,6 +36,7 @@ export function createApp(): Application {
   app.use("/api/permissions", permissionsRouter);
   app.use("/api/audit-logs", auditLogsRouter);
   app.use("/api/dashboard", dashboardRouter);
+  app.use("/api/notifications", notificationsRouter);
 
   app.get("/health", (_req, res) => {
     res.json({ status: "ok", timestamp: new Date().toISOString() });
