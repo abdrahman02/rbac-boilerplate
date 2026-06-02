@@ -147,10 +147,10 @@ model Notification {
   id        Int      @id @default(autoincrement()) @db.UnsignedInt
   title     String   @db.VarChar(255)
   message   String   @db.Text
-  createdBy Int      @map("created_by") @db.UnsignedInt
+  createdBy Int?     @map("created_by") @db.UnsignedInt
   createdAt DateTime @default(now()) @map("created_at")
 
-  creator User               @relation("NotificationCreator", fields: [createdBy], references: [id])
+  creator User?              @relation("NotificationCreator", fields: [createdBy], references: [id], onDelete: SetNull)
   roles   NotificationRole[]
   reads   NotificationRead[]
 
@@ -166,6 +166,7 @@ model NotificationRole {
   role         Role         @relation(fields: [roleId], references: [id], onDelete: Cascade)
 
   @@id([notificationId, roleId])
+  @@index([roleId])
   @@map("notification_roles")
 }
 
@@ -178,5 +179,6 @@ model NotificationRead {
   user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([notificationId, userId])
+  @@index([userId])
   @@map("notification_reads")
 }
