@@ -1,4 +1,4 @@
-import { FileText, Key, LayoutDashboard, Shield, ShieldCheck, Users } from "lucide-react";
+import { FileText, Key, LayoutDashboard, Megaphone, Shield, ShieldCheck, Users } from "lucide-react";
 import type { NavEntry } from "./Sidebar.types";
 
 export const NAV_CONFIG: NavEntry[] = [
@@ -12,6 +12,12 @@ export const NAV_CONFIG: NavEntry[] = [
       { href: "/roles", label: "Roles", icon: <ShieldCheck size={18} />, permission: "roles:read" },
       { href: "/permissions", label: "Permissions", icon: <Key size={18} />, permission: "permissions:read" },
     ],
+  },
+  {
+    href: "/notifications/broadcast",
+    label: "Broadcast",
+    icon: <Megaphone size={18} />,
+    permission: "notifications:create",
   },
   { href: "/audit-logs", label: "Audit Logs", icon: <FileText size={18} />, permission: "audit_logs:read" },
 ];

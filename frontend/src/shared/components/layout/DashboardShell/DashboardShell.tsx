@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { useNotificationSSE } from "@/features/notifications/hooks";
 import { Header } from "../Header";
 import { Sidebar } from "../Sidebar";
 import { useSidebar } from "./useSidebar";
@@ -11,6 +12,7 @@ interface DashboardShellProps {
 
 export function DashboardShell({ children }: DashboardShellProps) {
   const { collapsed, mobileOpen, toggleCollapsed, openMobile, closeMobile } = useSidebar();
+  useNotificationSSE();
 
   return (
     <div className="flex h-screen overflow-hidden bg-background">

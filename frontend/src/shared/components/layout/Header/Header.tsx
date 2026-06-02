@@ -2,6 +2,7 @@
 
 import { Menu, Moon, Sun } from "lucide-react";
 import { memo } from "react";
+import { NotificationDropdown } from "@/features/notifications";
 import { Button } from "@/shared/components/ui";
 import { AvatarMenu } from "./AvatarMenu";
 import { Breadcrumb } from "./Breadcrumb";
@@ -42,6 +43,7 @@ export const Header = memo(function Header({ onToggleSidebar, onOpenMobileNav }:
       </div>
 
       <div className="flex items-center gap-1.5">
+        <NotificationDropdown />
         <Button
           type="button"
           variant="ghost"
