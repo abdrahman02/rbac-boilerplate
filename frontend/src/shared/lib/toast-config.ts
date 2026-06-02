@@ -1,6 +1,6 @@
-import type { ExternalToast } from "sonner";
+import type { ToasterProps } from "sonner";
 
-export const TOAST_OPTIONS: Partial<ExternalToast> = {
+export const TOAST_OPTIONS: NonNullable<ToasterProps["toastOptions"]> = {
   unstyled: true,
   closeButton: true,
   classNames: {
