@@ -28,7 +28,7 @@ export async function findAllPermissions(
     prisma.permission.findMany({
       where,
       include: { roles: { select: { role: { select: { name: true } } } } },
-      orderBy: { name: "asc" },
+      orderBy: { updatedAt: "desc" },
       skip: offset,
       ...(fetchAll ? {} : { take: limit }),
     }),
