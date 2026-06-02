@@ -1,4 +1,6 @@
-import { copy, outputJson, readJson, pathExists } from "fs-extra";
+import fsExtra from "fs-extra";
+
+const { copy, outputJson, readJson, pathExists } = fsExtra;
 import path from "path";
 import { fileURLToPath } from "url";
 import chalk from "chalk";
