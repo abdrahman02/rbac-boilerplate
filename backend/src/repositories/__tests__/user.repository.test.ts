@@ -71,9 +71,7 @@ describe("findAllUsersForExport", () => {
 
     await findAllUsersForExport();
 
-    expect(prisma.user.findMany).toHaveBeenCalledWith(
-      expect.objectContaining({ orderBy: { updatedAt: "desc" } }),
-    );
+    expect(prisma.user.findMany).toHaveBeenCalledWith(expect.objectContaining({ orderBy: { updatedAt: "desc" } }));
   });
 });
 
@@ -85,9 +83,7 @@ describe("findAllUsers", () => {
 
     await findAllUsers(1, 10);
 
-    expect(prisma.user.findMany).toHaveBeenCalledWith(
-      expect.objectContaining({ orderBy: { updatedAt: "desc" } }),
-    );
+    expect(prisma.user.findMany).toHaveBeenCalledWith(expect.objectContaining({ orderBy: { updatedAt: "desc" } }));
   });
 });
 
@@ -99,8 +95,6 @@ describe("findUsersForExport", () => {
 
     await findUsersForExport();
 
-    expect(prisma.user.findMany).toHaveBeenCalledWith(
-      expect.objectContaining({ orderBy: { updatedAt: "desc" } }),
-    );
+    expect(prisma.user.findMany).toHaveBeenCalledWith(expect.objectContaining({ orderBy: { updatedAt: "desc" } }));
   });
 });

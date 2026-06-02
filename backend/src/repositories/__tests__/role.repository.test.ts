@@ -72,9 +72,7 @@ describe("findAllRoles", () => {
 
     await findAllRoles(1, 10);
 
-    expect(prisma.role.findMany).toHaveBeenCalledWith(
-      expect.objectContaining({ orderBy: { updatedAt: "desc" } }),
-    );
+    expect(prisma.role.findMany).toHaveBeenCalledWith(expect.objectContaining({ orderBy: { updatedAt: "desc" } }));
   });
 });
 
@@ -115,8 +113,6 @@ describe("findAllRolesForExport", () => {
 
     await findAllRolesForExport();
 
-    expect(prisma.role.findMany).toHaveBeenCalledWith(
-      expect.objectContaining({ orderBy: { updatedAt: "desc" } }),
-    );
+    expect(prisma.role.findMany).toHaveBeenCalledWith(expect.objectContaining({ orderBy: { updatedAt: "desc" } }));
   });
 });
