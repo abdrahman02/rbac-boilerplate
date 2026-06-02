@@ -4,7 +4,8 @@
   "private": true,
   "workspaces": [
     "backend",
-    "frontend"
+    "frontend",
+    "packages/cli"
   ],
   "scripts": {
     "dev:backend": "npm run dev --workspace=backend",
@@ -20,6 +21,7 @@
     "create-admin": "tsx backend/scripts/create-admin.ts",
     "test": "npm run test --workspace=backend && npm run test --workspace=frontend",
     "lint": "npm run lint --workspace=backend && npm run lint --workspace=frontend",
-    "typecheck": "npm run typecheck --workspace=backend && npm run typecheck --workspace=frontend"
+    "typecheck": "npm run typecheck --workspace=backend && npm run typecheck --workspace=frontend",
+    "build:cli": "npm run build --workspace=packages/cli"
   }
 }

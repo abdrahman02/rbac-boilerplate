@@ -1,0 +1,36 @@
+{
+  "name": "create-rbac-app",
+  "version": "1.0.0",
+  "description": "Create a new RBAC boilerplate project with Express.js, Next.js, and MySQL",
+  "type": "module",
+  "bin": {
+    "create-rbac-app": "./bin/create-rbac-app.js"
+  },
+  "files": [
+    "bin/",
+    "dist/",
+    "templates/"
+  ],
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "prepack": "npm run build && node scripts/copy-templates.js"
+  },
+  "keywords": ["rbac", "boilerplate", "express", "nextjs", "mysql", "jwt", "starter"],
+  "license": "MIT",
+  "dependencies": {
+    "@inquirer/prompts": "^7.0.0",
+    "chalk": "^5.4.1",
+    "fs-extra": "^11.3.0"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^25.9.1",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.6"
+  }
+}
