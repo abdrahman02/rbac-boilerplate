@@ -733,7 +733,7 @@ Get user count per role.
   "success": true,
   "data": [
     { "role": "admin", "count": 2 },
-    { "role": "viewer", "count": 8 }
+    { "role": "user", "count": 8 }
   ]
 }
 ```

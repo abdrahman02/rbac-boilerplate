@@ -31,7 +31,7 @@ backend/
 │   ├── schema.prisma          # Database schema (single source of truth)
 │   └── migrations/            # SQL migration files (Prisma-managed)
 ├── seeders/
-│   └── seed.ts                # Seeds 13 permissions + 2 roles (upsert — safe to re-run)
+│   └── seed.ts                # Seeds 14 permissions + 2 roles (upsert — safe to re-run)
 ├── scripts/
 │   └── create-admin.ts        # Interactive admin user creation
 └── src/

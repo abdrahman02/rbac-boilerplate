@@ -35,21 +35,24 @@ permissions, audit logging, and an admin UI — ready to clone and customize.
 **Prerequisites:** Node.js 20+, MySQL 8+, npm
 
 ```bash
-# 1. Clone the repository
-git clone https://github.com/your-username/rbac-boilerplate.git my-dashboard
+npx create-rbac-app my-dashboard
 cd my-dashboard
+```
 
-# 2. Configure environment
+### Setup
+
+```bash
+# 1. Configure environment
 cp backend/.env.example backend/.env
 # Open backend/.env and fill in: DB_HOST, DB_NAME, DB_USER, DB_PASSWORD, JWT_ACCESS_SECRET, JWT_REFRESH_SECRET
 
-# 3. Install dependencies, migrate database, seed defaults, create admin
+# 2. Install dependencies, migrate database, seed defaults, create admin
 npm install
 npm run migrate
 npm run seed
 npm run create-admin
 
-# 4. Start development servers
+# 3. Start development servers
 npm run dev:backend   # http://localhost:3001
 npm run dev:frontend  # http://localhost:3000
 ```
@@ -92,15 +95,15 @@ rbac-boilerplate/
 
 After running `npm run seed`, the database contains:
 
-**Roles:** `admin`, `viewer`
+**Roles:** `admin`, `user`
 
-**Permissions (13):**
+**Permissions (14):**
 `users:read`, `users:create`, `users:update`, `users:delete`,
 `roles:read`, `roles:create`, `roles:update`, `roles:delete`,
 `permissions:read`, `permissions:create`, `permissions:update`, `permissions:delete`,
-`audit_logs:read`
+`audit_logs:read`, `notifications:create`
 
-The `admin` role has all 13 permissions. The `viewer` role has read-only permissions.
+The `admin` role has all 14 permissions. The `user` role has no permissions by default.
 
 ## License
 

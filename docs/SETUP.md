@@ -10,10 +10,10 @@ Step-by-step instructions for running RBAC Boilerplate locally.
 | npm | 10+ | `npm --version` |
 | MySQL | 8+ | `mysql --version` |
 
-## 1. Clone the Repository
+## 1. Create the Project
 
 ```bash
-git clone https://github.com/your-username/rbac-boilerplate.git my-dashboard
+npx create-rbac-app my-dashboard
 cd my-dashboard
 ```
 
@@ -83,7 +83,7 @@ npm run migrate:reset
 npm run seed
 ```
 
-Creates 13 permissions + 2 roles (`admin` gets all 13, `viewer` gets read-only permissions).
+Creates 14 permissions + 2 roles (\`admin\` gets all 14, \`user\` gets no permissions by default).
 
 ## 7. Generate Prisma Client
 
