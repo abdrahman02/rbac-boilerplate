@@ -14,10 +14,17 @@ const EXCLUDE_PATTERNS = [
   "src/generated",
   ".claude",
   "docs/superpowers",
+  ".superpowers",
   ".git",
+  "coverage",
 ];
 
-const EXCLUDE_BASENAMES = [".env", ".env.local", ".env.production"];
+const EXCLUDE_BASENAMES = [
+  ".env",
+  ".env.local",
+  ".env.production",
+  "tsconfig.tsbuildinfo",
+];
 
 function shouldExclude(src) {
   const basename = path.basename(src);

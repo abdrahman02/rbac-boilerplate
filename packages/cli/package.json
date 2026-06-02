@@ -4,7 +4,7 @@
   "description": "Create a new RBAC boilerplate project with Express.js, Next.js, and MySQL",
   "type": "module",
   "bin": {
-    "rbac-boilerplate": "./bin/rbac-boilerplate.js"
+    "rbac-boilerplate": "bin/rbac-boilerplate.js"
   },
   "files": [
     "bin/",
@@ -20,7 +20,15 @@
     "test:watch": "vitest",
     "prepack": "npm run build && node scripts/copy-templates.js"
   },
-  "keywords": ["rbac", "boilerplate", "express", "nextjs", "mysql", "jwt", "starter"],
+  "keywords": [
+    "rbac",
+    "boilerplate",
+    "express",
+    "nextjs",
+    "mysql",
+    "jwt",
+    "starter"
+  ],
   "license": "MIT",
   "dependencies": {
     "@inquirer/prompts": "^7.0.0",
