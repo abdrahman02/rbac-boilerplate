@@ -1,19 +1,23 @@
 #!/usr/bin/env node
-import { copy, emptyDir, ensureDir } from "fs-extra";
+import fsExtra from "fs-extra";
 import path from "path";
 import { fileURLToPath } from "url";
+
+const { copy, emptyDir, ensureDir, readJson, writeJson } = fsExtra;
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, "../../..");
 const TEMPLATES_DIR = path.resolve(__dirname, "../templates");
 
-const EXCLUDE_PATTERNS = [
+// Directory names to skip, matched as exact path segments (not substrings)
+// so that, e.g., a ".git" pattern never matches a ".gitignore" file.
+const EXCLUDE_DIRS = [
   "node_modules",
   ".next",
   "dist",
-  "src/generated",
+  "generated",
   ".claude",
-  "docs/superpowers",
+  "superpowers",
   ".superpowers",
   ".git",
   "coverage",
@@ -26,10 +30,41 @@ const EXCLUDE_BASENAMES = [
   "tsconfig.tsbuildinfo",
 ];
 
-function shouldExclude(src) {
-  const basename = path.basename(src);
-  if (EXCLUDE_BASENAMES.includes(basename)) return true;
-  return EXCLUDE_PATTERNS.some((pattern) => src.includes(pattern));
+/**
+ * Builds a filter for `fs-extra.copy`, evaluating paths relative to `srcRoot`
+ * so ancestor directories never cause false exclusions.
+ */
+function makeFilter(srcRoot) {
+  return (src) => {
+    const relative = path.relative(srcRoot, src);
+    if (relative === "") return true;
+
+    const segments = relative.split(path.sep);
+    if (segments.some((segment) => EXCLUDE_DIRS.includes(segment))) return false;
+    if (EXCLUDE_BASENAMES.includes(path.basename(src))) return false;
+    return true;
+  };
+}
+
+/**
+ * Removes monorepo-only entries from the scaffolded root package.json:
+ * the `packages/cli` workspace and its `build:cli` script do not exist in
+ * a generated project.
+ */
+async function cleanRootPackageJson() {
+  const pkgPath = path.join(TEMPLATES_DIR, "root", "package.json");
+  const pkg = await readJson(pkgPath);
+
+  if (Array.isArray(pkg.workspaces)) {
+    pkg.workspaces = pkg.workspaces.filter((w) => w !== "packages/cli");
+  }
+  if (pkg.scripts) {
+    delete pkg.scripts["build:cli"];
+  }
+  pkg.name = "rbac-app";
+  pkg.private = true;
+
+  await writeJson(pkgPath, pkg, { spaces: 2 });
 }
 
 async function main() {
@@ -39,13 +74,15 @@ async function main() {
   await ensureDir(path.join(TEMPLATES_DIR, "root"));
 
   console.log("  Copying backend/...");
-  await copy(path.join(REPO_ROOT, "backend"), path.join(TEMPLATES_DIR, "backend"), {
-    filter: (src) => !shouldExclude(src),
+  const backendSrc = path.join(REPO_ROOT, "backend");
+  await copy(backendSrc, path.join(TEMPLATES_DIR, "backend"), {
+    filter: makeFilter(backendSrc),
   });
 
   console.log("  Copying frontend/...");
-  await copy(path.join(REPO_ROOT, "frontend"), path.join(TEMPLATES_DIR, "frontend"), {
-    filter: (src) => !shouldExclude(src),
+  const frontendSrc = path.join(REPO_ROOT, "frontend");
+  await copy(frontendSrc, path.join(TEMPLATES_DIR, "frontend"), {
+    filter: makeFilter(frontendSrc),
   });
 
   console.log("  Copying root files...");
@@ -56,6 +93,9 @@ async function main() {
       console.warn(`  Warning: ${file} not found at root, skipping.`);
     });
   }
+
+  console.log("  Cleaning root package.json...");
+  await cleanRootPackageJson();
 
   console.log("Templates ready.\n");
 }

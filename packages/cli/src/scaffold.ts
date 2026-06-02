@@ -8,21 +8,39 @@ import chalk from "chalk";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const TEMPLATES_DIR = path.resolve(__dirname, "../templates");
 
-const EXCLUDE_PATTERNS = [
+// Directory names to skip, matched as exact path segments (not substrings).
+// Matching by segment avoids false positives when the package itself is
+// installed under a `node_modules/` path (e.g. via `npx`).
+const EXCLUDE_DIRS = [
   "node_modules",
   ".next",
   "dist",
-  "src/generated",
+  "generated",
   ".claude",
-  "docs/superpowers",
+  "superpowers",
+  ".superpowers",
+  ".git",
+  "coverage",
 ];
 
 const EXCLUDE_BASENAMES = [".env", ".env.local", ".env.production"];
 
-function shouldExclude(src: string): boolean {
-  const basename = path.basename(src);
-  if (EXCLUDE_BASENAMES.includes(basename)) return true;
-  return EXCLUDE_PATTERNS.some((pattern) => src.includes(pattern));
+/**
+ * Builds a filter for `fs-extra.copy` that decides which paths to keep.
+ * Paths are evaluated relative to `srcRoot` so that ancestor directories
+ * (such as a `node_modules/` folder the package is installed into) never
+ * cause every file to be excluded.
+ */
+function makeFilter(srcRoot: string): (src: string) => boolean {
+  return (src: string) => {
+    const relative = path.relative(srcRoot, src);
+    if (relative === "") return true; // always include the root itself
+
+    const segments = relative.split(path.sep);
+    if (segments.some((segment) => EXCLUDE_DIRS.includes(segment))) return false;
+    if (EXCLUDE_BASENAMES.includes(path.basename(src))) return false;
+    return true;
+  };
 }
 
 /**
@@ -35,13 +53,15 @@ export async function scaffoldProject(projectName: string): Promise<void> {
   console.log(chalk.cyan(`\n  Scaffolding into ${chalk.bold(projectName)}/...\n`));
 
   // Copy backend template, excluding unwanted directories
-  await copy(path.join(TEMPLATES_DIR, "backend"), path.join(targetDir, "backend"), {
-    filter: (src) => !shouldExclude(src),
+  const backendSrc = path.join(TEMPLATES_DIR, "backend");
+  await copy(backendSrc, path.join(targetDir, "backend"), {
+    filter: makeFilter(backendSrc),
   });
 
   // Copy frontend template, excluding unwanted directories
-  await copy(path.join(TEMPLATES_DIR, "frontend"), path.join(targetDir, "frontend"), {
-    filter: (src) => !shouldExclude(src),
+  const frontendSrc = path.join(TEMPLATES_DIR, "frontend");
+  await copy(frontendSrc, path.join(targetDir, "frontend"), {
+    filter: makeFilter(frontendSrc),
   });
 
   // Copy root-level files (package.json, .env.example, etc.) if they exist
