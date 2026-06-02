@@ -31,7 +31,7 @@ export async function findAllRoles(
         permissions: { include: { permission: { select: { name: true } } } },
         users: { select: { user: { select: { id: true, fullName: true } } } },
       },
-      orderBy: { name: "asc" },
+      orderBy: { updatedAt: "desc" },
       skip: offset,
       ...(fetchAll ? {} : { take: limit }),
     }),
@@ -122,7 +122,7 @@ export interface RoleExportRow {
 export async function findAllRolesForExport(): Promise<RoleExportRow[]> {
   const roles = await prisma.role.findMany({
     include: { _count: { select: { permissions: true } } },
-    orderBy: { name: "asc" },
+    orderBy: { updatedAt: "desc" },
   });
 
   return roles.map((r) => ({

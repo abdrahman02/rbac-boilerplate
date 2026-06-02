@@ -66,6 +66,16 @@ describe("findAllRoles", () => {
     expect(result.total).toBe(0);
     expect(result.rows).toEqual([]);
   });
+
+  it("sorts by updatedAt descending", async () => {
+    vi.mocked(prisma.$transaction).mockResolvedValueOnce([0, []] as never);
+
+    await findAllRoles(1, 10);
+
+    expect(prisma.role.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({ orderBy: { updatedAt: "desc" } }),
+    );
+  });
 });
 
 describe("findAllRolesForExport", () => {
@@ -98,5 +108,15 @@ describe("findAllRolesForExport", () => {
     const result = await findAllRolesForExport();
 
     expect(result).toEqual([]);
+  });
+
+  it("sorts by updatedAt descending", async () => {
+    vi.mocked(prisma.role.findMany).mockResolvedValueOnce([]);
+
+    await findAllRolesForExport();
+
+    expect(prisma.role.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({ orderBy: { updatedAt: "desc" } }),
+    );
   });
 });
