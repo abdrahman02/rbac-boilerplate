@@ -11,6 +11,11 @@ export const sseRegistry = {
   },
   push: (userId: number, event: string, data: unknown): void => {
     const res = registry.get(userId);
-    res?.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
+    if (!res) return;
+    try {
+      res.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
+    } catch {
+      registry.delete(userId);
+    }
   },
 };
