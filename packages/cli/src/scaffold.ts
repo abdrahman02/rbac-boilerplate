@@ -11,16 +11,15 @@ const EXCLUDE_PATTERNS = [
   ".next",
   "dist",
   "src/generated",
-  ".env",
   ".claude",
   "docs/superpowers",
 ];
 
-/**
- * Checks if the given path should be excluded from copying.
- * Returns true if the path matches any excluded pattern.
- */
+const EXCLUDE_BASENAMES = [".env", ".env.local", ".env.production"];
+
 function shouldExclude(src: string): boolean {
+  const basename = path.basename(src);
+  if (EXCLUDE_BASENAMES.includes(basename)) return true;
   return EXCLUDE_PATTERNS.some((pattern) => src.includes(pattern));
 }
 

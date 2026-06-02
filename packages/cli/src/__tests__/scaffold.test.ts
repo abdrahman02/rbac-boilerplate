@@ -42,10 +42,10 @@ describe("scaffoldProject", () => {
     expect(pkg.name).toBe("my-custom-project");
   });
 
-  it("copies .env.example to project root", async () => {
+  it("copies backend/.env.example", async () => {
     const { scaffoldProject } = await import("../scaffold.js");
     await scaffoldProject("test-project");
 
-    expect(fs.existsSync(path.join(tmpDir, "test-project", ".env.example"))).toBe(true);
+    expect(fs.existsSync(path.join(tmpDir, "test-project", "backend", ".env.example"))).toBe(true);
   });
 });

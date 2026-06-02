@@ -12,13 +12,16 @@ const EXCLUDE_PATTERNS = [
   ".next",
   "dist",
   "src/generated",
-  ".env",
   ".claude",
   "docs/superpowers",
   ".git",
 ];
 
+const EXCLUDE_BASENAMES = [".env", ".env.local", ".env.production"];
+
 function shouldExclude(src) {
+  const basename = path.basename(src);
+  if (EXCLUDE_BASENAMES.includes(basename)) return true;
   return EXCLUDE_PATTERNS.some((pattern) => src.includes(pattern));
 }
 
