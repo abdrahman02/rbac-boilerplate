@@ -40,8 +40,8 @@ git clone https://github.com/your-username/rbac-boilerplate.git my-dashboard
 cd my-dashboard
 
 # 2. Configure environment
-cp .env.example .env
-# Open .env and fill in: DB_HOST, DB_NAME, DB_USER, DB_PASSWORD, JWT_ACCESS_SECRET, JWT_REFRESH_SECRET
+cp backend/.env.example backend/.env
+# Open backend/.env and fill in: DB_HOST, DB_NAME, DB_USER, DB_PASSWORD, JWT_ACCESS_SECRET, JWT_REFRESH_SECRET
 
 # 3. Install dependencies, migrate database, seed defaults, create admin
 npm install
