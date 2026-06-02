@@ -41,23 +41,34 @@ cd my-dashboard
 
 ### Setup
 
+All commands below are run from inside the `my-dashboard/` directory.
+
 ```bash
 # 1. Configure environment
 cp backend/.env.example backend/.env
+cp frontend/.env.example frontend/.env.local
 # Open backend/.env and fill in: DB_HOST, DB_NAME, DB_USER, DB_PASSWORD, JWT_ACCESS_SECRET, JWT_REFRESH_SECRET
 
-# 2. Install dependencies, migrate database, seed defaults, create admin
+# 2. Create the MySQL database (run once in your MySQL client)
+#   CREATE DATABASE rbac_db;
+
+# 3. Install dependencies and generate the Prisma client
 npm install
+npm run prisma:generate
+
+# 4. Set up the database, then create an admin user
 npm run migrate
 npm run seed
 npm run create-admin
 
-# 3. Start development servers
+# 5. Start the dev servers (two terminals, both inside my-dashboard/)
 npm run dev:backend   # http://localhost:3001
 npm run dev:frontend  # http://localhost:3000
 ```
 
 Login at `http://localhost:3000/login` with the admin credentials you just created.
+
+See [docs/SETUP.md](docs/SETUP.md) for the full step-by-step guide and troubleshooting.
 
 ## Documentation
 

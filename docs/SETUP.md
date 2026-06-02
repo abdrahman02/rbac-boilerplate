@@ -17,10 +17,13 @@ npx rbac-boilerplate my-dashboard
 cd my-dashboard
 ```
 
+All remaining commands are run from inside the `my-dashboard/` directory.
+
 ## 2. Configure Environment
 
 ```bash
 cp backend/.env.example backend/.env
+cp frontend/.env.example frontend/.env.local
 ```
 
 Open `backend/.env` and set these required values:
@@ -39,7 +42,7 @@ JWT_ACCESS_SECRET=<your-random-secret-min-32-chars>
 JWT_REFRESH_SECRET=<your-different-random-secret-min-32-chars>
 ```
 
-**Frontend environment** (`frontend/.env.local`) is already configured to point to `http://localhost:3001`.
+`frontend/.env.local` already defaults to `NEXT_PUBLIC_API_URL=http://localhost:3001/api` — no changes needed for local development.
 
 ## 3. Create MySQL Database
 
@@ -54,13 +57,17 @@ FLUSH PRIVILEGES;
 
 Replace `rbac_password` with the value you set in `backend/.env`.
 
-## 4. Install Dependencies
+## 4. Install Dependencies & Generate Prisma Client
 
 ```bash
 npm install
+npm run prisma:generate
 ```
 
-This installs dependencies for both `backend/` and `frontend/` workspaces.
+`npm install` installs dependencies for both the `backend/` and `frontend/` workspaces.
+`npm run prisma:generate` produces the type-safe Prisma client at `backend/src/generated/prisma/`
+— this is **required** before seeding or running the app, and again after any change to
+`backend/prisma/schema.prisma`.
 
 ## 5. Run Migrations
 
@@ -83,18 +90,9 @@ npm run migrate:reset
 npm run seed
 ```
 
-Creates 14 permissions + 2 roles (\`admin\` gets all 14, \`user\` gets no permissions by default).
+Creates 14 permissions + 2 roles (`admin` gets all 14, `user` gets no permissions by default).
 
-## 7. Generate Prisma Client
-
-```bash
-npm run prisma:generate --workspace=backend
-```
-
-Generates the type-safe Prisma client to `backend/src/generated/prisma/`.
-Run this after any change to `backend/prisma/schema.prisma`.
-
-## 8. Create Admin User
+## 7. Create Admin User
 
 ```bash
 npm run create-admin
@@ -102,15 +100,20 @@ npm run create-admin
 
 Interactive prompt asks for name, email, and password. The user is created with the `admin` role and email pre-verified.
 
-## 9. Start Development Servers
+## 8. Start Development Servers
+
+Run each server in its own terminal — **both from inside the project directory** (`my-dashboard/`):
 
 ```bash
-# Terminal 1
+# Terminal 1 (in my-dashboard/)
 npm run dev:backend   # Express API → http://localhost:3001
 
-# Terminal 2
+# Terminal 2 (in my-dashboard/)
 npm run dev:frontend  # Next.js app → http://localhost:3000
 ```
+
+> If `npm run dev:backend` reports `Could not read package.json`, you are not inside the
+> project directory. Run `cd my-dashboard` first.
 
 Visit `http://localhost:3000/login` and log in with the admin credentials.
 
@@ -130,9 +133,13 @@ API documentation (Swagger UI): `http://localhost:3001/api/docs`
 | `npm run migrate:dev` | Create and apply a new migration |
 | `npm run seed` | Seed default roles and permissions |
 | `npm run create-admin` | Create admin user interactively |
-| `npm run prisma:generate --workspace=backend` | Regenerate Prisma client after schema changes |
+| `npm run prisma:generate` | Regenerate Prisma client after schema changes |
 
 ## Troubleshooting
+
+**`npm error enoent Could not read package.json`**
+You are running the command from the wrong directory. `cd` into the project folder
+(e.g. `cd my-dashboard`) before running any `npm run` command.
 
 **`Error: connect ECONNREFUSED 127.0.0.1:3306`**
 MySQL is not running. Start it with `brew services start mysql` (macOS) or `sudo systemctl start mysql` (Linux).
@@ -141,7 +148,7 @@ MySQL is not running. Start it with `brew services start mysql` (macOS) or `sudo
 The MySQL user or database was not created. Re-run the SQL commands in Step 3.
 
 **`PrismaClientKnownRequestError: does not provide an export named 'PrismaClient'`**
-Run `npm run prisma:generate --workspace=backend` to regenerate the client.
+Run `npm run prisma:generate` to regenerate the client.
 
 **`Error: JWT_ACCESS_SECRET must be at least 32 characters`**
 Your `backend/.env` has a placeholder value. Generate real secrets:
@@ -150,5 +157,5 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 ```
 
 **Frontend shows blank page or API errors**
-Confirm `frontend/.env.local` contains `NEXT_PUBLIC_API_URL=http://localhost:3001`
+Confirm `frontend/.env.local` contains `NEXT_PUBLIC_API_URL=http://localhost:3001/api`
 and that the backend server is running.

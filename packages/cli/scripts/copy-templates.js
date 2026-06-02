@@ -94,6 +94,14 @@ async function main() {
     });
   }
 
+  console.log("  Copying docs/...");
+  const docsSrc = path.join(REPO_ROOT, "docs");
+  await copy(docsSrc, path.join(TEMPLATES_DIR, "root", "docs"), {
+    filter: makeFilter(docsSrc),
+  }).catch(() => {
+    console.warn("  Warning: docs/ not found, skipping.");
+  });
+
   console.log("  Cleaning root package.json...");
   await cleanRootPackageJson();
 

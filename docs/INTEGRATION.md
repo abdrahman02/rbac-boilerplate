@@ -150,8 +150,8 @@ model Report {
 }
 ```
 
-Run migration: `npm run migrate:dev --workspace=backend`
-Regenerate client: `npm run prisma:generate --workspace=backend`
+Run migration: `npm run migrate:dev`
+Regenerate client: `npm run prisma:generate`
 
 ---
 
