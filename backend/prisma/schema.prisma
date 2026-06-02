@@ -23,6 +23,8 @@ model User {
   auditLogs               AuditLog[]
   emailVerificationTokens EmailVerificationToken[]
   passwordResetTokens     PasswordResetToken[]
+  createdNotifications    Notification[]     @relation("NotificationCreator")
+  notificationReads       NotificationRead[]
 
   @@index([email])
   @@map("users")
@@ -34,8 +36,9 @@ model Role {
   description String?  @db.Text
   createdAt   DateTime @default(now()) @map("created_at")
 
-  users       UserRole[]
-  permissions RolePermission[]
+  users             UserRole[]
+  permissions       RolePermission[]
+  notificationRoles NotificationRole[]
 
   @@index([name])
   @@map("roles")
@@ -138,4 +141,42 @@ model PasswordResetToken {
   @@index([tokenHash])
   @@index([userId])
   @@map("password_reset_tokens")
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement()) @db.UnsignedInt
+  title     String   @db.VarChar(255)
+  message   String   @db.Text
+  createdBy Int      @map("created_by") @db.UnsignedInt
+  createdAt DateTime @default(now()) @map("created_at")
+
+  creator User               @relation("NotificationCreator", fields: [createdBy], references: [id])
+  roles   NotificationRole[]
+  reads   NotificationRead[]
+
+  @@index([createdAt])
+  @@map("notifications")
+}
+
+model NotificationRole {
+  notificationId Int @map("notification_id") @db.UnsignedInt
+  roleId         Int @map("role_id") @db.UnsignedInt
+
+  notification Notification @relation(fields: [notificationId], references: [id], onDelete: Cascade)
+  role         Role         @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([notificationId, roleId])
+  @@map("notification_roles")
+}
+
+model NotificationRead {
+  notificationId Int      @map("notification_id") @db.UnsignedInt
+  userId         Int      @map("user_id") @db.UnsignedInt
+  readAt         DateTime @default(now()) @map("read_at")
+
+  notification Notification @relation(fields: [notificationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([notificationId, userId])
+  @@map("notification_reads")
 }
