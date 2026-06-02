@@ -18,6 +18,7 @@ const ERROR_MAP: Record<string, { status: number; message: string }> = {
   ALREADY_VERIFIED: { status: 400, message: "Your email address is already verified." },
   INVALID_RESET_TOKEN: { status: 400, message: "This reset link is invalid or has already been used." },
   RESET_TOKEN_EXPIRED: { status: 400, message: "This reset link has expired. Please request a new one." },
+  NOTIFICATION_NOT_FOUND: { status: 404, message: "Notification not found." },
 };
 
 export function handleError(res: Response, err: unknown): void {

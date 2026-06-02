@@ -32,6 +32,7 @@ const DEFAULT_PERMISSIONS = [
   { name: 'permissions:update', description: 'Update existing permissions' },
   { name: 'permissions:delete', description: 'Delete permissions' },
   { name: 'audit_logs:read', description: 'View audit logs' },
+  { name: 'notifications:create', description: 'Broadcast notifications to selected roles' },
 ]
 
 const DEFAULT_ROLES = [
