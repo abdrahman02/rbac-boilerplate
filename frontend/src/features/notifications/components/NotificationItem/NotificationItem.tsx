@@ -2,6 +2,7 @@
 import { memo } from "react";
 import { Button } from "@/shared/components/ui/Button";
 import { formatRelative } from "@/shared/lib/format-date";
+import { useMarkAsRead } from "../../hooks";
 import type { Notification } from "../../types";
 import { notificationItem } from "./NotificationItem.variants";
 
@@ -11,6 +12,15 @@ interface NotificationItemProps {
 }
 
 export const NotificationItem = memo(function NotificationItem({ notification, onReadMore }: NotificationItemProps) {
+  const markAsRead = useMarkAsRead();
+
+  function handleReadMore(): void {
+    if (!notification.is_read) {
+      markAsRead.mutate(notification.id);
+    }
+    onReadMore(notification);
+  }
+
   return (
     <div className={notificationItem({ read: notification.is_read })}>
       <div className="flex items-start justify-between gap-2">
@@ -28,7 +38,7 @@ export const NotificationItem = memo(function NotificationItem({ notification, o
       <Button
         variant="ghost"
         size="sm"
-        onClick={() => onReadMore(notification)}
+        onClick={handleReadMore}
         className="text-xs text-primary underline-offset-2 hover:underline h-auto p-0 pl-3 font-normal"
       >
         baca selengkapnya
