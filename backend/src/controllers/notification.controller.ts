@@ -16,7 +16,14 @@ export const streamNotifications = asyncHandler(async (req, res) => {
   sseRegistry.add(userId, res);
 
   const heartbeat = setInterval(() => {
-    res.write(": keep-alive\n\n");
+    try {
+      if (!res.destroyed && !res.writableEnded) {
+        res.write(": keep-alive\n\n");
+      }
+    } catch {
+      clearInterval(heartbeat);
+      sseRegistry.remove(userId);
+    }
   }, 30_000);
 
   req.on("close", () => {
