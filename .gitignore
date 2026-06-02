@@ -45,3 +45,7 @@ coverage/
 
 # Misc
 *.pem
+
+# CLI package — generated at publish time
+packages/cli/templates/
+packages/cli/dist/
