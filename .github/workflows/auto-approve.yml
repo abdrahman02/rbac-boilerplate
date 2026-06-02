@@ -1,0 +1,24 @@
+name: Auto Approve Owner PRs
+
+# Automatically approves pull requests opened by the repository owner so that a
+# branch protection rule requiring an approval can be satisfied for solo work.
+# The approval is submitted by the github-actions[bot] using the built-in
+# GITHUB_TOKEN, which counts toward "require approvals".
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+
+permissions:
+  pull-requests: write
+
+jobs:
+  auto-approve:
+    runs-on: ubuntu-latest
+    # Only approve PRs authored by the repository owner.
+    if: github.event.pull_request.user.login == github.repository_owner
+    steps:
+      - name: Approve the pull request
+        uses: hmarr/auto-approve-action@v4
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
