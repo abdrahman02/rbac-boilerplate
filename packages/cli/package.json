@@ -1,6 +1,6 @@
 {
   "name": "rbac-boilerplate",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Create a new RBAC boilerplate project with Express.js, Next.js, and MySQL",
   "type": "module",
   "bin": {
