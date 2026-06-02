@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "sonner";
 import "./globals.css";
+import { TOAST_OPTIONS } from "@/shared/lib/toast-config";
 import { QueryProvider } from "@/shared/providers/QueryProvider";
 
 export const metadata: Metadata = {
@@ -17,7 +18,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
       <body className="min-h-screen antialiased">
         <QueryProvider>{children}</QueryProvider>
-        <Toaster position="top-right" theme="system" gap={8} offset={16} />
+        <Toaster position="top-right" theme="system" gap={8} offset={16} toastOptions={TOAST_OPTIONS} />
       </body>
     </html>
   );
