@@ -26,6 +26,11 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # templates/ is gitignored & generated from backend/frontend/docs.
+      # The scaffold tests copy from it, so it must exist before testing.
+      - name: Generate templates
+        run: node packages/cli/scripts/copy-templates.js
+
       - name: Run tests (CLI)
         run: npm test --workspace=packages/cli
 
