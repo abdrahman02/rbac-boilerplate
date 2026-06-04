@@ -1,7 +1,7 @@
 {
   "name": "rbac-boilerplate",
-  "version": "1.0.3",
-  "description": "Create a new RBAC boilerplate project with Express.js, Next.js, and MySQL",
+  "version": "1.0.4",
+  "description": "RBAC boilerplate & starter kit — full-stack Role-Based Access Control with Express.js, Next.js, Prisma, MySQL & JWT auth. Scaffold a production-ready dashboard with users, roles, permissions, and audit logging in one command.",
   "type": "module",
   "bin": {
     "rbac-boilerplate": "bin/rbac-boilerplate.js"
@@ -22,14 +22,44 @@
   },
   "keywords": [
     "rbac",
+    "rbac-boilerplate",
+    "role-based-access-control",
     "boilerplate",
+    "starter",
+    "starter-kit",
+    "template",
+    "scaffold",
+    "authentication",
+    "authorization",
+    "permissions",
+    "roles",
+    "acl",
+    "access-control",
+    "admin-dashboard",
+    "dashboard",
+    "fullstack",
     "express",
+    "expressjs",
     "nextjs",
+    "react",
+    "nodejs",
+    "typescript",
+    "prisma",
     "mysql",
     "jwt",
-    "starter"
+    "audit-log"
   ],
   "license": "MIT",
+  "author": "M. Abdul Rahman <mabdulr44@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/abdrahman02/rbac-boilerplate.git",
+    "directory": "packages/cli"
+  },
+  "homepage": "https://github.com/abdrahman02/rbac-boilerplate#readme",
+  "bugs": {
+    "url": "https://github.com/abdrahman02/rbac-boilerplate/issues"
+  },
   "dependencies": {
     "@inquirer/prompts": "^7.0.0",
     "chalk": "^5.4.1",
